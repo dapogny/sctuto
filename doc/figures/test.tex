@@ -1,0 +1,309 @@
+\documentclass[10pt]{amsart}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
+%\geometry{landscape}                % Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}
+\usepackage{dsfont}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{epstopdf}
+\usepackage{fullpage}
+\usepackage{enumerate}
+\usepackage{color,subcaption}
+\usepackage{amsthm}
+\usepackage{placeins}
+\usepackage{array}
+\usepackage{blkarray}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{morefloats}
+\usepackage{pgfplots}
+\usepackage[abs]{overpic}
+\usepackage{gensymb} % For the degree symbol
+
+%\usepackage{subfigure}
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning}
+\usepackage{algorithm,algorithmic}
+\usepackage{listings}
+
+%% References and call to Sections
+\usepackage[colorlinks=true]{hyperref}
+\usepackage[nameinlink,capitalise]{cleveref}
+\crefname{equation}{}{}
+
+%New line after subsection or subsubsection
+\makeatletter
+\def\subsection{\@startsection{subsection}{3}%
+  \z@{.5\linespacing\@plus.7\linespacing}{.5\linespacing}%
+  {\bf}}
+\makeatother
+
+\makeatletter
+\def\subsubsection{\@startsection{subsubsection}{3}%
+  \z@{.5\linespacing\@plus.7\linespacing}{.5\linespacing}%
+  {\it}}
+\makeatother
+
+\usepackage{amsopn}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+% For listings
+\definecolor{mygray}{rgb}{1.0,0.95,0.90}
+\definecolor{truegray}{rgb}{0.9,0.9,0.9}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygreen2}{rgb}{0,0.8,0}
+\definecolor{mypink}{rgb}{1.0,0.56,0.81}
+\lstdefinestyle{ff}%
+{% 
+    language = C++,
+    basicstyle=\ttfamily,
+    backgroundcolor=\color{truegray},
+    frame=tlbr,framesep=4pt,framerule=1pt,
+    captionpos=b,
+    commentstyle=\color{mygreen},
+    emph=[1]% Important types
+    {%
+        macro,
+        border,
+        fespace,
+    },
+    emphstyle=[1]{\bf\color{blue}},
+    %
+    emph=[2]% Variable Types
+    {%
+        varf,
+        matrix,
+        real,
+        string,
+        int,
+        Vh,
+        Vh0,
+        Vh0i,
+        Vh2,
+        Vhi,
+        mesh,
+    },
+  emphstyle=[2]{\bf\color{black}},
+  %
+    emph=[3]% minor or usual commands
+    {%
+        int2d,
+        int1d,
+        on,
+        readmesh,
+        savemesh,
+         load,
+        include,
+        trunc,
+    },
+  emphstyle=[3]{\bf\color{violet}},
+  %
+      emph=[4]% Important commands
+    {%
+        EigenValue,
+        buildmesh,
+        adaptmesh,
+        movemesh,
+        checkmovemesh,
+         solve,
+        problem,
+        laplace,
+        elas,
+    },
+  emphstyle=[4]{\color{red} \bfseries},  
+  %
+        emph=[5]% Personal macros
+    {%
+        volfrac,
+        readsol,
+        advectRedist,
+        normalvec,
+        curvature
+    },
+  emphstyle=[5]{\color{mygreen2} \bfseries}, 
+}
+
+\lstdefinestyle{shell}%
+{% 
+    basicstyle=\ttfamily\color{white},
+         frame=tlbr,framesep=4pt,framerule=1pt,
+    backgroundcolor=\color{black},
+    captionpos=b,
+     emph=[1]
+    {
+        python,
+    },
+    emphstyle=[1]{\color{red}\bfseries},
+}
+
+\lstdefinelanguage{mypython}{
+   basicstyle=\ttfamily\color{black},
+  morekeywords = [1]{print,format},
+  morekeywords = [2]{if,else,and,or,break,continue,def},
+  keywordstyle = [1]\bf\color{lightgray},
+  keywordstyle = [2]{\bf\color{mypink}},
+  morestring=[b]",
+  stringstyle = {\color{lightgray}},
+  morecomment=[l]{\#},
+}
+
+\lstdefinestyle{python}%
+{% 
+    language = mypython,
+     commentstyle=\color{mygreen},   
+     frame=tlbr,framesep=4pt,framerule=1pt,
+     showstringspaces=false,
+    backgroundcolor=\color{mygray},
+    captionpos=b,
+    % Modules
+     emph=[1]
+    {%
+        mechtools,
+        mshtools,
+        inigeom,
+        inout, 
+        lstools,
+        path,
+        subprocess,
+    },
+    emphstyle=[1]{\bf\color{blue}},
+    %
+  }
+
+
+
+
+
+%%%% To get table of contents %%%%%%%%
+\setcounter{tocdepth}{2}% to get subsubsections in toc
+
+\let\oldtocsection=\tocsection
+
+\let\oldtocsubsection=\tocsubsection
+
+\let\oldtocsubsubsection=\tocsubsubsection
+
+\renewcommand{\tocsection}[2]{\hspace{0em}\oldtocsection{#1}{#2}\textbf}
+\renewcommand{\tocsubsection}[2]{\hspace{1em}\oldtocsubsection{#1}{#2}}
+\renewcommand{\tocsubsubsection}[2]{\hspace{2em}\oldtocsubsubsection{#1}{#2}}
+
+\newenvironment{resume}
+  {\renewcommand\abstractname{R\'esum\'e}\begin{abstract}}
+  {\end{abstract}}
+  
+
+
+%%%%%%%%%%%%%%%%%%% Macros %%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\dv}{\text{\rm div}}
+\renewcommand{\dim}{\text{\rm dim}}
+\renewcommand{\o}{\text{\rm o}}
+\newcommand{\hhat}{\widehat{h}}
+\renewcommand{\d}{\text{\rm d}}
+\newcommand{\capa}{\text{\rm cap}}
+\newcommand{\com}{\text{\rm com}}
+\newcommand{\incle}{\omega_{\sigma,\varepsilon}}
+\newcommand{\tr}{\text{\rm tr}}
+\newcommand{\supp}{\text{\rm supp}}
+\newcommand{\e}{\varepsilon}
+\newcommand{\I}{\text{\rm I}}
+\newcommand{\Id}{\text{\rm Id}}
+\newcommand{\jac}{\text{\rm Jac}}
+\newcommand{\Ran}{\text{\rm Ran}}
+\newcommand{\hf}{\mathfrak{h}}
+\newcommand{\Per}{\text{\rm Per}}
+\newcommand{\calP}{{\mathcal P}}
+\newcommand{\calK}{{\mathcal K}}
+\newcommand{\calC}{{\mathcal C}}
+\newcommand{\calF}{{\mathcal F}}
+\newcommand{\calH}{{\mathcal H}}
+\newcommand{\calD}{{\mathcal D}}
+\newcommand{\calQ}{{\mathcal Q}}
+\newcommand{\calS}{{\mathcal S}}
+\newcommand{\calM}{{\mathcal M}}
+\newcommand{\calO}{{\mathcal O}}
+\newcommand{\calT}{{\mathcal T}}
+\newcommand{\calTt}{{\mathcal T}_{\text{\rm temp}}}
+\newcommand{\caliT}{{\mathcal T}_{\text{\rm int}}}
+\newcommand{\caleT}{{\mathcal T}_{\text{\rm ext}}}
+\newcommand{\calU}{{\mathcal U}}
+\newcommand{\calW}{{\mathcal W}}
+\newcommand{\Vol}{\text{\rm Vol}}
+\newcommand{\Winfty}{W^{1,\infty}(\mathbb{R}^d,\mathbb{R}^d)}
+\newcommand{\R}{{\mathbb R}}
+\renewcommand{\P}{{\mathbb P}}
+\newcommand{\Q}{{\mathbb Q}}
+\newcommand{\dist}{\text{\rm dist}}
+\newcommand{\CD}[1]{{\color{blue}{#1}}}
+% Just look for "alert" in your .tex or for "fixme" in your .pdf to find things to be fixed
+
+\usepackage{soul,xcolor}
+\setstcolor{violet}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{problem}{Problem}[section]
+\newtheorem{remark}{Remark}[section]
+\newtheorem{example}{Example}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{proposition}{Proposition}[section]
+\numberwithin{equation}{section}
+
+
+\title{Insensitizing control with respect to the domain}
+\author{
+B. Wayne
+}
+
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{center}
+\emph{\textsuperscript{1} Gotham City
+}
+
+\end{center}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bigskip
+\bigskip
+\hrule
+\tableofcontents
+\vspace{-0.5cm}
+\hrule
+\bigskip
+\bigskip
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{figure}
+\begin{center}
+\begin{tabular}{cc}
+\begin{minipage}{0.42\textwidth}
+\begin{overpic}[width=1.0\textwidth]{./diagstrain}
+\put(0,-20){\fcolorbox{black}{white}{$a$}}
+\end{overpic}
+\end{minipage} &
+\begin{minipage}{0.34\textwidth}
+\begin{overpic}[width=1.0\textwidth]{./offdiagstrain}
+\put(0,-20){\fcolorbox{black}{white}{$b$}}
+\end{overpic}
+\end{minipage}
+\end{tabular}
+\end{center}
+\caption{\it Physical interpretation of the entries of the strain tensor $e(u)(x)$; (a) The diagonal entry $e(u)(x)_{ii}$ appraises the variation of the segment $[x,x+he_i]$ after deformation; (b) The off-diagonal entry $e(u)(x)_{12}$ measures the variation of the angle between $[x,x+he_1]$ and $[x,x+he_2]$ after deformation.}
+\label{fig.illusstrain}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{siam}
+\bibliography{/Users/dapogny/Documents/genbib.bib}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

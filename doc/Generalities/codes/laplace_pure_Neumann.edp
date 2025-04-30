@@ -1,0 +1,66 @@
+/* Resolution of the Laplace equation with pure Neumann B.C.*/
+load "medit"
+
+/* Definition of the boundary curves of the domain */
+border Gammain(t=0.0,1.0){ x=0.0 ; y=1.0-t; label=1;};
+border bot(t=0.0,1.0){ x=t ; y=0.25*t; label=0;};
+border Gammaout(t=0.0,0.5){ x=1.0 ; y=0.25+t; label=2;};
+border top(t=0,1.0){ x=1.0-t ; y=0.75+0.25*t; label=0;};
+
+/* Build mesh, display and save as a .mesh file */
+mesh Th = buildmesh(Gammain(100)+bot(100)+Gammaout(50)+top(100));
+plot(Th,wait=1);
+
+/* Definition of Finite Element spaces and functions */
+fespace Vh(Th,P1);
+Vh u,v;
+
+/* Source term */
+real gin = 1.0;
+real gout = -2.0;
+real eps = 1.e-3;
+real mv,l;
+
+/**********************************************/
+/* Resolution of the problem via penalization */
+/**********************************************/
+problem lappen(u,v,solver=CG) = int2d(Th)(dx(u)*dx(v)+dy(u)*dy(v) + eps*(u*v)) 
+                                - int1d(Th,1)(gin*v)
+                                - int1d(Th,2)(gout*v);
+
+lappen; 
+/* Subtract mean value */
+mv = 1.0/Th.area*int2d(Th)(u);
+u = u - mv;
+
+/*********************************************************/
+/* Resolution of the problem using Lagrange multipliers */
+/********************************************************/
+
+int nv = Vh.ndof;
+
+/* Bilinear form for the Laplace equation */
+varf varlap(u,v) = int2d(Th)(dx(u)*dx(v)+dy(u)*dy(v));
+
+/* Bilinear form for the additional np*1 block */
+varf vb(u,v) = int2d(Th)(1.0*v);
+
+matrix A = varlap(Vh,Vh); // matrix with size nv*nv
+real[int] B = vb(0,Vh); // Column bloc with size nv*1
+
+/* Matrix of the augmented problem */
+matrix Aa = [[A,B],[B',0]]; // B' = transpose of B
+
+/* Construction of the right-hand side */
+varf vrhs(u,v) =  int1d(Th,1)(gin*v) + int1d(Th,2)(gout*v);
+real[int] b = vrhs(0,Vh);
+real[int] ba(nv+1);
+ba = [b,0.0];
+
+/* Inversion of the augmented system */
+set(Aa,solver=UMFPACK);
+real[int] ua = Aa^-1*ba;
+[u[],l] = ua;  // Comprehension of vector ua
+
+savemesh(Th,"heatpn2.mesh");
+savesol("heatpn2.sol",Th,u);
