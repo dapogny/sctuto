@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-python@v5
       - name: Install dependencies
         run: |
-          pip install sphinx sphinx_rtd_theme myst_parser sphinx_togglebutton sphinxcontrib.bibtex sphinx_proof sphinx_math_dollar
+          pip install sphinx sphinx_rtd_theme myst_parser sphinx_togglebutton sphinxcontrib.bibtex sphinx_proof sphinx_math_dollar sphinx.ext.mathjax
       - name: Sphinx build
         run: |
           sphinx-build doc _build
