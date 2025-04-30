@@ -1,0 +1,65 @@
+/* Calculation of the mean curvature of the borders of an input mesh
+  The two components of the normal vector field are passed as real[int] with size Th.nv */
+func int curvatureFromMesh(mesh & Th, real[int] & nx, real[int] & ny, real[int] & kappa ) {
+  int np = Th.nv;
+  int ne = Th.nbe; // number of boundary edges
+  int[int] nbpass(np);
+  int ip0,ip1,i,j;
+  real ps,ktmp;
+  real epscurv = 1.e-20;
+  real[int] n0(2),u(2);
+  real[int] kappa1(np),kappa2(np);
+  nbpass = 0;
+
+  /* Travel boundary edges */
+  for (int k=0; k<ne; k++) {
+    /* Travel both endpoints of the boundary edge */
+    for (i=0; i<2; i++) {
+      ip0 = Th.be(k)[i];
+    
+      /* Other endpoint */
+      j = (i+1) % 2;
+      ip1 = Th.be(k)[j];
+    
+      /* Coordinates of vector supporting the edge */
+      u[0] = Th(ip1).x - Th(ip0).x;
+      u[1] = Th(ip1).y - Th(ip0).y;
+    
+      /* Normal vector at ip0 */
+      n0[0] = nx[ip0]; n0[1] = ny[ip0];
+    
+      /* Add contribution to ip0 */
+      ps = n0[0]*u[0] + n0[1]*u[1];
+      ps *= -1.0;
+    
+      ktmp = (u[0]^2+u[1]^2) / (ps+epscurv);
+      if ( nbpass[ip0] == 0 ) {
+        kappa1[ip0] = ktmp;
+        nbpass[ip0]++;
+      }
+      else if ( nbpass[ip0] == 1 ) {
+        kappa2[ip0] = ktmp;
+        nbpass[ip0]++;
+      }
+      /* Else (case of triple points) replace the value with lowest radius of curvature */
+      else if (( abs(kappa1[ip0]) < abs(kappa2[ip0]) ) && ( abs(kappa1[ip0]) < abs(ktmp) )) {
+        kappa1[ip0] = ktmp;
+      }
+      else if (( abs(kappa2[ip0]) < abs(kappa1[ip0]) ) && ( abs(kappa2[ip0]) < abs(ktmp) )) {
+        kappa2[ip0] = ktmp;
+      }
+    }
+  }
+ 
+  /* Final formula */
+  kappa = 0.0;
+  for (int k=0; k<np; k++) {
+    if ( nbpass[k] == 0 ) continue;
+    kappa[k] = 1.0/(epscurv + kappa1[k] + kappa2[k]);
+    kappa[k] *= 4.0;
+  }
+  
+  return(1);
+}
+
+

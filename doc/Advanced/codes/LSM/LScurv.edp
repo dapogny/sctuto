@@ -1,0 +1,69 @@
+/* Calculation of the curvature of the boundary of a 2d domain from the datum of a level set function */
+load "medit"
+
+/* Output files */
+string MESH         = "box.mesh";
+string NVEC         = "normal.sol";
+string KAPPA        = "kappa.sol";
+string KAPPAEX      = "kappatem.sol";
+
+/* Creation of the mesh of a square */
+int npb = 100;
+border left(t=0,1) {x=0.0; y=1.0-t; label=0; }
+border bot(t=0,1) {x=t; y=0.0; label=0; }
+border right(t=0,1) {x=1.0; y=t; label=0; }
+border top(t=0,1) {x=1.0-t; y=1.0; label=0; }
+
+mesh Th = buildmesh(left(npb)+bot(npb)+right(npb)+top(npb));
+
+/* Finite Element spaces and functions */
+fespace Vh(Th,P1);
+fespace Vh0(Th,P0);
+Vh    nx,ny,kappa,v,kappaex,phi,norm1;
+Vh0   nx0,ny0,norm0;
+real  EPS = 1.e-10;
+real  alpha = 0.02;
+
+/* Creation of a level set function for the disk B(p_0,1.2) */
+real x0 = 0.5;
+real y0 = 0.5;
+real R   = 0.25;
+
+func anaLS = sqrt((x-x0)^2 + (y-y0)^2) - R;
+phi = anaLS;
+
+/* Calculation of the components (nx,ny) of the normal vector field n = \frac{\nabla\phi}{\lvert\nabla\phi\lvert} as P0 functions */
+norm0 = sqrt( dx(phi)^2 + dy(phi)^2 + EPS );
+nx0 = dx(phi) / norm0;
+ny0 = dy(phi) / norm0;
+
+/* Reconstruction of a P1 vector field for the normal vector;
+   Add a small smoothing with the Laplacian term \alpha^2 \Delta u */
+problem normalx(nx,v) = int2d(Th)( alpha^2*(dx(nx)*dx(v)+dy(nx)*dy(v)) + nx*v )
+                         - int2d(Th)( nx0*v);
+
+problem normaly(ny,v) = int2d(Th)( alpha^2*(dx(ny)*dx(v)+dy(ny)*dy(v)) + ny*v )
+                         - int2d(Th)( ny0*v);
+                         
+normalx;
+normaly;
+
+norm1 = sqrt( nx^2 + ny^2 + EPS );
+nx = nx / norm1;
+ny = ny / norm1;
+                         
+/* Reconstruction of the mean curvature by solving an approximate problem */
+problem curv(kappa,v) = int2d(Th)( 4.0*alpha^2*(dx(kappa)*dx(v)+dy(kappa)*dy(v)) + kappa*v )
+                    + int2d(Th)( nx0*dx(v)+ny0*dy(v) )
+                    - int1d(Th,0)( (nx*N.x+ny*N.y)*v);
+
+curv;
+
+/* Analytical curvature (for comparison) */
+kappaex = 1 / ( EPS + sqrt((x-x0)^2 + (y-y0)^2));
+
+/* Save mesh and solutions */
+savemesh(Th,MESH);
+savesol(NVEC,Th,[nx,ny]);
+savesol(KAPPA,Th,kappa);
+savesol(KAPPAEX,Th,kappaex);
