@@ -15,13 +15,15 @@ Before getting started, let us highlight a few useful references.
 
   - The online `$\texttt{FreeFem}$ documentation <https://doc.freefem.org/introduction/index.html>`_  is a very rich source of various physical problems addressed with $\texttt{FreeFem}$.
   
+  - The `online \texttt{FreeFem} tutorial <https://joliv.et/FreeFem-tutorial/>`_ by `P. Jolivet <https://joliv.et/>`_ is full of interesting mathematical models and advanced $\texttt{FreeFem}$ syntax elements.
+  
   - The recent book :cite:`hecht2024pde` is focused on PDE-constrained optimization problems, solved with $\texttt{FreeFem}$. It can be freely downloaded `here <https://hal.science/hal-04724788/>`_.
 
 Additionally, other online tutorials are available about (more or less closely) related topics: 
   
-  - The amazing `Numerical Tours <http://www.numerical-tours.com/>`_ by G. Peyré offer an exhaustive overview of multiple issues in imaging and learning.
+  - The amazing `Numerical Tours <http://www.numerical-tours.com/>`_ by `G. Peyré <https://www.gpeyre.com/>`_  offer an exhaustive overview of multiple issues in imaging and learning.
   
-  - The `Numerical Tours in continuum mechanics <https://comet-fenics.readthedocs.io/en/latest/index.html>`_ by J. Bleyer revolve around various models in continuum mechanics. 
+  - The `Numerical Tours in continuum mechanics <https://comet-fenics.readthedocs.io/en/latest/index.html>`_ by `J. Bleyer <https://navier-lab.fr/equipe/bleyer-jeremy/>`_  revolve around various models in continuum mechanics. 
   
   - The `NGSolve tutorials <https://docu.ngsolve.org/ngs24/intro.html>`_ contain presentations of a full series of physical models, and their solution with the software $\texttt{NGSolve}$.
 
