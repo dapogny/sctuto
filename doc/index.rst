@@ -15,7 +15,7 @@ Before getting started, let us highlight a few useful references.
 
   - The online `$\texttt{FreeFem}$ documentation <https://doc.freefem.org/introduction/index.html>`_  is a very rich source of various physical problems addressed with $\texttt{FreeFem}$.
   
-  - The `online \texttt{FreeFem} tutorial <https://joliv.et/FreeFem-tutorial/>`_ by `P. Jolivet <https://joliv.et/>`_ is full of interesting mathematical models and advanced $\texttt{FreeFem}$ syntax elements.
+  - The `online $\texttt{FreeFem}$ tutorial <https://joliv.et/FreeFem-tutorial/>`_ by `P. Jolivet <https://joliv.et/>`_ is full of interesting mathematical models and advanced $\texttt{FreeFem}$ syntax elements.
   
   - The recent book :cite:`hecht2024pde` is focused on PDE-constrained optimization problems, solved with $\texttt{FreeFem}$. It can be freely downloaded `here <https://hal.science/hal-04724788/>`_.
 
