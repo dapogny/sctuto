@@ -56,7 +56,7 @@ In turn, this task is realized by decomposing $\partial\Omega$ into several elem
 .. #################@
 
 .. _fig.LShape3dLayout:
-.. figure:: ../figures/LShape3dLayout.png
+.. figure:: ../figures/Lshape3dLayout.png
    :scale: 35 %
 
    Construction layout of the surface mesh for $\partial\Omega$. The normal vectors to $\partial \Omega$, pointing outward $\Omega$ are represented by blue arrows. The conformity of the surface mesh resulting from this construction plan requires that the discretizations of the bottom part of  $\texttt{Thang2}$ and the top part of $\texttt{Thang1}$ agree.
