@@ -1,0 +1,40 @@
+/* Reading .mesh and .sol files */
+/* Load visualization tool */
+load "medit"
+
+/* Paths to files */
+string MESH = "./lluke.mesh";
+string SOL  = "./lluke.sol";
+
+/* Reading the mesh */
+mesh Th = readmesh(MESH);
+
+/* Finite Element spaces and functions */
+fespace Vh(Th,P1);
+Vh phi;
+
+/* Read a .sol file containing a scalar-valued solution */
+ifstream fin(SOL);
+string s;
+int nv;
+  
+/* Read header */
+for(int i=0; i<5; i++) {
+  fin >> s;
+}
+  
+/* Parse number of vertices */
+fin >> nv;
+    
+/* Read header (bis) */
+for(int i=0; i<2; i++) {
+  fin >> s;
+}
+      
+/* Read values of the solution */
+for(int i=0; i<nv; i++) {
+  fin >> phi[][i];
+}
+
+/* Display the result */
+plot(Th,phi,fill=1,wait=1);

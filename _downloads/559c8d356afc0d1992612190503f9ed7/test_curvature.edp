@@ -1,0 +1,34 @@
+/* Resolution of a model bifluid problem: Couette flow with an elliptic droplet */
+load "medit"
+include "curvature.idp"
+
+/* Definition of the domain */
+border left(t=0.0,1.0){x=0.0; y=1.0-t; label = 0;}
+border bot(t=0.0,1.0){x=t; y=0.0; label = 1;}
+border right(t=0.0,1.0){x=1.0; y=t; label = 2;}
+border top(t=0.0,1.0){x=1.0-t; y=1.0; label = 3;}
+border ellipse(t=0.0,1.0) {x=0.2*cos(2.0*pi*t)+0.5; y=0.1*sin(2.0*pi*t)+0.5; label=10;}
+
+mesh Th= buildmesh(left(40)+bot(40)+right(40)+top(40)+ellipse(100));
+savemesh(Th,"box.mesh");
+
+/* Finite element spaces and functions */
+fespace Vh(Th,P1);
+Vh nx,ny,kappa,norm;
+
+/* Calculation of the normal vector to all borders of the mesh */
+real EPS = 1.e-5;
+varf normalx(u,v) = int1d(Th)(N.x*v);
+varf normaly(u,v) = int1d(Th)(N.y*v);
+
+nx[] = normalx(0,Vh);
+ny[] = normaly(0,Vh);
+norm = sqrt(nx^2+ny^2+EPS^2);
+nx = nx / norm;
+ny = ny / norm;
+
+/* Calculation of the mean curvature */
+curvatureFromMesh(Th,nx[],ny[],kappa[]);
+
+/* Save the result */
+savesol("box.sol",Th,kappa);

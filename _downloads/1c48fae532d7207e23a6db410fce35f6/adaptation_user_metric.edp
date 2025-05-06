@@ -1,0 +1,38 @@
+/* Adaptation of a mesh to a user-defined metric */
+load "medit"
+
+/* Load mesh */
+string MESH   = "./mario.mesh";
+string SOL    = "./mario.sol";
+string NMESH  = "./nmario.mesh";
+int REFISO   = 20;
+int REFOUT   = 0;
+int REFINT   = 7;
+int REFEXT   = 0;
+mesh Th = readmesh(MESH);
+
+/* Finite element spaces and functions */
+fespace Vh(Th,P1);
+Vh m,v;
+
+/* Create a size map that takes size hmin on boundary with ref REFISO, and hmax on bdy REFOUT */
+real hmin     = 0.001;
+real hmax     = 0.2;
+real alphaint = 0.2;
+real alphaext = 0.5;
+
+/* Fictitious thermal diffusion problem to interpolate between the desired values on boundaries */
+problem gensizemap(m,v) = int2d(Th,REFEXT)(alphaext^2*(dx(m)*dx(v)+dy(m)*dy(v)))
+                          + int2d(Th,REFINT)(alphaint^2*(dx(m)*dx(v)+dy(m)*dy(v)))
+                          - int2d(Th)(1*v)
+                          + on(REFISO,m=hmin)
+                          + on(REFOUT,m=hmax);
+                          
+gensizemap;
+
+/* Mesh adaptation */
+mesh Thn = adaptmesh(Th,IsMetric=1,m,nbvx=100000);
+
+/* Save data */
+savesol(SOL,Th,m);
+savemesh(Thn,NMESH);
