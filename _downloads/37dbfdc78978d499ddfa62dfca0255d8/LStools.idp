@@ -1,0 +1,110 @@
+/* Additional functions for the practice of the Level Set Method in FreeFem */
+/* !!!! The user is not suppose to modify this file !!!! */
+
+/* Calculate squared distance from c to segment papb */
+func real distpted(real[int] &c,real[int] &pa,real[int] &pb) {
+  real[int] n(2);
+  real ps,norm;
+  real EPSNORM = 1.e-20;
+  
+  /* Infimum is realized by pa */
+  ps = (c[0]-pa[0])*(pb[0]-pa[0]) + (c[1]-pa[1])*(pb[1]-pa[1]);
+  if ( ps < 0.0 )
+    return ( (c[0]-pa[0])^2 + (c[1]-pa[1])^2 );
+  
+  /* Infimum is realized by pb */
+  ps = (c[0]-pb[0])*(pa[0]-pb[0]) + (c[1]-pb[1])*(pa[1]-pb[1]);
+  if ( ps < 0.0 )
+    return ( (c[0]-pb[0])^2 + (c[1]-pb[1])^2 );
+  
+  /* Infimum is realized strictly inside segment */
+  n[0] = - (pb[1]-pa[1]);
+  n[1] = pb[0] - pa[0];
+  norm = n[0]^2 + n[1]^2;
+  ps   = (c[0]-pa[0])*n[0] + (c[1]-pa[1])*n[1];
+  
+  return( ps^2/(norm+EPSNORM) );
+}
+
+/* Calculation of the signed distance function near the border between REFINT and REFEXT
+ Assumptions: - A mesh Th is declared in the main file
+              - Vh is the space of P1 finite elements on Th
+              - Vh0 is the space of P0 finite elements on Th
+*/
+func real[int] inidist(int refborder,int refint,int refext) {
+  Vh0 reg = region; // keyword: reg(x,y) = label of region containing (x,y)
+  real[int] phi(Th.nv);
+  real[int] pa(2),pb(2),c(2);
+  real INIVAL = 1.e10;
+  int i,ipa,ipb,iq,jq,iel,jel,nbe,ref;
+  
+  /* Initialization */
+  for (int k=0; k<Th.nv; k++)
+    phi[k] = INIVAL;
+
+  /* Travel interface edges */
+  nbe = Th.nbe;
+  
+  for (int k=0; k<Th.nbe; k++) {
+    ref = Th.be(k).label;
+    if ( ref != refborder ) continue;
+    
+    ipa = Th.be(k)[0];
+    ipb = Th.be(k)[1];
+    pa[0] = Th(ipa).x ; pa[1] = Th(ipa).y;
+    pb[0] = Th(ipb).x ; pb[1] = Th(ipb).y;
+
+    iel = Th.be(k).Element; // Triangle containingg edge k
+    i  = Th.be(k).whoinElement; // Edge corresponding to the bdy
+    
+    iq = Th[iel][i];
+    c[0] = Th(iq).x ; c[1] = Th(iq).y;
+    
+    phi[ipa] = 0.0;
+    phi[ipb] = 0.0;
+    phi[iq] = min(phi[iq],distpted(c,pa,pb)); // for the moment
+    
+    jel = Th[iel].adj(i); // i is modified in place
+    jq = Th[jel][i];
+    c[0] = Th(jq).x ; c[1] = Th(jq).y;
+    
+    phi[ipa] = 0.0;
+    phi[ipb] = 0.0;
+    phi[jq] = min(phi[jq],distpted(c,pa,pb)); // for the moment
+  }
+  
+  /* Take square root */
+  for (int k=0; k<Th.nv; k++)
+    phi[k] = sqrt(phi[k]);
+  
+  /* Set negative sign for interior vertices */
+  for (int k=0; k<Th.nt; k++) {
+    ref = Th[k].label;
+    if ( ref != refint ) continue;
+    for (int i=0; i<3; i++) {
+      iq = Th[k][i];
+      phi[iq] = - abs(phi[iq]);
+    }
+  }
+  
+  return phi;
+}
+
+/* Advection of \phi according to the velocity field [velx,vely] for a time step,
+ then redistancing;
+ phitmp is externally defined as a P1 function on the mesh */
+macro advectRedist(phi,velx,vely,step) {
+  phitmp = convect([velx,vely],-step,phi);
+  distance(Th,phitmp,phi[]);
+} // EOM
+
+/* Macro for the adaptation of the mesh near the 0 level set of a scalar function \phi
+  (which is expected to be close to a signed distance function)
+  hmin = minimum authorized size in the mesh
+  hmax = maximum authorized size in the mesh
+  thick = thickness of the layer where adaptation occurs */
+macro adapLS(phi,hmin,hmax,thick) {
+  /* Construction of the metric and adaptation */
+  met = hmin + min(1.0,abs(phi)/thick)*(hmax-hmin);
+  Th = adaptmesh(Th,met,IsMetric=1,nbvx=30000,iso=1);
+} // EOM

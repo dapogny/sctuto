@@ -1,0 +1,43 @@
+/* Resolution of the Laplace equation in a L-shaped domain by handling stiffness matrices */
+load "medit"
+
+/* Definition of the boundary curves of the domain */
+border left(t=0,1.0){ x=0.0 ; y=1.0-t; label=1;};
+border bot(t=0,1.0){ x=t ; y=0.0; label=1;};
+border right(t=0,0.5){ x=1.0 ; y=t; label=1;};
+border ang1(t=0,0.5){ x=1.0-t ; y=0.5; label=1;};
+border ang2(t=0,0.5){ x=0.5 ; y=0.5+t; label=1;};
+border top(t=0,0.5){ x=0.5-t ; y=1.0; label=1;};
+
+/* Build mesh */
+mesh Th = buildmesh(left(100)+bot(100)+right(50)+ang1(50)+ang2(50)+top(50));
+
+/* Finite Element spaces and functions */
+fespace Vh(Th,P1);
+Vh uh;
+
+/* Source term */
+func real f() {
+  return (1.0);
+}
+
+/* Variational formulation of the Laplace equation */
+varf varlap(u,v) = int2d(Th)(dx(u)*dx(v)+dy(u)*dy(v))
+                   + int2d(Th)(f()*v)   // Watch out for the sign!
+                   + on(1,u=0);
+
+/* Assembly of the stiffness matrix */
+matrix A;
+A = varlap(Vh,Vh,solver=UMFPACK);
+
+/* Assembly of the right-hand side */
+Vh rhs;
+rhs[] = varlap(0,Vh); // rhs[] is the array with size the number of dofs of the finite element
+                     // space whose entries are the coefficients of rhs.
+
+/* Resolution of the finite element system */
+uh[] = A^-1 *rhs[];
+
+/* Save the results */
+savemesh(Th,"Lshape.mesh");
+savesol("Lshape.sol",Th,uh);
