@@ -85,7 +85,7 @@ The size of a mesh is a crucial feature; we indeed expect the mesh ${\mathcal T}
 
 - Geometric approximation: Often, the domain $\Omega$ is not a polygon: it is a smooth domain which is approximated by the polygonal mesh $\calT$. It is thus natural to require that $\calT$ be a fine geometric approximation of $\Omega$.
 
-- Computational approximation: As we shall see below, the accuracy of the numerical solution supplied by the finite element method is related to the size of the elements of $\calT$. Intuitively, if the continuous solution $u$ has large variations in a region of the domain $\Omega$, the mesh \calT$ has to be fine enough (at least in this region) to authorize the capture of this phenomenon.
+- Computational approximation: As we shall see below, the accuracy of the numerical solution supplied by the finite element method is related to the size of the elements of $\calT$. Intuitively, if the continuous solution $u$ has large variations in a region of the domain $\Omega$, the mesh $\calT$ has to be fine enough (at least in this region) to authorize the capture of this phenomenon.
 
 
 For this reason, a common practice is to label the mesh $\calT$ as ${\mathcal T}_h$, where $h$ is a measure of its \"size\". For instance, $h$ may represent the largest diameter of a triangle in the mesh: 
@@ -316,7 +316,7 @@ The key result in this perspective is the following lemma.
 
     .. math::
       \begin{array}{ccl}
-      \alpha || u-u_h || ^2 $\leq$ a(u-u_h,u-u_h)\\ 
+      \alpha || u-u_h || ^2 &\leq & a(u-u_h,u-u_h)\\ 
       &=& a(u-u_h,u-v_h) \\
       &\leq& M || u-u_h ||_V || u - v_h ||_V.
      \end{array}

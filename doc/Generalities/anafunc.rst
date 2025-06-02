@@ -101,7 +101,9 @@ $$\nabla \u(\x) = \left(\frac{\partial u_i}{\partial x_j}(\x)\right)_{i,j=1,\ldo
 \vdots & & &\vdots \\
 \frac{\partial u_d}{\partial x_1}(\x) & \frac{\partial u_d}{\partial x_2}(\x) & \ldots & \frac{\partial u_d}{\partial x_d}(\x)  
 \end{array}
-\right). $$
+\right), $$
+
+    i.e. the $i^{\text{th}}$ line of $\nabla \u(\x)$ is the gradient of the real-valued function $u_i$ at $\x$.
 
   - For $k \geq 1$, $\u$ is said to be $k$ times continuously differentiable (or of class $\calC^k$) if all its coordinate functions $u_1,\ldots,u_d$ are themselves $k$ times continuously differentiable. 
   
@@ -280,7 +282,7 @@ The following exercise deals with the important fact that, because of the bounde
 
    Recall that the domain $\Omega$ is bounded, and let $a, b$ be two real values such that $1 \leq a \leq b \leq \infty$. Prove that the space $L^b(\Omega)$ is continuously embedded in $L^a(\Omega)$, i.e. 
   
-   $$\text{There exists a constant }C_{a,b} \text{ s.t. for all } u \in L^b(\Omega), \: u \in L^a(\Omega) \text{ and }\:\: \lvert\lvert u \lvert\lvert_{L^a(\Omega)} \leq C_{a,b} \lvert\lvert u \lvert\lvert_{L^a(\Omega)}. $$
+   $$\text{There exists a constant }C_{a,b} \text{ s.t. for all } u \in L^b(\Omega), \: u \in L^a(\Omega) \text{ and }\:\: \lvert\lvert u \lvert\lvert_{L^a(\Omega)} \leq C_{a,b} \lvert\lvert u \lvert\lvert_{L^b(\Omega)}. $$
 
 .. ##########
 
@@ -327,7 +329,7 @@ If $u$ were to be a function of class $\calC^1$ on $\Omega$, then the :ref:`Gree
 
 $$\text{For all test functions } \varphi \in \calC^\infty_c(\Omega), \quad \int_\Omega \frac{\partial u}{\partial x_i} \varphi \:\d \x = -\int_\Omega u \frac{\partial \varphi}{\partial x_i} \:\d \x.$$
 
-The key observation is that the right-hand side of the above identity makes sense under very weak assumptions about $u$, contrary to its left-hand side. In particular, it makes sense as soon as $u$ belongs to $L^1(\Omega)$. Hence, this relation can actually be thought of as a definition for the existence of a derivative for $u$. 
+The key observation is that the right-hand side of the above identity makes sense under very weak assumptions about $u$, contrary to its left-hand side: this right-hand side makes sense as soon as $u$ belongs to $L^1(\Omega)$. Hence, this relation can actually be thought of as a definition for the existence of a derivative for $u$. 
 
 .. ####################
 
@@ -461,10 +463,10 @@ On the other hand, the set where functions in $H^1(\Omega)$ are discontinuous ca
 
 .. prf:proposition::
 
-  There exists a mapping $\gamma: H^1(\Omega) \to L^2(\partial \Omega)$ such that, for any differentiable function $u \in {\mathcal C}^1(\overline{\Omega})$ up to the boundary $\partial\Omega$, it holds:
+  There exists a unique linear and continuous mapping $\gamma: H^1(\Omega) \to L^2(\partial \Omega)$ such that, for any differentiable function $u \in {\mathcal C}^1(\overline{\Omega})$ up to the boundary $\partial\Omega$, it holds:
   
   .. math::
-     \gamma(\varphi) = \varphi|_{\partial \Omega}.
+     \gamma(u) = u|_{\partial \Omega}.
      
   This mapping is called the trace operator on $H^1(\Omega)$. We denote by $H^{1/2}(\partial \Omega)$ its range:
   
@@ -554,7 +556,7 @@ We denote by $H^{-1}(\Omega)$ the dual space of $H^1_0(\Omega)$, that is, the ve
      
          $$v \mapsto \int_{\partial \Omega} v \:\d s $$
      
-         is in the dual space $H^{-1}(\partial \Omega)$ and also in the dual space of $H^1(\Omega)$, but that it is equal to $0$ when it is seen as an element in $H^{-1}(\Omega)$. 
+         is in the dual space $H^{-\frac{1}{2}}(\partial \Omega)$ and also in the dual space of $H^1(\Omega)$, but that it is equal to $0$ when it is seen as an element in $H^{-1}(\Omega)$. 
       
 .. ##########
 
@@ -649,7 +651,7 @@ The instructive proof of this result makes this intuition rigorous.
     
     The proof makes use of the notions of compactness and weak convergence, recalled in :numref:`sec.compact`.
     
-    We proceed by contradiction, assuming that a constant $C$ as in the statement does not exist. Then, there each integer $n$, there exists a function $u_n \in H^1_0(\Omega)$ such that: 
+    We proceed by contradiction, assuming that a constant $C$ as in the statement does not exist. Then, for each integer $n$, there exists a function $u_n \in H^1_0(\Omega)$ such that: 
     
     $$\int_\Omega (u_n)^2 \:\d\x \geq n \int_\Omega\lvert\nabla u_n\lvert^2\:\d\x. $$
     

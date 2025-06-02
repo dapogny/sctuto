@@ -169,7 +169,7 @@ The well-known Lax-Milgram theorem gives sufficient conditions, which are often 
   .. math::
     :label: eq.stabLM
      
-       \lvert\lvert u \lvert\lvert \leq \frac{1}{\alpha} \lvert\lvert \ell \lvert\lvert_{V^\prime}.
+       \lvert\lvert u \lvert\lvert \leq \frac{1}{\alpha} \lvert\lvert \ell \lvert\lvert_{V^*}.
 
 Let us check that the variational problem :math:numref:`eq.varpb` associated to the Laplace equation :math:numref:`eq:lap` satisfies the assumptions of the Lax-Milgram theorem:
 
@@ -211,7 +211,7 @@ The :ref:`Lax-Milgram theorem <th.LaxMilgram>` has the following useful \"energe
   
   $$J(u) = \frac{1}{2} a(u,u) - \ell(u)$$
   
-  has a unique miniminzer over $V$, which is the unique solution to the variational problem :math:numref:`eq.varpb`.
+  has a unique minimizer over $V$, which is the unique solution to the variational problem :math:numref:`eq.varpb`.
 
 .. ##########
 
@@ -310,7 +310,7 @@ Hence, the problem :math:numref:`eq:lapNeumannvarf` is well-posed.
 
   Let us briefly comment about the equivalence between the strong form :math:numref:`eq:lapNeumann` of the Neumann problem and its weak form :math:numref:`eq:lapNeumannvarf`:
   
-  - If $u$ is a function in $H^1(\Omega)$ satisfying the problem :math:numref:`eq:lapNeumann`, then the main equation shows that $\nabla u \in \Hdiv(\Omega)$. Therefore, the normal trace $\frac{\partial u}{\partial n}$ is well-defined as an element in $H^{-1/2}(\partial \Omega)$, and the boundary condition in :math:numref:`eq:lapNeumann` makes sense in this space.
+  - If $u$ is a function in $H^1(\Omega)$ satisfying the problem :math:numref:`eq:lapNeumann`, then the main equation shows that $\nabla u \in \Hdiv(\Omega)$. Therefore, the normal trace $\frac{\partial u}{\partial n} = \nabla u \cdot \n$ is well-defined as an element in $H^{-1/2}(\partial \Omega)$, and the boundary condition in :math:numref:`eq:lapNeumann` makes sense in this space.
   
   - On the contrary, if $u$ is a function in $H^1(\Omega)$ satisfying the variational problem :math:numref:`eq:lapNeumannvarf`, then it follows immediately that $\nabla u$ belongs to $\Hdiv(\Omega)$. The first line of :math:numref:`eq:lapNeumann` holds true in the sense of distributions by restricting test functions to elements in $\calC^\infty_c(\Omega)$, and the boundary conditions holds true in $H^{-1/2}(\partial \Omega)$ on account of the trace theorem for functions in $\Hdiv(\Omega)$, see :numref:`prop.traceHdiv`.
   
