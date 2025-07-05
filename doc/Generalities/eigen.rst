@@ -184,7 +184,7 @@ where the matrix $K_h$ is the usual stiffness matrix for the Laplace equation, a
 .. #################@
 
 .. math::
-  (K_h)_{ij} = \int_\Omega{\nabla \varphi_j \cdot \nabla \varphi_i \:dx}, \text{ and } (B_h){ij} = \int_\Omega{\varphi_j \varphi_i \:dx}.
+  (K_h)_{ij} = \int_\Omega{\nabla \varphi_j \cdot \nabla \varphi_i \:\d\x}, \text{ and } (B_h){ij} = \int_\Omega{\varphi_j \varphi_i \:\d\x}.
 
 .. #################@
   
