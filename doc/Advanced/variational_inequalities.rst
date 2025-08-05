@@ -259,7 +259,7 @@ Use of a constrained optimization algorithm: $\texttt{ipopt}$
 .. ##########
 
 An alternative idea is to use a constrained optimization algorithm.
-Let us consider the following discretization of the obstacle problem:
+Let us consider the following discretization of the obstacle problem.
 
 Then, it is natural to try and use an on-the-shelf constrained optimization algorithm, such as $\texttt{ipopt}$, which is interfaced in $\texttt{FreeFem}$. The syntax for calling $\texttt{ipopt}$ in $\texttt{FreeFem}$ is the following.
 
