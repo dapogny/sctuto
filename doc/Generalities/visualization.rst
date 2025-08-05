@@ -176,6 +176,19 @@ A few additional features of $\texttt{medit}$ rely on the use of a parameter fil
 .. #################@
 
 .. #################@
+
+.. prf:remark::
+
+  Additional features of $\texttt{medit}$ will be described in subsequent parts of this book: 
+
+    - :numref:`sec.visu3d` deals with the vizualization of meshes and solutions in 3d; 
+
+    - :numref:`sec.visuElas` is devoted to the vizualization of vector fields. 
+    
+
+.. #################@
+    
+.. #################@
 .. #################@
 
 .. _sec.animmedit:

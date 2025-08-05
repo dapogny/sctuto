@@ -1,0 +1,50 @@
+/* Resolution of the linear elasticity system associated to a connecting rod */
+load "medit"
+
+/* Input and output files */
+string MESH         = "conn.mesh";
+string DISPMESH     = "conn_disp.mesh";
+string SOL          = "conn.sol";
+string STRESS       = "stress.sol";
+
+/* References */
+int REFDIR        = 1;
+int REFNEU        = 2;
+
+/* Mesh and finite element space */
+mesh Th = readmesh(MESH);
+fespace Vh(Th,P1);
+fespace Vh0(Th,P0);
+Vh ux,uy,vx,vy;
+Vh0 sxx,syy,sxy,trs,vm;
+
+/* Physical parameters */
+real E  = 1.0;
+real nu = 0.3;
+real lm = E*nu / (1.0-nu^2);
+real mu = 0.5*E / (1.0+nu);
+real gx = -0.01; // Horizontal component of the load
+real gy = 0.0;  // Vertical component of the load
+
+/* Linear elasticity system */
+problem linelas([ux,uy],[vx,vy],solver=CG) = int2d(Th)( 2.0*mu*( dx(ux)*dx(vx)
+                                                                 + 0.5*(dx(uy)+dy(ux))*(dx(vy)+dy(vx))
+                                                                 + dy(uy)*dy(vy) )
+                                                        + lm*(dx(ux)+dy(uy))*(dx(vx)+dy(vy))
+                                                      )
+                                             - int1d(Th,REFNEU)(gx*vx+gy*vy)
+                                             + on(REFDIR,ux=0.0,uy=0.0);
+
+linelas;
+
+/* Calculation of von Mises stress */
+sxx = 
+vm =  // sqrt(3/2 * sigmaprime*sigmeprime)
+
+/* Displaced mesh */
+mesh Thd = movemesh(Th,[x+ux,y+uy]);
+savemesh(Thd,DISPMESH);
+
+/* Save solution and stress */
+savesol(SOL,Th,[ux,uy]);
+savesol(STRESS,Th,vm);

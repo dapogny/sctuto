@@ -1,19 +1,7 @@
+.. _sec.hyperelasticity:
+
 Hyperelasticity
 ===============
-
-.. ##################################################
-.. ##################################################
-
-.. _sec.Newton:
-
-The Newton method
------------------
-
-.. ##################################################
-.. ##################################################
-
-
-We give a brief reminder about Newton's method, which is one method of choice when it comes to solving nonlinear equations. We shall repeatedly use this method in Fluid Mechanics, see :numref:`sec.FM`.
 
 .. ##################################################
 .. ##################################################
@@ -25,6 +13,8 @@ Solving a non linear elasticity problem by Newton's method
 
 .. ##################################################
 .. ##################################################
+
+In this section, we exemplify the use of Newton's method for the solution of a nonlinear elasticity problem, see :numref:`sec.Newton` for generalities about this method.
 
 
 .. ##################################################

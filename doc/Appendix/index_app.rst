@@ -9,6 +9,7 @@ Appendix
 
    Differential calculus <calculus.rst>
    Complements of functional analysis <companafunc.rst>
+   More advanced functional analysis <appadvanafunc.rst>
    Convexity <convexity.rst>
    Optimization theory <compoptim.rst>
    PDE <appPDE.rst>

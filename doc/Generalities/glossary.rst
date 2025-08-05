@@ -10,6 +10,18 @@ Glossary
     
        This is a complete space equipped with a norm.
      .. #########
+  
+   * .. ##########
+     .. _glos.divtensor:
+     .. admonition:: Divergence (of a tensor)
+       :class: dropdown
+    
+       Let $\sigma: \Omega \to \R^{d\times d}$ be a second-order tensor, i.e. a matrix-valued mapping on $\Omega$. 
+       The divergence of $\sigma$ is the vector field $\dv\sigma : \Omega \to \R^d$ with entries: 
+       
+       $$(\dv\sigma(\x))_i = \sum\limits_{j=1}^d \frac{\partial \sigma_{ij}}{\partial x_j}(\x), \quad i=1,\ldots,d.$$
+        
+     .. #########
      
    * .. ##########
      .. _glos.Eulerian:

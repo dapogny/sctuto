@@ -217,7 +217,7 @@ The constrained optimization method
 
 .. #############################
 
-In this section, we develop an alternative viewpoint about the variational problem :math:numref:`eq.varfPureNeumann`, which is inspired by constrained optimization theory, a subject whose basic stakes are recalled in :numref:`sec.recalloptim`.
+In this section, we develop an alternative viewpoint about the variational problem :math:numref:`eq.varfPureNeumann`, which is inspired by constrained optimization theory, a subject whose basic stakes are recalled in :numref:`app.recalloptim`.
 
 Let us recall that $V$ stands for the space of functions in $H^1(\Omega)$ with vanishing average on $\Omega$, see :math:numref:`eq.VPureNeumann`. The energy version of the Lax-Milgram theorem in :numref:`lem.corLM` states that $u$ is the unique solution to the following energy minimization problem:
 

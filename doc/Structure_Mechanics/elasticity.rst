@@ -1,7 +1,19 @@
 An introduction to linear elasticity
 =====================================
 
-The model of linear elasticity is the combination of several ingredients:
+.. ##################################################
+.. ##################################################
+
+This section deals with the physical model of linear elasticity describing the displacement of mechanical structures. 
+Elasticity generally refers to the ability of an object to deform under the effect of loads, and to return to its exact initial configuration when they cease to be applied.
+
+We consider particular instances of such situations, that hinge on two simplifying assumptions:
+
+  - When the applied load is sufficiently small, so is the deformation, and the regime is linear. 
+  
+  - We restrict ourselves to considering time-independent situations. After a transient regime, the situations is assumed to have reached a state of equilibrim.  
+
+The classical model of linear elasticity builds on three ingredients:
 
   - The first ingredient is kinematics, i.e. a description of the elastic body and its deformation, without making any reference to the efforts that have caused the latter. This is studied in :numref:`sec.kinematics`.
   
@@ -12,7 +24,7 @@ The model of linear elasticity is the combination of several ingredients:
 The reader primarily interested in the mathematical formulation of linear elasticity can directly jump to :numref:`sec.elasBVP`.
 Eventually, much intuition about mechanical structures can be gleaned by adopting an energy viewpoint. This is dicussed in :numref:`sec.elasenergy`.
 
-When it comes to the description of a medium :math:`\Omega`, two paradigms are available:
+When it comes to the description of a medium $\Omega$, two paradigms are available:
   
   - The :ref:`Lagrangian <glos.Lagrangian>` point of view assumes a reference configuration :math:`\widehat{\Omega}` (for instance, the state of :math:`\Omega` at rest, or at the initial time of study).
 
@@ -33,14 +45,13 @@ Notations regarding vectors and tensors
 .. ##################################################
 
 Before getting into the core of the matter, let us set some notations.
-Let :math:`\sigma, \tau` be two second-order tensors whose entries are denoted by :math:`\sigma_{ij}` and :math:`\tau_{ij}`, :math:`i,j=1,...,d`, respectively.
+Let $\sigma, \tau$ be two second-order tensors, i.e. mappings on $\Omega$ whose values $\sigma(\x)$, $\tau(\x)$ are square $d \times d$ matrices, $\x \in \Omega$. Their entries are denoted by $\sigma_{ij}$ and $\tau_{ij}$, $i,j=1,...,d$, respectively.
 
-  - The :ref:`Frobenius inner product <glos.Frobenius>` :math:`\sigma : \tau` between :math:`\sigma` and :math:`\tau` is the real-valued quantity defined by:
+  - The :ref:`Frobenius inner product <glos.Frobenius>` $\sigma : \tau$ between $\sigma$ and $\tau$ is the real-valued quantity defined by:
     
-    .. math::
-      \sigma : \tau = \sum\limits_{i,j=1}^d {\sigma_{ij} \tau_{ij}} = \text{tr}(\sigma^T \tau).
+    $$\sigma : \tau = \sum\limits_{i,j=1}^d {\sigma_{ij} \tau_{ij}} = \text{tr}(\sigma^T \tau).$$
   
-  -  The \index{divergence of a tensor}{divergence} of :math:`\sigma` is the vector :math:`\text{div} \sigma` with size :math:`d` whose coordinates are the divergence of the rows of :math:`\sigma`, that is:
+  -  The :ref:`divergence of a tensor <glos.divtensor>` of :math:`\sigma` is the vector :math:`\text{div} \sigma` with size :math:`d` whose coordinates are the divergence of the rows of :math:`\sigma`, that is:
      
      .. math::
         (\text{div} \sigma)_i = \sum\limits_{j=1}^d{\frac{\partial \sigma_{ij}}{\partial x_j}}, \:\: i=1,...,d.
@@ -52,7 +63,7 @@ Let :math:`\sigma, \tau` be two second-order tensors whose entries are denoted b
     Let :math:`\sigma: \Omega \to {\mathcal S}(\mathbb{R}^d)` be a smooth symmetric tensor field, and let :math:`\u : \Omega \to \mathbb{R}^d` be a smooth function. Then:
     
     .. math::
-       \int_{\Omega}{\text{div} \sigma \cdot \u \:dx } = \int_{\partial \Omega}{( \sigma \n )\cdot \u \:\text{d} s} - \int_\Omega{\sigma : D(\u) \:\text{d} x}.
+       \int_{\Omega}{\text{div} \sigma \cdot \u \:\d\x } = \int_{\partial \Omega}{( \sigma \n )\cdot \u \:\d s} - \int_\Omega{\sigma : e(\u) \:\d \x}.
 
 .. ##########
 .. ##########
@@ -61,6 +72,7 @@ Let :math:`\sigma, \tau` be two second-order tensors whose entries are denoted b
     :class: dropdown
   
     This is a simple adaptation of the basic Green's theorem.
+    
 .. ##########
 
 
@@ -76,7 +88,7 @@ Kinematics
 .. ##################################################
 .. ##################################################
 
-The usual description of an elastic structure is Lagrangian. It is based on the configuration at rest of the structure, which is a domain :math:`\Omega \subset \mathbb{R}^d`, and on the displacement vector field $\u : \Omega \to \mathbb{R}^d$, which encodes the location $\x + \u(\x)$ of any point $\x \in \Omega$ after deformation: the deformed configuration of the structure is $(\text{Id} + \u)(\Omega)$, as depicted on :numref:`fig.sketchelas`.
+As we have mentioned, elastic structures are usually described in a Lagrangian manner. Let us represent the configuration at rest of the structure by a domain $\Omega \subset \R^d$, and the displacement of the structure by a vector field $\u : \Omega \to \R^d$, which encodes the location $\x + \u(\x)$ of any point $\x \in \Omega$ after deformation: the deformed configuration of the structure is $(\text{Id} + \u)(\Omega)$, as depicted on :numref:`fig.sketchelas`.
 
 .. #######
 
@@ -171,6 +183,22 @@ The entries of the tensor :math:`\sigma(x)` can be separated between traction-co
    The stress tensor: (a) For :math:`x\in \Omega` and :math:`n \in \mathbb{S}^{d-1}`, the vector :math:`\sigma(x) n` is the force imposed by the outer medium onto the face oriented by :math:`n` of a small cube around :math:`x`; (b) The diagonal entries of :math:`\sigma(x)` account for the compression efforts felt by this cube; (c) The off-diagonal entries encode the shear effects imposed on this cube.
 
 .. #######
+
+.. ##########
+
+.. prf:theorem::
+
+    The stress is linear.
+
+.. ##########
+.. ##########
+
+.. admonition:: Proof
+    :class: dropdown
+  
+    Cauchy's tetrahedron 
+    
+.. ##########
 
 
 The laws of equilibrium

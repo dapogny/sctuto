@@ -1,8 +1,33 @@
 Complements of functional analysis
 ====================================
 
-We provide some more details, in a more rigorous way than in :numref:`sec.anafunc`
+This appendix is a pot-pourri of results in functional analysis that underlie some of the theoretical developments of this book.
 
+.. ##################################################
+.. ##################################################
+
+.. _sec.Banachcontraction:
+
+The Banach contraction mapping theorem
+----------------------------------------
+
+.. ##################################################
+.. ##################################################
+
+.. ########
+
+.. _th.BanachFP:
+
+.. prf:theorem:: Banach contraction mapping
+   
+   Let $E$ be a Banach space, and let $A : E \to E$ be a (possibly non linear) mapping. Assume that $A$ is a contraction, i.e. there exists $k<1$ such that:
+   
+   $$\forall u,v \in E, \quad \lvert\lvert Au - Av \lvert\lvert < k \lvert\lvert u - v \lvert\lvert. $$
+   
+   Then $A$ has a unique fixed point $u^* \in V$, i.e. there is a unique $u^* \in V$ such that $Au^* = u^*$.  
+   
+
+.. ########
 
 .. ##################################################
 .. ##################################################

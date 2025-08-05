@@ -218,6 +218,8 @@ Note that, as the size $h$ of the mesh $\calT_h$ tends to $0$ -- i.e. $\calT_h$ 
 .. ##################################################
 .. ##################################################
 
+.. _sec.discvarpb:
+
 The discrete variational problem
 ---------------------------------
 

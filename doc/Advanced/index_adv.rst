@@ -13,6 +13,8 @@ The present section builds on the contents of :numref:`chap.start` and jumps to 
 
    Meshing images <imgmesh.rst>
    Curvature <curvature.rst>
+   Nonlinear problems <nonlinear.rst>
+   Variational inequalities <variational_inequalities.rst>
    Level Set method I <LSM.rst>
    Level Set method II <LSM2.rst>
    Going 3d <3dext.rst>

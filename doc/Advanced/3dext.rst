@@ -147,6 +147,8 @@ The result of this procedure is presented in :numref:`fig.genmesh3d`.
 .. #################@
 .. #################@
 
+.. _sec.visu3d:
+
 3d visualization with $\texttt{medit}$
 --------------------------------------
 
