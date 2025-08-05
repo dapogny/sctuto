@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>1.9. The Laplace equation with pure Neumann boundary conditions &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2. More advanced issues in scientific computing" href="../Advanced/index_adv.html" />
+    <link rel="prev" title="1.8. Imposing Dirichlet boundary conditions by exact penalization" href="dirpen.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="the-laplace-equation-with-pure-neumann-boundary-conditions">
+<span id="sec-lappureneumann"></span><h1><span class="section-number">1.9. </span>The Laplace equation with pure Neumann boundary conditions<a class="headerlink" href="#the-laplace-equation-with-pure-neumann-boundary-conditions" title="Link to this heading">¶</a></h1>
+<p>This section deals with the pure Neumann problem for the Laplace operator. A comprehensive reference about this issue is the journal article <span id="id1">[<a class="reference internal" href="bibliography.html#id4" title="Pavel Bochev and Richard B Lehoucq. On the finite element solution of the pure neumann problem. SIAM review, 47(1):50–66, 2005.">BL05</a>]</span>.</p>
+<p>Let us consider the following boundary-value problem for the Laplace operator:</p>
+<div class="math notranslate nohighlight" id="equation-eq-pureneumann">
+<span class="eqno">(1.33)<a class="headerlink" href="#equation-eq-pureneumann" title="Link to this equation">¶</a></span>\[\begin{split}\text{Search for } u \text{ s.t. } \left\{
+\begin{array}{cl}
+-\Delta u = f &amp; \text{in } \Omega, \\
+\frac{\partial u}{\partial n} = 0 &amp; \text{on } \partial \Omega.
+\end{array}
+\right.\end{split}\]</div>
+<p>Here, the source <span class="math notranslate nohighlight">\(f\)</span> belongs to the space <span class="math notranslate nohighlight">\(L^2(\Omega)\)</span>. The considered Neumann conditions are homogeneous, but inhomogeneous conditions could be analyzed by similar considerations.</p>
+<section id="a-bit-of-theory">
+<span id="sec-theorypureneumann"></span><h2><span class="section-number">1.9.1. </span>A bit of theory<a class="headerlink" href="#a-bit-of-theory" title="Link to this heading">¶</a></h2>
+<p>One subtle point about the pure Neumann problem <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a> is that it is not necessarily well-posed. This is easily seen by multiplying both sides of the main equation by the constant function <span class="math notranslate nohighlight">\(1\)</span> and using the <a class="reference internal" href="anafunc.html#th-green"><span class="std std-ref">Green’s formula</span></a>, which yields:</p>
+<div class="math notranslate nohighlight" id="equation-eq-compatibility">
+<span class="eqno">(1.34)<a class="headerlink" href="#equation-eq-compatibility" title="Link to this equation">¶</a></span>\[\int_\Omega f(\x) \:\text{d} \x = 0.\]</div>
+<p>This equality is a &quot;compatibility condition&quot;, bearing only on the data <span class="math notranslate nohighlight">\(f\)</span> of the problem <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a>.
+If it is not satisfied, <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a> cannot possibly have a solution.</p>
+<p>On the other hand, when a solution <span class="math notranslate nohighlight">\(u\)</span> to <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a> exists, it cannot be unique since then any function of the form <span class="math notranslate nohighlight">\(u + c\)</span>, where <span class="math notranslate nohighlight">\(c\)</span> is a real constant, is obviously also a solution.</p>
+<p>These evidences of the ill-posedness of <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a> are actually two sides of the same coin. They actually reflect a very general phenomenon called Fredholm alternative: loosely speaking, the more numerous the compatibility conditions to be satisfied by the data for existence of a solution, the higher the dimension of the kernel of the problem.</p>
+<p>Without entering any further into this deep mathematical topic, let us assume that the considered source <span class="math notranslate nohighlight">\(f\)</span> satisfies <a class="reference internal" href="#equation-eq-compatibility">(1.34)</a>, and let us proceed formally to derive a variational formulation for <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a>, along the lines of <a class="reference internal" href="varpbs.html#sec-lm"><span class="std std-numref">Section 1.2</span></a>. Because the solution <span class="math notranslate nohighlight">\(u\)</span> to <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a> will be defined up to a constant, we search for one such solution <span class="math notranslate nohighlight">\(u\)</span> satisfying <span class="math notranslate nohighlight">\(\int_\Omega u(\x) \:\d \x = 0\)</span>. Formally multiplying the main equation in <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a> by a smooth test function <span class="math notranslate nohighlight">\(v \in \calC^\infty(\overline\Omega)\)</span>, then applying the <a class="reference internal" href="anafunc.html#th-green"><span class="std std-ref">Green’s formula</span></a>, we obtain:</p>
+<p><div class="math notranslate nohighlight">
+\[\int_\Omega \nabla u \cdot \nabla v \:\d \x = \int_\Omega fv \:\d \x.\]</div>
+</p>
+<p>Besides, it is enough to assume that this relation holds true only for test functions <span class="math notranslate nohighlight">\(v\)</span> satisfying <span class="math notranslate nohighlight">\(\int_\Omega v \:\d\x=0\)</span>, since it is obviously satisfied for <span class="math notranslate nohighlight">\(v=1\)</span>, owing to <a class="reference internal" href="#equation-eq-compatibility">(1.34)</a>. Since the differential operator at the left-hand side involves first-order partial derivatives of <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span>, we are led to consider the functional space</p>
+<div class="math notranslate nohighlight" id="equation-eq-vpureneumann">
+<span class="eqno">(1.35)<a class="headerlink" href="#equation-eq-vpureneumann" title="Link to this equation">¶</a></span>\[V := \left\{ v \in H^1(\Omega) \text{ s.t. } \int_\Omega v \: \d \x = 0 \right\},\]</div>
+<p>equipped with the norm <span class="math notranslate nohighlight">\(\lvert\lvert \cdot \lvert\lvert_{H^1(\Omega)}\)</span>.
+These formal considerations lead us to introduce the following variational problem:</p>
+<div class="math notranslate nohighlight" id="equation-eq-varfpureneumann">
+<span class="eqno">(1.36)<a class="headerlink" href="#equation-eq-varfpureneumann" title="Link to this equation">¶</a></span>\[\text{Search for } u \in V \text{ s.t. } \forall v \in V, \quad \int_\Omega \nabla u \cdot \nabla v \:\d \x = \int_\Omega f v \:\d \x.\]</div>
+<p>The well-posedness of <a class="reference internal" href="#equation-eq-varfpureneumann">(1.36)</a> is the subject of the next proposition, whose proof is left as an exercise.</p>
+<div class="proof proposition admonition" id="proposition-0">
+<span id="prop-wppureneumann"></span><p class="admonition-title"><span class="caption-number">Proposition 1.13 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(f \in L^2(\Omega)\)</span> be a given source term. Then the variational problem <a class="reference internal" href="#equation-eq-varfpureneumann">(1.36)</a> is well-posed.</p>
+</section>
+</div><div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<p>Prove <a class="reference internal" href="#prop-wppureneumann"><span class="std std-numref">proposition 1.13</span></a> thanks to the <a class="reference internal" href="varpbs.html#th-laxmilgram"><span class="std std-ref">Lax-Milgram theorem</span></a>.</p>
+<blockquote>
+<div><p><em>(Hint: The coercivity of the bilinear form at the right-hand side of</em> <a class="reference internal" href="#equation-eq-varfpureneumann">(1.36)</a>, <em>rests on the</em> <a class="reference internal" href="anafunc.html#prop-poincarewirtinger"><span class="std std-ref">Poincaré-Wirtinger inequality</span></a> <em>.)</em></p>
+</div></blockquote>
+</div>
+<div class="proof remark admonition" id="remark-1">
+<p class="admonition-title"><span class="caption-number">Remark 1.12 </span></p>
+<section class="remark-content" id="proof-content">
+<p>The compatibility condition <a class="reference internal" href="#equation-eq-compatibility">(1.34)</a> is not needed to guarantee the well-posedness of <a class="reference internal" href="#equation-eq-varfpureneumann">(1.36)</a>. It however ensures that the variational solution <span class="math notranslate nohighlight">\(u\)</span> is also solution to the original boundary-value problem <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a> in a suitable sense. Indeed, arguing as in <a class="reference internal" href="varpbs.html#rm-eqstrongweakneu"><span class="std std-numref">remark 1.3</span></a> and without entering into details, one can show that <span class="math notranslate nohighlight">\(u\)</span> is the unique <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> function satisfying</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left\{
+\begin{array}{cl}
+-\Delta u = f - \frac{1}{\lvert \Omega \lvert}\int_\Omega f(\x) \:\d \x &amp; \text{in } \Omega, \\
+\frac{\partial u}{\partial n} = 0 &amp; \text{on } \partial \Omega.
+\end{array}
+\right.\end{split}\]</div>
+<p>where the main equation is understood in the sense of distributions. Note that its right-hand side satisfies the compatibility condition <a class="reference internal" href="#equation-eq-compatibility">(1.34)</a> and that it coincides with the original source term <span class="math notranslate nohighlight">\(f\)</span> provided the latter satisfies <a class="reference internal" href="#equation-eq-compatibility">(1.34)</a>.</p>
+</section>
+</div></section>
+<section id="two-different-numerical-resolution-methods">
+<h2><span class="section-number">1.9.2. </span>Two different numerical resolution methods<a class="headerlink" href="#two-different-numerical-resolution-methods" title="Link to this heading">¶</a></h2>
+<p>Although rigorous, the mathematical framework developed in the previous <a class="reference internal" href="#sec-theorypureneumann"><span class="std std-numref">Section 1.9.1</span></a> does not easily lend itself to numerical implementation. Indeed, the Finite Element discretization of the functional space <a class="reference internal" href="#equation-eq-vpureneumann">(1.35)</a>, featuring functions with vanishing integral, is awkward. In the following, we describe two different mathematical and numerical approaches for the numerical resolution of <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a>.</p>
+<section id="the-penalization-method">
+<span id="sec-penneu"></span><h3><span class="section-number">1.9.2.1. </span>The penalization method<a class="headerlink" href="#the-penalization-method" title="Link to this heading">¶</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(\e\)</span> be a &quot;small&quot; parameter. We propose to approximate the solution <span class="math notranslate nohighlight">\(u\)</span> to <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a> by that <span class="math notranslate nohighlight">\(u_{\e}\)</span> to the following problem:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight" id="equation-eq-pureneumannpen">
+<span class="eqno">(1.37)<a class="headerlink" href="#equation-eq-pureneumannpen" title="Link to this equation">¶</a></span>\[\begin{split}\text{Search for } u_{\e}\:\: \text{ s.t. }\:\: \left\{\begin{array}{cl}
+-\Delta u +\e u= f &amp; \text{in } \Omega, \\
+\frac{\partial u_{\e}}{\partial n} = 0 &amp; \text{on } \partial \Omega.
+\end{array}
+\right.\end{split}\]</div>
+</div></blockquote>
+<p>Intuitively, the above boundary-value problem is a slightly modified version of <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a> where a small <span class="math notranslate nohighlight">\(0^{\text{th}}\)</span> order term is added to the main equation. A variational formulation for this problem reads:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight" id="equation-eq-varfpureneumannpen">
+<span class="eqno">(1.38)<a class="headerlink" href="#equation-eq-varfpureneumannpen" title="Link to this equation">¶</a></span>\[\text{Search for } u_{\e} \in H^1(\Omega) \text{ s.t. } \forall v \in H^1(\Omega), \quad \int_\Omega \nabla u_{\e} \cdot \nabla v \:\d \x + \e \int_\Omega u_{\e} v \:\d \x = \int_\Omega f v \:\d \x.\]</div>
+</div></blockquote>
+<p>A standard application of the <a class="reference internal" href="varpbs.html#sec-lm"><span class="std std-ref">Lax-Milgram theory</span></a> shows that this variational problem is well-posed: indeed, the added <span class="math notranslate nohighlight">\(0^{\text{th}}\)</span> order term makes the bilinear form at the left-hand side coercive.</p>
+<p>This penalization approach is made rigorous by the following proposition.</p>
+<div class="proof proposition admonition" id="proposition-2">
+<p class="admonition-title"><span class="caption-number">Proposition 1.14 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(f \in L^2(\Omega)\)</span> satisfy the compatibility condition <a class="reference internal" href="#equation-eq-compatibility">(1.34)</a>. The solution <span class="math notranslate nohighlight">\(u_{\e} \in H^1(\Omega)\)</span> to the penalized Laplace equation <a class="reference internal" href="#equation-eq-pureneumannpen">(1.37)</a> converges to the solution <span class="math notranslate nohighlight">\(u\)</span> of the pure Neumann problem <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a>:</p>
+<p><div class="math notranslate nohighlight">
+\[\lvert\lvert u_{\e} - u \lvert\lvert_{H^1(\Omega)} \xrightarrow{\e \to 0} 0.\]</div>
+</p>
+</section>
+</div><div class="dropdown admonition">
+<p class="admonition-title">Proof</p>
+<p>The proof uses results about <a class="reference internal" href="../Appendix/companafunc.html#sec-weakcv"><span class="std std-ref">weak convergence</span></a>.</p>
+<p>At first, taking <span class="math notranslate nohighlight">\(v=1\)</span> in the variational formulation <a class="reference internal" href="#equation-eq-varfpureneumannpen">(1.38)</a> for <span class="math notranslate nohighlight">\(u_\e\)</span>, we see immediately that <span class="math notranslate nohighlight">\(\int_\Omega u_{\e} \:\d\x =0\)</span>, because <span class="math notranslate nohighlight">\(f\)</span> satisfies <a class="reference internal" href="#equation-eq-compatibility">(1.34)</a>.</p>
+<p>Now, taking <span class="math notranslate nohighlight">\(v=u_{\e}\)</span>, we obtain, in particular:</p>
+<p><div class="math notranslate nohighlight">
+\[\int_{\Omega} \lvert \nabla u_{\e} \lvert^2 \:\d \x \leq C \lvert\lvert f \lvert\lvert_{L^2(\Omega)} \lvert\lvert u _\e\lvert\lvert_{L^2(\Omega)}.\]</div>
+</p>
+<p>The <a class="reference internal" href="anafunc.html#prop-poincarewirtinger"><span class="std std-ref">Poincaré-Wirtinger inequality</span></a> then implies that <span class="math notranslate nohighlight">\(u_{\e}\)</span> is bounded in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>.
+Owing to <a class="reference internal" href="../Appendix/companafunc.html#prop-seqcompactbounded"><span class="std std-numref">proposition 6.2</span></a>, we can thus extract a subsequence <span class="math notranslate nohighlight">\(\e_n\)</span> of the <span class="math notranslate nohighlight">\(\e\)</span> such that:</p>
+<p><div class="math notranslate nohighlight">
+\[u_{\e_n} \to u_* \text{ weakly in } H^1(\Omega), \text{ for a certain limit function }u_*.\]</div>
+</p>
+<p>Passing to the weak limits in the variational problem <a class="reference internal" href="#equation-eq-varfpureneumannpen">(1.38)</a> and in the relation <span class="math notranslate nohighlight">\(\int_\Omega u _{\e_n} \:\d x\ =0\)</span>, we see that:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall v \in H^1(\Omega), \quad \int_\Omega \nabla u_{*} \cdot \nabla v \:\d\x  = \int_\Omega fv \:\d\x, \text{ and } \int_\Omega u_* \:\d\x=0, \]</div>
+</p>
+<p>i.e. <span class="math notranslate nohighlight">\(u_*\)</span> is the unique solution to the pure Neumann problem in the space <span class="math notranslate nohighlight">\(V\)</span> defined by <a class="reference internal" href="#equation-eq-vpureneumann">(1.35)</a>.
+Invoking a <a class="reference internal" href="../Appendix/companafunc.html#sec-uniquelim"><span class="std std-ref">classical argument about the uniqueness of the limit</span></a>, we conclude that the whole sequence <span class="math notranslate nohighlight">\(u _\e\)</span> converges to <span class="math notranslate nohighlight">\(u\)</span> weakly in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>.</p>
+<p>To conclude, we have to prove that this convergence is actually strong. To achieve this, we just expand the square:</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{ccl}
+\displaystyle\int_\Omega \lvert \nabla u_{\e} -\nabla u_* \lvert^2 \:\d\x &amp;=&amp;  \displaystyle\int_\Omega \lvert \nabla u _\e \lvert^2 \:\d\x +  \displaystyle\int_\Omega \lvert \nabla u \lvert^2 \:\d\x  - 2  \displaystyle\int_\Omega  \nabla u _\e \cdot \nabla u \:\d\x \\
+&amp;=&amp;  \displaystyle\int_\Omega f u _\e \:\d x +  \displaystyle\int_\Omega f u \:\d \x - 2  \displaystyle\int_\Omega f u _\e \:\d \x,
+\end{array}\end{split}\]</div>
+</p>
+<p>where we have used both variational problems <a class="reference internal" href="#equation-eq-varfpureneumannpen">(1.38)</a> and <a class="reference internal" href="#equation-eq-varfpureneumann">(1.36)</a> with <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(u _\e\)</span> as test functions, respectively. Eventually, the right-hand side of the above equality tends to <span class="math notranslate nohighlight">\(0\)</span> as <span class="math notranslate nohighlight">\(\e \to 0\)</span> because of the weak <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> convergence of <span class="math notranslate nohighlight">\(u_\e\)</span> to <span class="math notranslate nohighlight">\(u\)</span>, which ends the proof.</p>
+</div>
+</section>
+<section id="the-constrained-optimization-method">
+<span id="sec-csneu"></span><h3><span class="section-number">1.9.2.2. </span>The constrained optimization method<a class="headerlink" href="#the-constrained-optimization-method" title="Link to this heading">¶</a></h3>
+<p>In this section, we develop an alternative viewpoint about the variational problem <a class="reference internal" href="#equation-eq-varfpureneumann">(1.36)</a>, which is inspired by constrained optimization theory, a subject whose basic stakes are recalled in <a class="reference internal" href="../Appendix/compoptim.html#app-recalloptim"><span class="std std-numref">Section 6.5</span></a>.</p>
+<p>Let us recall that <span class="math notranslate nohighlight">\(V\)</span> stands for the space of functions in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> with vanishing average on <span class="math notranslate nohighlight">\(\Omega\)</span>, see <a class="reference internal" href="#equation-eq-vpureneumann">(1.35)</a>. The energy version of the Lax-Milgram theorem in <a class="reference internal" href="varpbs.html#lem-corlm"><span class="std std-numref">lemma 1.1</span></a> states that <span class="math notranslate nohighlight">\(u\)</span> is the unique solution to the following energy minimization problem:</p>
+<p><div class="math notranslate nohighlight">
+\[\min_{v \in V} E(v), \text{ where } E(v) := \frac12 \int_\Omega \lvert \nabla v\lvert^2 \:\d \x - \int_\Omega fv \:\d \x.\]</div>
+</p>
+<p>Let us reformulate this as a constrained optimization problem:</p>
+<p><div class="math notranslate nohighlight">
+\[\min_{v \in H^1(\Omega)} E(v) \text{ s.t. } \int_\Omega v \:\d x =0. \]</div>
+</p>
+<p>The necessary and sufficient optimality condition for this problem states that a solution <span class="math notranslate nohighlight">\(u \in H^1(\Omega)\)</span> to the latter should satisfy:</p>
+<p><div class="math notranslate nohighlight">
+\[\exists \lambda \in \R, \text{ s.t. } \forall v \in H^1(\Omega), \quad \int_\Omega \nabla u \cdot \nabla v \:\d \x - \int_\Omega fv \:\d\x + \lambda \int_\Omega v \:\d \x = 0.\]</div>
+</p>
+<p>In particular, this relation should hold true for <span class="math notranslate nohighlight">\(v=1\)</span>, which implies that the Lagrange multiplier <span class="math notranslate nohighlight">\(\lambda\)</span> necessarily equals:</p>
+<p><div class="math notranslate nohighlight">
+\[\lambda = \frac{1}{\lvert\Omega\lvert} \int_\Omega f(\x) \:\d\x. \]</div>
+</p>
+<p>It follows that <span class="math notranslate nohighlight">\(u\)</span> is thus solution to the variational problem:</p>
+<p><div class="math notranslate nohighlight">
+\[\text{Search for } u \in V, \text{ s.t. } \forall v \in V, \quad \int_\Omega \nabla u \cdot \nabla v \:\d \x = \int_\Omega \widetilde{f} v \:\d\x,  \]</div>
+</p>
+<p>where <span class="math notranslate nohighlight">\(\widetilde f := f - \frac{1}{\lvert\Omega\lvert}\int_\Omega f\:\d\x\)</span> is the <span class="math notranslate nohighlight">\(0\)</span> averaged version of <span class="math notranslate nohighlight">\(f\)</span>. In other words, <span class="math notranslate nohighlight">\(u\)</span> is the unique solution in <span class="math notranslate nohighlight">\(V\)</span> to the version of <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a> featuring the <span class="math notranslate nohighlight">\(0\)</span> averaged right-hand side <span class="math notranslate nohighlight">\(\widetilde{f}\)</span>.
+In particular, if <span class="math notranslate nohighlight">\(f \in L^2(\Omega)\)</span> satisfies the condition <a class="reference internal" href="#equation-eq-compatibility">(1.34)</a>, the solution <span class="math notranslate nohighlight">\(u\)</span> to <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a> can be calculated by searching for the unique pair <span class="math notranslate nohighlight">\((u,\lambda) \in H^1(\Omega) \times \R\)</span> satisfying the following variational problem:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\text{Search for } (u,\lambda) \in H^1(\Omega) \times \R \text{ s.t. } \forall (v,\mu) \in H^1(\Omega) \times \R, \quad \left\{
+\begin{array}{l}
+\displaystyle\int_\Omega \nabla u \cdot \nabla v \:\d \x + \lambda \displaystyle\int_\Omega v \:\d \x = \displaystyle\int_\Omega fv \:\d\x, \\
+\mu \displaystyle\int_\Omega u \:\d\x = 0,
+\end{array}
+\right.\end{split}\]</div>
+<p>or equivalently:</p>
+<div class="math notranslate nohighlight" id="equation-eq-varpbulambda">
+<span class="eqno">(1.39)<a class="headerlink" href="#equation-eq-varpbulambda" title="Link to this equation">¶</a></span>\[\text{Search for } (u,\lambda) \in H^1(\Omega) \times \R \text{ s.t. } \forall (v,\mu) \in H^1(\Omega) \times \R, \quad \int_\Omega \nabla u \cdot \nabla v \:\d \x + \lambda \int_\Omega v \:\d \x  +  \mu \int_\Omega u \:\d\x = \int_\Omega fv \:\d\x.\]</div>
+</section>
+</section>
+<section id="implementation-of-the-pure-neumann-problem">
+<h2><span class="section-number">1.9.3. </span>Implementation of the pure Neumann problem<a class="headerlink" href="#implementation-of-the-pure-neumann-problem" title="Link to this heading">¶</a></h2>
+<p>We exemplify the resolution of the pure Neumann problem <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a> with an example. The implementation of the penalization strategy of <a class="reference internal" href="#sec-penneu"><span class="std std-numref">Section 1.9.2.1</span></a> is simple enough, and it is left as an <a class="reference internal" href="#exo-neu"><span class="std std-ref">exercise</span></a>.</p>
+<div class="admonition-exo admonition" id="exo-neu">
+<p class="admonition-title">Exercise</p>
+<p>Implement the penalization approach in <a class="reference internal" href="#sec-penneu"><span class="std std-numref">Section 1.9.2.1</span></a> to solve the pure Neumann problem <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a>.</p>
+</div>
+<p>The solution based on the constrained optimization viewpoint of <a class="reference internal" href="#sec-csneu"><span class="std std-numref">Section 1.9.2.2</span></a> is slightly more involved. The assembly of the Finite Element problem <a class="reference internal" href="#equation-eq-varpbulambda">(1.39)</a>, posed over the product space <span class="math notranslate nohighlight">\(H^1(\Omega) \times \R\)</span>, requires handling the Finite Element matrices associated to the three components of its left-hand side. This can be realized by using the syntax elements of <a class="reference internal" href="eigen.html#sec-femats"><span class="std std-numref">Section 1.7.1</span></a>, as described in the following listing.
+The complete numerical implementation of both approaches is proposed <a class="reference download internal" download="" href="../_downloads/06dd66e313c39b2ad7cd23c929512104/laplace_pure_Neumann.edp"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>, and the numerical results are presented on <a class="reference internal" href="#fig-lappureneumann"><span class="std std-numref">Fig. 1.24</span></a>.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Resolution of the problem using Lagrange multipliers */</span>
+<span class="kt">int</span><span class="w"> </span><span class="kr">nv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Vh</span><span class="p">.</span><span class="kr">ndof</span><span class="p">;</span>
+
+<span class="cm">/* Bilinear form for the Laplace equation */</span>
+<span class="kt">varf</span><span class="w"> </span><span class="nf">varlap</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">int2d</span><span class="p">(</span><span class="n">Th</span><span class="p">)(</span><span class="nf">dx</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="nf">dx</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">+</span><span class="nf">dy</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="nf">dy</span><span class="p">(</span><span class="n">v</span><span class="p">));</span>
+
+<span class="cm">/* Bilinear form for the additional np*1 block */</span>
+<span class="kt">varf</span><span class="w"> </span><span class="nf">vb</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">int2d</span><span class="p">(</span><span class="n">Th</span><span class="p">)(</span><span class="mf">1.0</span><span class="o">*</span><span class="n">v</span><span class="p">);</span>
+
+<span class="kt">matrix</span><span class="w"> </span><span class="kp">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">varlap</span><span class="p">(</span><span class="n">Vh</span><span class="p">,</span><span class="n">Vh</span><span class="p">);</span><span class="w"> </span><span class="c1">// matrix with size nv*nv</span>
+<span class="kt">real</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="w"> </span><span class="kp">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vb</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">Vh</span><span class="p">);</span><span class="w"> </span><span class="c1">// Column bloc with size nv*1</span>
+
+<span class="cm">/* Matrix of the augmented problem */</span>
+<span class="kt">matrix</span><span class="w"> </span><span class="n">Aa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[</span><span class="kp">A</span><span class="p">,</span><span class="kp">B</span><span class="p">],[</span><span class="kp">B</span><span class="o">&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">]];</span><span class="w"> </span><span class="c1">// B&#39; = transpose of B</span>
+
+<span class="cm">/* Construction of the right-hand side */</span>
+<span class="kt">varf</span><span class="w"> </span><span class="nf">vrhs</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="nf">int1d</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="mi">1</span><span class="p">)(</span><span class="n">gin</span><span class="o">*</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nf">int1d</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="mi">2</span><span class="p">)(</span><span class="n">gout</span><span class="o">*</span><span class="n">v</span><span class="p">);</span>
+<span class="kt">real</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vrhs</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">Vh</span><span class="p">);</span>
+<span class="kt">real</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="w"> </span><span class="n">ba</span><span class="p">(</span><span class="kr">nv</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">ba</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="mf">0.0</span><span class="p">];</span>
+
+<span class="cm">/* Inversion of the augmented system */</span>
+<span class="nf">set</span><span class="p">(</span><span class="n">Aa</span><span class="p">,</span><span class="kp">solver</span><span class="o">=</span><span class="kr">UMFPACK</span><span class="p">);</span>
+<span class="kt">real</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="w"> </span><span class="n">ua</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Aa</span><span class="o">^</span><span class="mi">-1</span><span class="o">*</span><span class="n">ba</span><span class="p">;</span>
+<span class="p">[</span><span class="n">u</span><span class="p">[],</span><span class="n">l</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ua</span><span class="p">;</span><span class="w">  </span><span class="c1">// Comprehension of vector ua</span>
+</pre></div>
+</div>
+<figure class="align-default" id="id2">
+<span id="fig-lappureneumann"></span><a class="reference internal image-reference" href="../_images/lapPureNeumann.png"><img alt="../_images/lapPureNeumann.png" src="../_images/lapPureNeumann.png" style="width: 793.98px; height: 378.18px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.24 </span><span class="caption-text">Resolution of the pure Neumann problem <a class="reference internal" href="#equation-eq-pureneumann">(1.33)</a>; (Left) Setting of the test-case: heat is entering <span class="math notranslate nohighlight">\(\Omega\)</span> from the left boundary <span class="math notranslate nohighlight">\(\Gamma_{\text{in}}\)</span> with a flux <span class="math notranslate nohighlight">\(g_{\text{in}}\)</span> and is leaving <span class="math notranslate nohighlight">\(\Omega\)</span> from the right boundary <span class="math notranslate nohighlight">\(\Gamma_{\text{out}}\)</span> with a flux <span class="math notranslate nohighlight">\(g_{\text{out}}\)</span>; (right) Plot of the solution.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index_gen.html">1. Generalities</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="anafunc.html">1.1. Functional analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varpbs.html">1.2. Lax-Milgram framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEtheory.html">1.3. The Finite Element method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="laplace.html">1.4. Laplace equation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization.html">1.5. Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">1.6. Meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen.html">1.7. Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dirpen.html">1.8. Penalization for Dirichlet conditions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1.9. Pure Neumann</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Advanced/index_adv.html">2. Advanced features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_gen.html"><span class="section-number">1. </span>Getting started</a><ul>
+      <li>Previous: <a href="dirpen.html" title="previous chapter"><span class="section-number">1.8. </span>Imposing Dirichlet boundary conditions by exact penalization</a></li>
+      <li>Next: <a href="../Advanced/index_adv.html" title="next chapter"><span class="section-number">2. </span>More advanced issues in scientific computing</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Generalities/laplace_pure_Neumann.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

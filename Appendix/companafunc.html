@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>6.2. Complements of functional analysis &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="6.3. More advanced functional analysis" href="appadvanafunc.html" />
+    <link rel="prev" title="6.1. A reminder of differential calculus" href="calculus.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="complements-of-functional-analysis">
+<h1><span class="section-number">6.2. </span>Complements of functional analysis<a class="headerlink" href="#complements-of-functional-analysis" title="Link to this heading">¶</a></h1>
+<p>This appendix is a pot-pourri of results in functional analysis that underlie some of the theoretical developments of this book.</p>
+<section id="the-banach-contraction-mapping-theorem">
+<span id="sec-banachcontraction"></span><h2><span class="section-number">6.2.1. </span>The Banach contraction mapping theorem<a class="headerlink" href="#the-banach-contraction-mapping-theorem" title="Link to this heading">¶</a></h2>
+<div class="proof theorem admonition" id="theorem-0">
+<span id="th-banachfp"></span><p class="admonition-title"><span class="caption-number">Theorem 6.2 </span> (Banach contraction mapping)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(E\)</span> be a Banach space, and let <span class="math notranslate nohighlight">\(A : E \to E\)</span> be a (possibly non linear) mapping. Assume that <span class="math notranslate nohighlight">\(A\)</span> is a contraction, i.e. there exists <span class="math notranslate nohighlight">\(k&lt;1\)</span> such that:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall u,v \in E, \quad \lvert\lvert Au - Av \lvert\lvert &lt; k \lvert\lvert u - v \lvert\lvert. \]</div>
+</p>
+<p>Then <span class="math notranslate nohighlight">\(A\)</span> has a unique fixed point <span class="math notranslate nohighlight">\(u^* \in V\)</span>, i.e. there is a unique <span class="math notranslate nohighlight">\(u^* \in V\)</span> such that <span class="math notranslate nohighlight">\(Au^* = u^*\)</span>.</p>
+</section>
+</div></section>
+<section id="the-uniqueness-of-the-limit-argument">
+<span id="sec-uniquelim"></span><h2><span class="section-number">6.2.2. </span>The uniqueness of the limit argument<a class="headerlink" href="#the-uniqueness-of-the-limit-argument" title="Link to this heading">¶</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(V\)</span> be a topological vector space. This argument is generic, but the reader which does not want to bother with the language of topological vector spaces can think of <span class="math notranslate nohighlight">\(V\)</span> as a Hilbert space, equipped with notion of strong or weak convergence.</p>
+<div class="proof lemma admonition" id="lemma-1">
+<p class="admonition-title"><span class="caption-number">Lemma 6.2 </span></p>
+<section class="lemma-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(\left\{u_n\right\}_{n\in \N}\)</span> be a sequence of elements in <span class="math notranslate nohighlight">\(V\)</span> such that there exists <span class="math notranslate nohighlight">\(u^* \in V\)</span> with the following property:
+<div class="math notranslate nohighlight">
+\[\text{From any subsequence }\left\{u_{n_k}\right\}_{k \in \N} \text{ of }u_n, \text{ one can extract a sub-subsequence }\left\{u_{n_{k_l}}\right\}_{l \in \N} \text{ converging to }u^*.\]</div>
+
+Then, the whole sequence <span class="math notranslate nohighlight">\(\left\{u_n\right\}_{n\in \N}\)</span> converges to <span class="math notranslate nohighlight">\(u^*\)</span>.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. We argue by contradiction, assuming that <span class="math notranslate nohighlight">\(\left\{u_n\right\}_{n\in \N}\)</span> does not converge to <span class="math notranslate nohighlight">\(u^*\)</span>.</p>
+<p>On the one hand, by negating the definition of convergence of a sequence, there exists an open subset <span class="math notranslate nohighlight">\(U\)</span> of <span class="math notranslate nohighlight">\(V\)</span> containing <span class="math notranslate nohighlight">\(u^*\)</span> and a subsequence <span class="math notranslate nohighlight">\(\left\{u_{n_k}\right\}_{k\in \N}\)</span> of <span class="math notranslate nohighlight">\(\left\{u_n\right\}_{n\in \N}\)</span> such that <span class="math notranslate nohighlight">\(u_{n_k} \in V \setminus U\)</span> for all <span class="math notranslate nohighlight">\(k \in \N\)</span>.</p>
+<p>On the other hand, the assumption implies that there exists a sub-subsequence <span class="math notranslate nohighlight">\(\left\{u_{n_{k_l}}\right\}_{l \in \N}\)</span> of <span class="math notranslate nohighlight">\(\left\{u_{n_k}\right\}_{k\in \N}\)</span> which converges to <span class="math notranslate nohighlight">\(u^*\)</span>. In particular, for <span class="math notranslate nohighlight">\(l\)</span> large enough, <span class="math notranslate nohighlight">\(u_{n_{k_l}}\)</span> belongs to <span class="math notranslate nohighlight">\(U\)</span>.</p>
+<p>We have come to the desired contradiction: such an element <span class="math notranslate nohighlight">\(u_{n_{k_l}}\)</span> cannot belong to <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V \setminus U\)</span> at the same time.</p>
+</div>
+</section>
+<section id="weak-convergence-in-a-hilbert-space">
+<span id="sec-weakcv"></span><h2><span class="section-number">6.2.3. </span>Weak convergence in a Hilbert space<a class="headerlink" href="#weak-convergence-in-a-hilbert-space" title="Link to this heading">¶</a></h2>
+<p>This section recalls a few facts about the important notion of weak convergence. Note that many of these hold true in a larger context, that of reflexive Banach spaces, although we shall not need such generality. See again <span id="id1">[<a class="reference internal" href="../Generalities/bibliography.html#id5" title="Haim Brezis. Functional analysis, Sobolev spaces and partial differential equations. Springer Science &amp; Business Media, 2010.">Bre10</a>]</span> for more details.</p>
+<div class="proof definition admonition" id="definition-2">
+<p class="admonition-title"><span class="caption-number">Definition 6.5 </span></p>
+<section class="definition-content" id="proof-content">
+<p>A sequence <span class="math notranslate nohighlight">\(u_n \in H\)</span> converges weakly to an element <span class="math notranslate nohighlight">\(u \in H\)</span> if:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall v \in H, \quad ( u_n, v )_H \xrightarrow{n \to \infty} 0.\]</div>
+</p>
+</section>
+</div><p>A few useful properties of weakly convergent sequences are listed below.</p>
+<div class="proof proposition admonition" id="proposition-3">
+<p class="admonition-title"><span class="caption-number">Proposition 6.1 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(u_n\)</span> be a sequence in <span class="math notranslate nohighlight">\(H\)</span>, which converges weakly to an element <span class="math notranslate nohighlight">\(u \in H\)</span>. Then,</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(u\)</span> is the unique weak limit of the sequence <span class="math notranslate nohighlight">\(u_n\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(u_n\)</span> is bounded.</p></li>
+</ul>
+</div></blockquote>
+</section>
+</div><p>The following very important fact states the weak sequential compactness of bounded subsets of a Hilbert space.</p>
+<div class="proof proposition admonition" id="proposition-4">
+<span id="prop-seqcompactbounded"></span><p class="admonition-title"><span class="caption-number">Proposition 6.2 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(u_n\)</span> be a bounded sequence in <span class="math notranslate nohighlight">\(H\)</span>. Then there exists a subsequence <span class="math notranslate nohighlight">\(n_k\)</span> and <span class="math notranslate nohighlight">\(u \in H\)</span> such that <span class="math notranslate nohighlight">\(u_{n_k}\)</span> converges weakly to <span class="math notranslate nohighlight">\(u\)</span>.</p>
+</section>
+</div></section>
+<section id="compactness">
+<span id="sec-compact"></span><h2><span class="section-number">6.2.4. </span>Compactness<a class="headerlink" href="#compactness" title="Link to this heading">¶</a></h2>
+<div class="proof definition admonition" id="definition-5">
+<span id="def-compact"></span><p class="admonition-title"><span class="caption-number">Definition 6.6 </span></p>
+<section class="definition-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(H_1\)</span>, <span class="math notranslate nohighlight">\(H_2\)</span> be two Hilbert spaces. A linear operator <span class="math notranslate nohighlight">\(T : H_1 \to H_2\)</span> is called compact if for any sequence <span class="math notranslate nohighlight">\(u_n\)</span> of elements in <span class="math notranslate nohighlight">\(H_1\)</span> converging weakly to some <span class="math notranslate nohighlight">\(u^* \in H_1\)</span>, the sequence <span class="math notranslate nohighlight">\(T u_n \in H_2\)</span> converges strongly in <span class="math notranslate nohighlight">\(H_2\)</span>.</p>
+</section>
+</div><p>An example of a compact operator which is crucial in applications arises in the context of Sobolev spaces, broached in <a class="reference internal" href="../Generalities/anafunc.html#sec-sobolev"><span class="std std-numref">Section 1.1.3.2</span></a>.</p>
+<div class="proof theorem admonition" id="theorem-6">
+<span id="th-rellich"></span><p class="admonition-title"><span class="caption-number">Theorem 6.3 </span> (Rellich theorem)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(\Omega\)</span> be a bounded Lipschitz domain in <span class="math notranslate nohighlight">\(\R^d\)</span>. Then the injection <span class="math notranslate nohighlight">\(H^1(\Omega) \to L^2(\Omega)\)</span> is compact.</p>
+</section>
+</div></section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/index_gen.html">1. Generalities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Advanced/index_adv.html">2. Advanced features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index_app.html">6. Appendix</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="calculus.html">6.1. Differential calculus</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">6.2. Complements of functional analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appadvanafunc.html">6.3. More advanced functional analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convexity.html">6.4. Convexity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compoptim.html">6.5. Optimization theory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appPDE.html">6.6. PDE</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_app.html"><span class="section-number">6. </span>Appendix</a><ul>
+      <li>Previous: <a href="calculus.html" title="previous chapter"><span class="section-number">6.1. </span>A reminder of differential calculus</a></li>
+      <li>Next: <a href="appadvanafunc.html" title="next chapter"><span class="section-number">6.3. </span>More advanced functional analysis</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Appendix/companafunc.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

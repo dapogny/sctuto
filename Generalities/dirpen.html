@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>1.8. Imposing Dirichlet boundary conditions by exact penalization &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="1.9. The Laplace equation with pure Neumann boundary conditions" href="laplace_pure_Neumann.html" />
+    <link rel="prev" title="1.7. Eigenvalue problems" href="eigen.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="imposing-dirichlet-boundary-conditions-by-exact-penalization">
+<span id="sec-dirtgv"></span><h1><span class="section-number">1.8. </span>Imposing Dirichlet boundary conditions by exact penalization<a class="headerlink" href="#imposing-dirichlet-boundary-conditions-by-exact-penalization" title="Link to this heading">¶</a></h1>
+<p>In this section, we present a simple and efficient numerical method to enforce the Dirichlet boundary conditions of a boundary-value problem.
+This method is actually the one used in most Finite Element libraries; in particular, it is the numerical recipe underlying the keyword <code class="code docutils literal notranslate"><span class="pre">on</span></code> in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span>.</p>
+<p>To set ideas, let us consider the Laplace equation with homogeneous Dirichlet boundary conditions of <a class="reference internal" href="laplace.html#sec-lap"><span class="std std-numref">Section 1.4</span></a>. Reusing the notations of the latter, its variational formulation reads:</p>
+<div class="math notranslate nohighlight" id="equation-eq-dirpen">
+<span class="eqno">(1.31)<a class="headerlink" href="#equation-eq-dirpen" title="Link to this equation">¶</a></span>\[\text{Search for } u \in H^1_0(\Omega) \text{ s.t. } \forall v \in H^1_0(\Omega), \:\: \int_{\Omega}{\nabla u \cdot \nabla v \:\d \x} = \int_{\Omega}{fv\:\d\x}.\]</div>
+<p>The direct implementation of the Finite Element Method for the discretization and solution of this problem is somewhat tedious, even in the case of the relatively simple <span class="math notranslate nohighlight">\(\P_1\)</span> Lagrange Finite Element method described in <a class="reference internal" href="FEtheory.html#sec-fe"><span class="std std-numref">Section 1.3</span></a>. This task indeed requires to assemble the stiffness matrix <span class="math notranslate nohighlight">\(K_h\)</span> by retaining only those degrees of freedom lying in the interior of <span class="math notranslate nohighlight">\(\Omega\)</span>, which raises cumbersome renumbering issues of the vertices of the mesh <span class="math notranslate nohighlight">\(\calT_h\)</span>.</p>
+<p>A much simpler approach consists in approximating <span class="math notranslate nohighlight">\(u\)</span> by the solution <span class="math notranslate nohighlight">\(u_\e \in H^1(\Omega)\)</span> to the following problem:</p>
+<div class="math notranslate nohighlight" id="equation-eq-dirpen2">
+<span class="eqno">(1.32)<a class="headerlink" href="#equation-eq-dirpen2" title="Link to this equation">¶</a></span>\[\text{Search for } u _\e \in H^1(\Omega) \text{ s.t. } \forall v \in H^1(\Omega), \:\: \int_{\Omega}{\nabla u_\e \cdot \nabla v \:\d\x} + \frac{1}{\varepsilon}\int_{\partial \Omega}{u _\e v \:\d s} = \int_{\Omega}{fv\:\d\x},\]</div>
+<p>where <span class="math notranslate nohighlight">\(\varepsilon\)</span> is a &quot;very small&quot; parameter (typically of the order of <span class="math notranslate nohighlight">\(10^{-20}\)</span>).
+Intuitively, <span class="math notranslate nohighlight">\(u_\e\)</span> does not exactly equal <span class="math notranslate nohighlight">\(0\)</span> on <span class="math notranslate nohighlight">\(\partial \Omega\)</span>, but the second integral in the left-hand side of <a class="reference internal" href="#equation-eq-dirpen2">(1.32)</a> is a large penalization of its values on <span class="math notranslate nohighlight">\(\partial \Omega\)</span>.</p>
+<p>The validity of this approach is assessed by the following theoretical exercise.</p>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<p>This exercise uses the notions of compactness and weak convergence in Hilbert spaces, recalled in <a class="reference internal" href="../Appendix/companafunc.html#sec-compact"><span class="std std-numref">Section 6.2.4</span></a>.</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Prove the following version of the <a class="reference internal" href="anafunc.html#prop-poincare"><span class="std std-ref">Poincaré’s inequality</span></a>: there exists a constant <span class="math notranslate nohighlight">\(C &gt;0\)</span> such that:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall u \in H^1(\Omega), \quad \int_\Omega u^2 \:\d \x \leq C \left( \int_\Omega \lvert \nabla u \lvert^2 \:\d\x + \int_{\partial \Omega} u^2 \:\d s \right). \]</div>
+</p>
+</li>
+<li><p>Prove that the solution <span class="math notranslate nohighlight">\(u_\e\)</span> to <a class="reference internal" href="#equation-eq-dirpen2">(1.32)</a> is bounded in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>, independently of the value of <span class="math notranslate nohighlight">\(\e\)</span>, i.e. that there exists a constant <span class="math notranslate nohighlight">\(C &gt;0\)</span> such that, for <span class="math notranslate nohighlight">\(\e &gt;0\)</span> small enough,</p>
+<p><div class="math notranslate nohighlight">
+\[\lvert\lvert u _\e \lvert\lvert_{H^1(\Omega)} \leq C \lvert\lvert f \lvert\lvert_{L^2(\Omega)}. \]</div>
+</p>
+<p>Deduce that there exists a function <span class="math notranslate nohighlight">\(u_* \in H^1(\Omega)\)</span> such that:</p>
+<p><div class="math notranslate nohighlight">
+\[u_\e \xrightarrow{\e \to 0} u_* \text{ weakly in } H^1(\Omega).\]</div>
+</p>
+</li>
+<li><p>Prove that <span class="math notranslate nohighlight">\(u_*\)</span> is the unique solution <span class="math notranslate nohighlight">\(u \in H^1_0(\Omega)\)</span> to the exact variational problem <a class="reference internal" href="#equation-eq-dirpen">(1.31)</a>.</p></li>
+<li><p>Prove that <span class="math notranslate nohighlight">\(u_\e\)</span> actually converges to <span class="math notranslate nohighlight">\(u\)</span> strongly in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> when the penalization parameter <span class="math notranslate nohighlight">\(\e\)</span> vanishes, i.e.</p>
+<p><div class="math notranslate nohighlight">
+\[\lvert\lvert u _\e - u \lvert\lvert_{H^1(\Omega)} \xrightarrow{\e \to 0} 0.\]</div>
+</p>
+</li>
+</ol>
+</div></blockquote>
+</div>
+<div class="dropdown admonition">
+<p class="admonition-title">Correction</p>
+<ol class="arabic">
+<li><p>The proof of this inequality relies on a contradiction argument very similar to that of the proof of  <a class="reference internal" href="anafunc.html#prop-poincare"><span class="std std-ref">Poincaré’s inequality</span></a>, and we omit the proof for brevity.</p></li>
+<li><p>Taking <span class="math notranslate nohighlight">\(u_\e\)</span> as test function in the variational problem <a class="reference internal" href="#equation-eq-dirpen2">(1.32)</a>, we obtain:
+<div class="math notranslate nohighlight">
+\[\int_\Omega \lvert \nabla u _\e \lvert^2 \:\d x + \frac{1}{\e} \int_{\partial \Omega} u _\e^2 \:\d s = \int_\Omega f u _\e \:\d \x. \]</div>
+
+Now combining the Cauchy-Schwarz inequality with the Poincaré’s inequality proved in the former question, we obtain:
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{ccl}
+\displaystyle\int_\Omega \lvert \nabla u _\e \lvert^2 \:\d x + \frac{1}{\e} \displaystyle\int_{\partial \Omega} u _\e^2 \:\d s &amp;\leq&amp; \lvert\lvert f \lvert\lvert_{L^2(\Omega)} \lvert\lvert u _\e \lvert\lvert_{L^2(\Omega)} \\
+&amp;\leq&amp; C \lvert\lvert f \lvert\lvert_{L^2(\Omega)} \left( \displaystyle\int_\Omega \lvert \nabla u _\e \lvert^2 \:\d\x + \displaystyle\int_{\partial \Omega} u _\e^2 \:\d s\right)^{\frac{1}{2}} \\
+&amp;\leq&amp; C \lvert\lvert f \lvert\lvert_{L^2(\Omega)} \left( \displaystyle\int_\Omega \lvert \nabla u _\e \lvert^2 \:\d\x + \frac{1}{\e}\displaystyle\int_{\partial \Omega} u _\e^2 \:\d s\right)^{\frac{1}{2}}.
+\end{array}
+\end{split}\]</div>
+
+This proves that:
+<div class="math notranslate nohighlight">
+\[\displaystyle\int_\Omega \lvert \nabla u _\e \lvert^2 \:\d x + \frac{1}{\e} \displaystyle\int_{\partial \Omega} u _\e^2 \:\d s \leq C \lvert\lvert f \lvert\lvert_{L^2(\Omega)}^2,\]</div>
+
+and in particular, <span class="math notranslate nohighlight">\(u_\e\)</span> is a bounded sequence in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>.</p>
+<p>Now invoking <a class="reference internal" href="../Appendix/companafunc.html#prop-seqcompactbounded"><span class="std std-numref">proposition 6.2</span></a>, there exists a subsequence <span class="math notranslate nohighlight">\(u_{\e_k}\)</span> of <span class="math notranslate nohighlight">\(u_\e\)</span> and a function <span class="math notranslate nohighlight">\(u_* \in H^1(\Omega)\)</span> such that:
+<div class="math notranslate nohighlight">
+\[u_{\e_k} \xrightarrow{k \to \infty} u_* \text{ weakly in } H^1(\Omega). \]</div>
+</p>
+</li>
+<li><p>For a fixed test function <span class="math notranslate nohighlight">\(v \in H^1(\Omega)\)</span>, the variational equation <a class="reference internal" href="#equation-eq-dirpen2">(1.32)</a> rewrites:
+<div class="math notranslate nohighlight">
+\[\int_{\partial\Omega} u _{\e_k} v \:\d s = - \e_k \int_\Omega \nabla u _{\e_k} \cdot \nabla v \:\d \x + \e_k \int_\Omega f v \:\d \x. \]</div>
+
+Since the sequence <span class="math notranslate nohighlight">\(u_{\e_k}\)</span> is bounded in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> and the trace operator is continuous from <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> into <span class="math notranslate nohighlight">\(H^{1/2}(\partial \Omega)\)</span>, we may take limits in the previous expression, which yields:
+<div class="math notranslate nohighlight">
+\[\int_{\partial \Omega} u_* v \:\d s = 0.\]</div>
+
+Since this holds for an arbitrary function <span class="math notranslate nohighlight">\(v \in H^1(\Omega)\)</span>, it follows that <span class="math notranslate nohighlight">\(u_* = 0\)</span> on <span class="math notranslate nohighlight">\(\partial \Omega\)</span>.
+Now, for a given test function <span class="math notranslate nohighlight">\(v \in H^1_0(\Omega)\)</span>, the variational problem <a class="reference internal" href="#equation-eq-dirpen2">(1.32)</a> reads:
+<div class="math notranslate nohighlight">
+\[\int_{\Omega}{\nabla u _{\e_k} \cdot \nabla v \:\d\x}  = \int_{\Omega}{fv\:\d\x}.\]</div>
+
+Passing to the limit in this expression thanks to the weak <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> convergence of <span class="math notranslate nohighlight">\(u_{\e_k}\)</span> to <span class="math notranslate nohighlight">\(u_*\)</span>, we see that <span class="math notranslate nohighlight">\(u_*\)</span> satisfies <a class="reference internal" href="#equation-eq-dirpen">(1.31)</a>. The solution to this variational problem being unique, we obtain that <span class="math notranslate nohighlight">\(u_* = u\)</span>.</p>
+<p>At this point, we have proved that the particular subsequence <span class="math notranslate nohighlight">\(u_{\e_k}\)</span> of <span class="math notranslate nohighlight">\(u_\e\)</span> that we have considered converges weakly in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> to the unique solution <span class="math notranslate nohighlight">\(u\)</span> to <a class="reference internal" href="#equation-eq-dirpen">(1.31)</a>. Since this holds true for any weakly convergent subsequence of <span class="math notranslate nohighlight">\(u_\e\)</span>, we deduce from <a class="reference internal" href="../Appendix/companafunc.html#sec-uniquelim"><span class="std std-ref">a classical argument based on the uniqueness of the weak limit</span></a> that the whole sequence <span class="math notranslate nohighlight">\(u_\e\)</span> weakly converges to <span class="math notranslate nohighlight">\(u\)</span> in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>.</p>
+</li>
+<li><p>By expanding the squares, we see that:
+<div class="math notranslate nohighlight">
+\[\displaystyle\int_\Omega \lvert \nabla u _\e  - \nabla u \lvert^2 \:\d \x + \frac{1}{\e} \displaystyle\int_{\partial \Omega}\lvert  u _\e - u \lvert ^2 \:\d s =  \displaystyle\int_\Omega \lvert \nabla u _\e \lvert^2 \:\d \x +  \displaystyle\int_\Omega \lvert \nabla u \lvert^2 \:\d \x - 2  \displaystyle\int_\Omega  \nabla u _\e \cdot \nabla u \:\d \x + \frac{1}{\e}\int_{\partial \Omega} u _\e^2 \:\d s.\]</div>
+
+Now invoking the variational problems <a class="reference internal" href="#equation-eq-dirpen">(1.31)</a> and <a class="reference internal" href="#equation-eq-dirpen2">(1.32)</a> respectively satisfied by <span class="math notranslate nohighlight">\(u _\e\)</span> and <span class="math notranslate nohighlight">\(u\)</span>, we obtain:
+<div class="math notranslate nohighlight">
+\[\displaystyle\int_\Omega \lvert \nabla u _\e  - \nabla u \lvert^2 \:\d \x + \frac{1}{\e} \displaystyle\int_{\partial \Omega}\lvert  u _\e - u \lvert ^2 \:\d s = -\frac{1}{\e} \int_{\partial \Omega} u _\e^2 \:\d s + \int_\Omega f u _\e \:\d \x + \int_\Omega f u \:\d \x - 2 \int_{\Omega} f u \:\d \x + \frac{1}{\e} \int_{\partial \Omega} u _\e^2 \:\d s. \]</div>
+
+Rearranging the foregoing expression, we obtain:
+<div class="math notranslate nohighlight">
+\[\displaystyle\int_\Omega \lvert \nabla u _\e  - \nabla u \lvert^2 \:\d \x + \frac{1}{\e} \displaystyle\int_{\partial \Omega}\lvert  u _\e - u \lvert ^2 \:\d s = \int_\Omega f (u _\e - u) \:\d \x. \]</div>
+
+Since <span class="math notranslate nohighlight">\(u _\e \to u\)</span> weakly in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>, the right-hand side in the above equality tends to <span class="math notranslate nohighlight">\(0\)</span> as <span class="math notranslate nohighlight">\(\e \to 0\)</span>, which is the expected conclusion.</p></li>
+</ol>
+</div>
+<p>The practical implementation of the penalization method for Dirichlet boundary conditions is relatively straightforward, and it is left as an exercise; the solution can be downloaded <a class="reference download internal" download="" href="../_downloads/9111c687826b73fe88a670789f159237/laplace_pen_Dirichlet.edp"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<blockquote>
+<div><p>Let <span class="math notranslate nohighlight">\(\Omega \subset \R^2\)</span> be the L-shaped domain represented in <a class="reference internal" href="laplace.html#fig-lshapelap"><span class="std std-numref">Fig. 1.8</span></a> (left), and let <span class="math notranslate nohighlight">\(f = 1\)</span>. Let <span class="math notranslate nohighlight">\(u \in H^1_0(\Omega)\)</span> and <span class="math notranslate nohighlight">\(u_\e \in H^1(\Omega)\)</span> be the unique solutions to <a class="reference internal" href="#equation-eq-dirpen">(1.31)</a> and <a class="reference internal" href="#equation-eq-dirpen">(1.31)</a>, respectively.</p>
+<ol class="arabic">
+<li><p>Solve the penalized problem for <span class="math notranslate nohighlight">\(u_\e\)</span> with <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span>; you may try out different values for the parameter <span class="math notranslate nohighlight">\(\e\)</span>.</p></li>
+<li><p>Adapt the above penalization trick to the numerical resolution of the following version of the Laplace equation:</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\left\{\begin{array}{cl} - \Delta u = 0 &amp; \text{in } \Omega, \\ u = 1 &amp; \text{on }\partial \Omega, \end{array} \right.\end{split}\]</div>
+</p>
+</li>
+</ol>
+</div></blockquote>
+</div>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index_gen.html">1. Generalities</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="anafunc.html">1.1. Functional analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varpbs.html">1.2. Lax-Milgram framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEtheory.html">1.3. The Finite Element method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="laplace.html">1.4. Laplace equation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization.html">1.5. Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">1.6. Meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen.html">1.7. Eigenvalues</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1.8. Penalization for Dirichlet conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="laplace_pure_Neumann.html">1.9. Pure Neumann</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Advanced/index_adv.html">2. Advanced features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_gen.html"><span class="section-number">1. </span>Getting started</a><ul>
+      <li>Previous: <a href="eigen.html" title="previous chapter"><span class="section-number">1.7. </span>Eigenvalue problems</a></li>
+      <li>Next: <a href="laplace_pure_Neumann.html" title="next chapter"><span class="section-number">1.9. </span>The Laplace equation with pure Neumann boundary conditions</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Generalities/dirpen.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

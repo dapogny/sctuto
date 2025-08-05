@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>1.6. A second encounter with meshes &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="1.7. Eigenvalue problems" href="eigen.html" />
+    <link rel="prev" title="1.5. Visualization of meshes and solutions" href="visualization.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="a-second-encounter-with-meshes">
+<span id="sec-mesh"></span><h1><span class="section-number">1.6. </span>A second encounter with meshes<a class="headerlink" href="#a-second-encounter-with-meshes" title="Link to this heading">¶</a></h1>
+<p>This section elaborates further about the topic of meshes, that we have first encountered in <a class="reference internal" href="FEtheory.html#sec-fe"><span class="std std-numref">Section 1.3</span></a>. In the first <a class="reference internal" href="#sec-meshfff"><span class="std std-numref">Section 1.6.1</span></a>, we provide a few <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> syntax commands associated to their construction and handling. We then turn to the topic of mesh adaptation in <a class="reference internal" href="#sec-amr"><span class="std std-numref">Section 1.6.2</span></a>, before giving a few details about the structure of typical mesh files treated by <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> in <a class="reference internal" href="#sec-meshsolfiles"><span class="std std-numref">Section 1.6.3</span></a>.</p>
+<section id="handling-meshes-with-texttt-freefem">
+<span id="sec-meshfff"></span><h2><span class="section-number">1.6.1. </span>Handling meshes with <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span><a class="headerlink" href="#handling-meshes-with-texttt-freefem" title="Link to this heading">¶</a></h2>
+<p>The <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> environment offers multiple options to create, handle and modify meshes. The present section presents a few of the most useful features; the associated source code can be downloaded <a class="reference download internal" download="" href="../_downloads/cf5a96cfd51e722a509965d0037c3ff5/handling_meshes.edp"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
+<section id="construction-of-a-mesh">
+<h3><span class="section-number">1.6.1.1. </span>Construction of a mesh<a class="headerlink" href="#construction-of-a-mesh" title="Link to this heading">¶</a></h3>
+<p>A convenient way to create a mesh of a 2d domain <span class="math notranslate nohighlight">\(\Omega\)</span> in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> starts from the input of a parametrization of its boundary <span class="math notranslate nohighlight">\(\partial \Omega\)</span>, as a collection of 2d curves oriented counterclockwise, i.e. in such a way that the interior of <span class="math notranslate nohighlight">\(\Omega\)</span> is at the left-hand side of the curves. For example, the following listing defines the independent components of the boundary of a domain.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Definition of the boundary curves of the domain */</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">left</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">){</span><span class="w"> </span><span class="kr">x</span><span class="o">=</span><span class="mf">0.0</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="kr">y</span><span class="o">=</span><span class="mf">1.0</span><span class="o">-</span><span class="kp">t</span><span class="p">;</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">0</span><span class="p">;};</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">bot</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">){</span><span class="w"> </span><span class="kr">x</span><span class="o">=</span><span class="kp">t</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="kr">y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">0</span><span class="p">;};</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">right</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">){</span><span class="w"> </span><span class="kr">x</span><span class="o">=</span><span class="mf">2.0</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="kr">y</span><span class="o">=</span><span class="kp">t</span><span class="p">;</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">0</span><span class="p">;};</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">top</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">){</span><span class="w"> </span><span class="kr">x</span><span class="o">=</span><span class="mf">2.0</span><span class="o">-</span><span class="kp">t</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="kr">y</span><span class="o">=</span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">0</span><span class="p">;};</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">hole1</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">){</span><span class="w"> </span><span class="kr">x</span><span class="o">=</span><span class="mf">0.5</span><span class="o">+</span><span class="mf">0.1</span><span class="o">*</span><span class="nf">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="kr">pi</span><span class="o">*</span><span class="kp">t</span><span class="p">);</span><span class="w"> </span><span class="kr">y</span><span class="o">=</span><span class="mf">0.5</span><span class="o">+</span><span class="mf">0.1</span><span class="o">*</span><span class="nf">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="kr">pi</span><span class="o">*</span><span class="kp">t</span><span class="p">);</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">1</span><span class="p">;};</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">hole2</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">){</span><span class="w"> </span><span class="kr">x</span><span class="o">=</span><span class="mf">1.5</span><span class="o">+</span><span class="mf">0.1</span><span class="o">*</span><span class="nf">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="kr">pi</span><span class="o">*</span><span class="kp">t</span><span class="p">);</span><span class="w"> </span><span class="kr">y</span><span class="o">=</span><span class="mf">0.5</span><span class="o">+</span><span class="mf">0.1</span><span class="o">*</span><span class="nf">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="kr">pi</span><span class="o">*</span><span class="kp">t</span><span class="p">);</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">1</span><span class="p">;};</span>
+</pre></div>
+</div>
+<p>Then, a mesh of <span class="math notranslate nohighlight">\(\Omega\)</span> is constructed thanks to the command <span class="math notranslate nohighlight">\(\texttt{buildmesh}\)</span>, where the number of vertices discretizing each piece can be specified. This results with the mesh displayed on <a class="reference internal" href="#fig-meshborder"><span class="std std-numref">Fig. 1.18</span></a>.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Build mesh, display and save as a .mesh file */</span>
+<span class="cm">/* A negative numbers of vertices indicates reverse orientation */</span>
+<span class="kt">mesh</span><span class="w"> </span><span class="n">Th</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">buildmesh</span><span class="p">(</span><span class="n">left</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="o">+</span><span class="n">bot</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="n">right</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="o">+</span><span class="n">top</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="n">hole1</span><span class="p">(</span><span class="mi">-20</span><span class="p">)</span><span class="o">+</span><span class="n">hole2</span><span class="p">(</span><span class="mi">-20</span><span class="p">));</span>
+</pre></div>
+</div>
+<figure class="align-default" id="id1">
+<span id="fig-meshborder"></span><a class="reference internal image-reference" href="../_images/ex_bordermesh.png"><img alt="../_images/ex_bordermesh.png" src="../_images/ex_bordermesh.png" style="width: 502.2px; height: 256.2px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.18 </span><span class="caption-text">Creation of a 2d mesh from the input of its border with <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span>.</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="access-to-the-elements-of-a-mesh">
+<h3><span class="section-number">1.6.1.2. </span>Access to the elements of a mesh<a class="headerlink" href="#access-to-the-elements-of-a-mesh" title="Link to this heading">¶</a></h3>
+<p>In simple situations, the built-in operations in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> conveniently alleviate the need to handle the triangles and vertices of a mesh <span class="math notranslate nohighlight">\(\texttt{Th}\)</span>. However, more advanced features sometimes raise the need to have access to these data, which can be achieved along the following lines.</p>
+<p>The mesh <span class="math notranslate nohighlight">\(\texttt{Th}\)</span> contains <span class="math notranslate nohighlight">\(\texttt{Th.nt}\)</span> triangles, which are numbered from <span class="math notranslate nohighlight">\(k=0\)</span> to <span class="math notranslate nohighlight">\(k=\texttt{Th.nt}-1\)</span>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>For <span class="math notranslate nohighlight">\(i=0,1,2\)</span>, <span class="math notranslate nohighlight">\(\texttt{Th[k][i]}\)</span> is the number of the <span class="math notranslate nohighlight">\(i^{\text{th}}\)</span> vertex of element <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\texttt{Th[k].label}\)</span> is the label of element <span class="math notranslate nohighlight">\(k\)</span>, i.e. the number of the assigned material region.</p></li>
+</ul>
+</div></blockquote>
+<p>The mesh contains <span class="math notranslate nohighlight">\(\texttt{Th.nv}\)</span> vertices, which are numbered from <span class="math notranslate nohighlight">\(l=0\)</span> to <span class="math notranslate nohighlight">\(l=\texttt{Th.nv}-1\)</span>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\texttt{Th(l).x}\)</span> and <span class="math notranslate nohighlight">\(\texttt{Th(l).y}\)</span> are the <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> coordinates of the <span class="math notranslate nohighlight">\(l^{\text{th}}\)</span> vertex of the mesh.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\texttt{Th(l).label}\)</span> is the label of the <span class="math notranslate nohighlight">\(l^{\text{th}}\)</span> vertex of the mesh.</p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+<section id="adaptive-mesh-refinement">
+<span id="sec-amr"></span><h2><span class="section-number">1.6.2. </span>Adaptive mesh refinement<a class="headerlink" href="#adaptive-mesh-refinement" title="Link to this heading">¶</a></h2>
+<p>This section skims over the popular topic of mesh adaptivity. Its basic assessment is that most physical phenomena are not equally interesting everywhere in the computational domain <span class="math notranslate nohighlight">\(\Omega\)</span>. For the sake of concentrating the computational effort where it is needed, one would like the elements of the mesh <span class="math notranslate nohighlight">\(\texttt{Th}\)</span> to be small enough where fine effects occur, and coarse enough on the other regions of <span class="math notranslate nohighlight">\(\Omega\)</span>.</p>
+<section id="principle-size-maps">
+<h3><span class="section-number">1.6.2.1. </span>Principle, size maps<a class="headerlink" href="#principle-size-maps" title="Link to this heading">¶</a></h3>
+<p>The most intuitive way to perform mesh refinement in practice relies on a size map, i.e. a mapping: <span class="math notranslate nohighlight">\(h: \Omega \to \R_+\)</span>, such that:</p>
+<p><div class="math notranslate nohighlight">
+\[\text{For all point } \x \in \Omega, \quad h(\x) = \text{ desired length of edges near } \x.\]</div>
+</p>
+<p>In a basic <span class="math notranslate nohighlight">\(\texttt{Freefem}\)</span> implementation, such a size map can be defined as a <span class="math notranslate nohighlight">\(\P_1\)</span> Finite Element function on a mesh <span class="math notranslate nohighlight">\(\texttt{Th}\)</span> of <span class="math notranslate nohighlight">\(\Omega\)</span>.</p>
+<p>In <span class="math notranslate nohighlight">\(\texttt{Freefem}\)</span>, adaptive mesh refinement is usually applied in two different situations.</p>
+<p>– A function <span class="math notranslate nohighlight">\(u\)</span> is given at the vertices of the mesh <span class="math notranslate nohighlight">\(\texttt{Th}\)</span>, and one would like to adapt this mesh to capture the regions where <span class="math notranslate nohighlight">\(u\)</span> has large variations. This task is accomplished thanks to the following command:</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Adaptation of a mesh Th with respect to the variations of $u$;</span>
+<span class="cm">    err is a parameter quantifying the fineness of the adaptation */</span>
+<span class="w">   </span><span class="kt">real</span><span class="w"> </span><span class="kp">eps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05</span><span class="p">;</span>
+<span class="w">   </span><span class="n">Th</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="nf">adaptmesh</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="n">u</span><span class="p">,</span><span class="kp">err</span><span class="o">=</span><span class="kp">eps</span><span class="p">);</span><span class="w"> </span><span class="c1">// The previous mesh is overwritten</span>
+</pre></div>
+</div>
+<p>In this case, the size map used by <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> to adapt the mesh is hidden from the user.
+Here, the argument <span class="math notranslate nohighlight">\(\texttt{err}\)</span> is the desired <span class="math notranslate nohighlight">\(\P_1\)</span> interpolation error of the function <span class="math notranslate nohighlight">\(u\)</span> on <span class="math notranslate nohighlight">\(\texttt{Th}\)</span>: as a rule of thumbs, the smaller the value, the finer the mesh in the regions where <span class="math notranslate nohighlight">\(u\)</span> has sharp variations.</p>
+<p>– It is possible to directly supply the desired size map to <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span>, via the following command:</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="kt">fespace</span><span class="w"> </span><span class="nf">Vh</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="nc">P1</span><span class="p">);</span>
+<span class="n">Vh</span><span class="w"> </span><span class="kr">m</span><span class="p">;</span>
+
+<span class="p">[...]</span>
+
+<span class="cm">/* Adaptation of a mesh Th with respect to the size map $m$ */</span>
+<span class="kt">mesh</span><span class="w"> </span><span class="n">Thn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">adaptmesh</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="kp">IsMetric</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="kr">m</span><span class="p">,</span><span class="kp">nbvx</span><span class="o">=</span><span class="mi">100000</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Here,</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The argument <code class="code docutils literal notranslate"><span class="pre">IsMetric=1</span></code> indicates that the supplied function <span class="math notranslate nohighlight">\(m\)</span> is the size map.</p></li>
+<li><p>The argument <code class="code docutils literal notranslate"><span class="pre">nbvx=100000</span></code> indicates the maximum number of vertices allowed in the resulting mesh.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="example-1-adaptation-to-a-solution-with-a-refinement-loop">
+<h3><span class="section-number">1.6.2.2. </span>Example 1: Adaptation to a solution with a refinement loop<a class="headerlink" href="#example-1-adaptation-to-a-solution-with-a-refinement-loop" title="Link to this heading">¶</a></h3>
+<p>In order to illustrate the idea of adapting a mesh to the resolution of a Finite Element problem, let us consider again the standard Laplace equation introduced in <a class="reference internal" href="laplace.html#sec-lap"><span class="std std-numref">Section 1.4</span></a>.</p>
+<p>The results of the standard resolution that we have conducted in there, which are reprinted on <a class="reference internal" href="#fig-laplaceamr"><span class="std std-numref">Fig. 1.19</span></a> (left), are actually a little disappointing. Indeed, the solution <span class="math notranslate nohighlight">\(u\)</span> is calculated on a coarse mesh of <span class="math notranslate nohighlight">\(\Omega\)</span>, while the theory predicts that <span class="math notranslate nohighlight">\(u\)</span> is not very regular near the reentrant corner of <span class="math notranslate nohighlight">\(\Omega\)</span>.
+Therefore, a coarse mesh is unable to account for the fine features of <span class="math notranslate nohighlight">\(u\)</span> in this region.
+One remedy to this problem would be to use a very fine mesh of <span class="math notranslate nohighlight">\(\Omega\)</span> (i.e. a mesh with many triangles),
+but this is unefficient, as the size of the corresponding linear system would increase dramatically (and thereby the required CPU cost).</p>
+<p>This raises the idea of adapting the computational mesh, so that it is selectively refined where needed (i.e. at the regions where the numerical solution <span class="math notranslate nohighlight">\(u_h\)</span> shows large variations), and coarse where it is not. Doing so typically relies on a loop:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>At first, a coarse computational mesh <span class="math notranslate nohighlight">\(\texttt{Th}\)</span> of <span class="math notranslate nohighlight">\(\Omega\)</span> is used, which results in an inaccurate, but cheap numerical solution <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p>the mesh <span class="math notranslate nohighlight">\(\texttt{Th}\)</span> is then refined near the regions of <span class="math notranslate nohighlight">\(\Omega\)</span> where <span class="math notranslate nohighlight">\(u\)</span> has large variations, which yields a new version of <span class="math notranslate nohighlight">\(\texttt{Th}\)</span> which is better adapted to the solution of <a class="reference internal" href="laplace.html#sec-lap"><span class="std std-numref">Section 1.4</span></a>. This boundary value problem is thus solved on this new mesh.</p></li>
+<li><p>This procedure is iterated a few times, so that the mesh <span class="math notranslate nohighlight">\(\texttt{Th}\)</span> is increasingly better adapted to <span class="math notranslate nohighlight">\(u\)</span> (while retaining a moderate size), and the numerical approximation of the latter is increasingly accurate.</p></li>
+</ul>
+</div></blockquote>
+<p>This procedure is summarized in the following <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> listing.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Multiple resolutions of the Laplace equation,</span>
+<span class="cm">               intertwined with mesh adaptation steps */</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">it</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">it</span><span class="o">&lt;</span><span class="kp">maxit</span><span class="p">;</span><span class="w"> </span><span class="n">it</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">laplace</span><span class="p">;</span>
+<span class="w">  </span><span class="n">Th</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">adaptmesh</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="n">u</span><span class="p">,</span><span class="kp">err</span><span class="o">=</span><span class="kp">eps</span><span class="p">);</span>
+<span class="w">  </span><span class="nf">plot</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="n">u</span><span class="p">,</span><span class="kp">fill</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">  </span><span class="kp">eps</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mf">0.5</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<p>Implement the procedure in the listing below to achieve this goal.</p>
+</div>
+<p>The result is presented on <a class="reference internal" href="#fig-laplaceamr"><span class="std std-numref">Fig. 1.19</span></a> (right), and the associated code is contained in <a class="reference download internal" download="" href="../_downloads/ee3631767e53de3e1ae54465ec189ed3/laplace_with_mesh_refinement.edp"><code class="xref download docutils literal notranslate"><span class="pre">this</span> <span class="pre">file</span></code></a>.</p>
+<figure class="align-default" id="id2">
+<span id="fig-laplaceamr"></span><a class="reference internal image-reference" href="../_images/LaplaceAMR.png"><img alt="../_images/LaplaceAMR.png" src="../_images/LaplaceAMR.png" style="width: 794.0px; height: 356.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.19 </span><span class="caption-text">Temperature field <span class="math notranslate nohighlight">\(u\)</span> obtained in the resolution of <a class="reference internal" href="laplace.html#equation-eq-laplace">(1.22)</a> using  <span class="math notranslate nohighlight">\(\mathbb{P}_1\)</span> elements (left) On a coarse mesh, (right) On an iteratively adapted mesh.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="example-2-adaptation-with-respect-to-a-user-defined-metric">
+<h3><span class="section-number">1.6.2.3. </span>Example 2: Adaptation with respect to a user-defined metric<a class="headerlink" href="#example-2-adaptation-with-respect-to-a-user-defined-metric" title="Link to this heading">¶</a></h3>
+<p>Let us consider the situation depicted on <a class="reference internal" href="#fig-adaptuser"><span class="std std-numref">Fig. 1.20</span></a> (left); the corresponding mesh can be downloaded <a class="reference download internal" download="" href="../_downloads/c9473201d2b915a01549243af43d168b/mario.mesh"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>. The domain <span class="math notranslate nohighlight">\(\Omega\)</span> is made of two subdomains <span class="math notranslate nohighlight">\(\omega\)</span> and <span class="math notranslate nohighlight">\(\Omega \setminus \overline{\omega}\)</span>, with respective labels <span class="math notranslate nohighlight">\(7\)</span> and <span class="math notranslate nohighlight">\(0\)</span>, separated by the interface <span class="math notranslate nohighlight">\(\partial \omega\)</span> with label <span class="math notranslate nohighlight">\(20\)</span>. One would like to adapt the mesh <span class="math notranslate nohighlight">\(\texttt{Th}\)</span> of <span class="math notranslate nohighlight">\(\Omega\)</span> so that it feature a small size <span class="math notranslate nohighlight">\(\texttt{hmin}=0.001\)</span> near <span class="math notranslate nohighlight">\(\partial \omega\)</span>, and a larger size <span class="math notranslate nohighlight">\(\texttt{hmax}=0.2\)</span> near <span class="math notranslate nohighlight">\(\partial \Omega\)</span>.</p>
+<figure class="align-default" id="id3">
+<span id="fig-adaptuser"></span><a class="reference internal image-reference" href="../_images/adaptusermetric.png"><img alt="../_images/adaptusermetric.png" src="../_images/adaptusermetric.png" style="width: 966.5999999999999px; height: 317.4px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.20 </span><span class="caption-text">(Left) The considered domain <span class="math notranslate nohighlight">\(\Omega\)</span> contains is made of two subdomains <span class="math notranslate nohighlight">\(\omega\)</span> and <span class="math notranslate nohighlight">\(\Omega \setminus \overline\omega\)</span> (depicted respectively in purple and yellow), separated by the interface <span class="math notranslate nohighlight">\(\partial \omega\)</span>; (center) One size map <span class="math notranslate nohighlight">\(m: \Omega \to \R\)</span> imposing a small size <span class="math notranslate nohighlight">\(\texttt{hmin}\)</span> on <span class="math notranslate nohighlight">\(\partial \omega\)</span> and a large size <span class="math notranslate nohighlight">\(\texttt{hmax}\)</span> on <span class="math notranslate nohighlight">\(\partial \Omega\)</span>; (right) Adapted mesh of <span class="math notranslate nohighlight">\(\Omega\)</span> to this size map.</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<ol class="arabic simple">
+<li><p>Create a size map <span class="math notranslate nohighlight">\(m : \Omega \to \R\)</span> that shows a smooth transition between the values <span class="math notranslate nohighlight">\(\texttt{hmin}=0.001\)</span> on <span class="math notranslate nohighlight">\(\partial \omega\)</span> and <span class="math notranslate nohighlight">\(\texttt{hmax}=0.2\)</span> on <span class="math notranslate nohighlight">\(\partial \Omega\)</span>.</p></li>
+</ol>
+<blockquote>
+<div><p><em>(Hint: You may solve a Laplace-like equation associated with suitable boundary conditions, conductivity coefficients inside and outside <span class="math notranslate nohighlight">\(\omega\)</span>, and right-hand side to achieve this goal.)</em></p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Adapt the mesh of <span class="math notranslate nohighlight">\(\Omega\)</span> to <span class="math notranslate nohighlight">\(m\)</span> thanks to the <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> command <span class="math notranslate nohighlight">\(\texttt{adaptmesh}\)</span>.</p></li>
+</ol>
+</div>
+<p>The source code associated to a possible solution to this exercise can be downloaded <a class="reference download internal" download="" href="../_downloads/1c48fae532d7207e23a6db410fce35f6/adaptation_user_metric.edp"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.
+The numerical result is depicted on <a class="reference internal" href="#fig-adaptuser"><span class="std std-numref">Fig. 1.20</span></a> (middle,right).</p>
+</section>
+</section>
+<section id="description-of-the-texttt-mesh-and-texttt-sol-formats">
+<span id="sec-meshsolfiles"></span><h2><span class="section-number">1.6.3. </span>Description of the <span class="math notranslate nohighlight">\(\texttt{.mesh}\)</span> and <span class="math notranslate nohighlight">\(\texttt{.sol}\)</span> formats<a class="headerlink" href="#description-of-the-texttt-mesh-and-texttt-sol-formats" title="Link to this heading">¶</a></h2>
+<p>We have come across files under the formats <span class="math notranslate nohighlight">\(\texttt{.mesh}\)</span> and <span class="math notranslate nohighlight">\(\texttt{.sol}\)</span> on several occasions in the previous developments; this sections provides a little more details about their structure.</p>
+<p>As the name suggests, a <span class="math notranslate nohighlight">\(\texttt{.mesh}\)</span> file is used to store a mesh, so that it can be visualized, as described in <a class="reference internal" href="visualization.html#sec-visu"><span class="std std-numref">Section 1.5</span></a>, or reused for later computations. As we have already seen in <a class="reference internal" href="laplace.html#sec-laplacestart"><span class="std std-numref">Section 1.4.2</span></a>, in <span class="math notranslate nohighlight">\(\texttt{Freefem}\)</span>, a mesh is written thanks to the <span class="math notranslate nohighlight">\(\texttt{savemesh}\)</span> command. Such a file can be loaded by providing its path to the <span class="math notranslate nohighlight">\(\texttt{readmesh}\)</span> function.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Path of the mesh */</span>
+<span class="kt">string</span><span class="w"> </span><span class="n">MESH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./lluke.mesh&quot;</span><span class="p">;</span>
+
+<span class="cm">/* Read .mesh file */</span>
+<span class="kt">mesh</span><span class="w"> </span><span class="n">Th</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">read</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="n">MESH</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The <span class="math notranslate nohighlight">\(\texttt{.mesh}\)</span> format is relatively self-explanatory: it basically consists in the lists of vertices and triangles of the mesh, as depicted on <a class="reference internal" href="#fig-meshfile"><span class="std std-numref">Fig. 1.21</span></a>.</p>
+<figure class="align-default" id="id4">
+<span id="fig-meshfile"></span><a class="reference internal image-reference" href="../_images/structmeshfile.png"><img alt="../_images/structmeshfile.png" src="../_images/structmeshfile.png" style="width: 686.5px; height: 635.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.21 </span><span class="caption-text">Organization of a typical <span class="math notranslate nohighlight">\(\texttt{.mesh}\)</span> file.</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="proof remark admonition" id="remark-0">
+<p class="admonition-title"><span class="caption-number">Remark 1.10 </span></p>
+<section class="remark-content" id="proof-content">
+<p>Multiple other formats are used in practice to store meshes, such as <span class="math notranslate nohighlight">\(\texttt{.stl}\)</span> (which are ubiquitous for 3d printing models) and <span class="math notranslate nohighlight">\(\texttt{.wrl}\)</span>, to name a few. Meshes under the <span class="math notranslate nohighlight">\(\texttt{.mesh}\)</span> format can be converted from and to most existing formats thanks to the open-source software <a class="reference external" href="https://gmsh.info/"><span class="math notranslate nohighlight">\(\texttt{GMSH}\)</span></a>.</p>
+</section>
+</div><p>Let us finally describe the organization of <span class="math notranslate nohighlight">\(\texttt{.sol}\)</span> files, that we have already used in <a class="reference internal" href="visualization.html#sec-visu"><span class="std std-numref">Section 1.5</span></a> to store <span class="math notranslate nohighlight">\(\P_1\)</span> Finite Element functions defined at the vertices of a mesh <span class="math notranslate nohighlight">\(\texttt{Th}\)</span>. Such a file simply consists in the list of the values of the function at the vertices of <span class="math notranslate nohighlight">\(\texttt{Th}\)</span>, as exemplified in <a class="reference internal" href="#fig-solfile"><span class="std std-numref">Fig. 1.22</span></a>.</p>
+<figure class="align-default" id="id5">
+<span id="fig-solfile"></span><a class="reference internal image-reference" href="../_images/structsolfile.png"><img alt="../_images/structsolfile.png" src="../_images/structsolfile.png" style="width: 678.6px; height: 372.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.22 </span><span class="caption-text">Organization of a typical <span class="math notranslate nohighlight">\(\texttt{.sol}\)</span> file.</span><a class="headerlink" href="#id5" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>As we have seen in <a class="reference internal" href="laplace.html#sec-laplacestart"><span class="std std-numref">Section 1.4.2</span></a>, <span class="math notranslate nohighlight">\(\P_1\)</span> Finite Element functions can be saved as <span class="math notranslate nohighlight">\(\texttt{.sol}\)</span> files in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> thanks to the function <span class="math notranslate nohighlight">\(\texttt{savesol}\)</span>. On the contrary, no built-in command allows to read such functions; however, this task can be achieved thanks to the following listing, which is implemented in <a class="reference download internal" download="" href="../_downloads/346155a5d44b2e2fd636ecfe6fdc7328/readmshsol.edp"><code class="xref download docutils literal notranslate"><span class="pre">this</span> <span class="pre">file</span></code></a>; click <a class="reference download internal" download="" href="../_downloads/ccee228e9f74711c42d2d56f0ebf9c42/lluke.mesh"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a> to download the mesh file and <a class="reference download internal" download="" href="../_downloads/346155a5d44b2e2fd636ecfe6fdc7328/readmshsol.edp"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a> for the solution file.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="kt">string</span><span class="w"> </span><span class="n">SOL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./lluke.sol&quot;</span><span class="p">;</span>
+
+<span class="p">[...]</span>
+
+<span class="cm">/* Read a .sol file containing a scalar-valued solution */</span>
+<span class="kt">ifstream</span><span class="w"> </span><span class="n">fin</span><span class="p">(</span><span class="n">SOL</span><span class="p">);</span>
+<span class="kt">string</span><span class="w"> </span><span class="n">s</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="kr">nv</span><span class="p">;</span>
+
+<span class="cm">/* Read header */</span>
+<span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">fin</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">s</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* Read number of vertices */</span>
+<span class="n">fin</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="kr">nv</span><span class="p">;</span>
+
+<span class="cm">/* Read header (bis) */</span>
+<span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">fin</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">s</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* Read values of the solution */</span>
+<span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="kr">nv</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">fin</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">phi</span><span class="p">[][</span><span class="n">i</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="cm">/* Display the result */</span>
+<span class="nf">plot</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="n">phi</span><span class="p">,</span><span class="kp">fill</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="kp">wait</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="proof remark admonition" id="remark-1">
+<span id="rm-ucoef"></span><p class="admonition-title"><span class="caption-number">Remark 1.11 </span></p>
+<section class="remark-content" id="proof-content">
+<p>In this listing, the array of the coefficients of a function <span class="math notranslate nohighlight">\(u\)</span> in the basis of the Finite Element space (see <a class="reference internal" href="FEtheory.html#equation-eq-decompfebasis">(1.16)</a>) is given by the syntax <span class="math notranslate nohighlight">\(\texttt{u[]}\)</span>.</p>
+</section>
+</div></section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index_gen.html">1. Generalities</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="anafunc.html">1.1. Functional analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varpbs.html">1.2. Lax-Milgram framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEtheory.html">1.3. The Finite Element method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="laplace.html">1.4. Laplace equation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization.html">1.5. Visualization</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1.6. Meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen.html">1.7. Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dirpen.html">1.8. Penalization for Dirichlet conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="laplace_pure_Neumann.html">1.9. Pure Neumann</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Advanced/index_adv.html">2. Advanced features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_gen.html"><span class="section-number">1. </span>Getting started</a><ul>
+      <li>Previous: <a href="visualization.html" title="previous chapter"><span class="section-number">1.5. </span>Visualization of meshes and solutions</a></li>
+      <li>Next: <a href="eigen.html" title="next chapter"><span class="section-number">1.7. </span>Eigenvalue problems</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Generalities/mesh.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,64 @@
+/* Resolution of the Laplace equation using fictitious domain methods */
+load "medit"
+
+/* Read mesh */
+string MESH   = "./box_ers.mesh";
+string LS     = "./box_ers.sol";
+string SOLNEU = "./neufic.sol";
+string SOLDIR = "./dirfic.sol";
+
+mesh Th = readmesh(MESH);
+
+/* Finite Element space and functions */
+fespace Vh(Th,P1);
+int np = Vh.ndof;
+real[int] tab(np);
+Vh un,ud,v,phi;
+string s;
+
+/* Read Level Set function */
+ifstream fin(LS);
+for(int i=0; i<8; i++) {
+  fin>>s;
+}
+for(int i=0; i<np; i++) {
+  fin>>tab[i];
+}
+phi[] = tab;
+
+/* Temperature on boundary 1 */
+func real uin (real a) {
+  if ( a>0.8 ) return(100.0*(1.0-a)*(a-0.8));
+  else if (  a<0.2 ) return(100.0*a*(0.2-a));
+}
+
+/* Flux at boundary 2 */
+real gout = -1.0;
+
+/* Erstaz parameters */
+real epsneu = 1.e-3;
+func real heps (real t) {
+  return max(epsneu,0.5*(1+tanh(-t/epsneu)));
+}
+
+real epsdir = 1.e-6;
+real epsspc = 1.e-3;
+func real ceps(real t) {
+  return ( 0.5/epsdir*(1+tanh(t/epsspc)) );
+}
+
+/* Problem with homogeneous Neumann conditions on boundary 0 */
+problem laplaceneufic(un,v) = int2d(Th)(heps(phi)*(dx(un)*dx(v)+dy(un)*dy(v)))
+                          - int1d(Th,2)(gout*v) 
+                          + on(1,un=uin(y));
+
+/* Problem with homogeneous Neumann conditions on boundary 0 */
+problem laplacedirfic(ud,v) = int2d(Th)((1.0+ceps(phi))*(dx(ud)*dx(v)+dy(ud)*dy(v)))
+                              + int2d(Th)(ceps(phi)*ud*v)
+                           - int1d(Th,2)(gout*v)
+                           + on(1,ud=uin(y));
+
+laplaceneufic;
+laplacedirfic;
+savesol(SOLNEU,Th,un);
+savesol(SOLDIR,Th,ud);

@@ -1,0 +1,119 @@
+/* Solution of an obstacle problem via the penalty method */
+load "medit"
+
+/* Names of meshes and Finite Element files */
+string MESH     = "obs.mesh";
+string SOL      = "obs.sol";
+string SOLEX    = "obs_ex.sol";
+
+/* Creation of a mesh of a ball with radius 2 */
+int Nmesh  = 200;
+int REFDIR = 1;
+
+border left(t=0.0,1.0) {x=-2.0; y=2.0-4.0*t; label=REFDIR;};
+border bottom(t=0.0,1.0) {x=-2.0+4.0*t; y=-2.0; label=REFDIR;};
+border right(t=0.0,1.0) {x=2.0; y=-2.0+4.0*t; label=REFDIR;};
+border top(t=0.0,1.0) {x=2.0-4.0*t; y=2.0; label=REFDIR;};
+
+mesh Th = buildmesh(left(Nmesh)+bottom(Nmesh)+right(Nmesh)+top(Nmesh));
+
+/* Finite Element spaces and functions */
+fespace Vh(Th,P1);
+Vh In,An,u,uold,v,m,uex,lambda;
+
+/* Computation parameters */
+int MAXIT  = 100;
+real TGV   = 1e30;
+real TOL   = 1e-6;
+real c     = 1e3; // Parameter in the primal-dual active set method
+int N      = Vh.ndof;
+real res;
+
+/* Definition of the obstacle */
+func real obstacle(real xx,real yy) {
+  real rr = xx^2 + yy^2;
+  if ( rr <= 1.0 ) {
+    return (sqrt(1.0-rr));
+  }
+  else return (-1.0);
+}
+
+m = obstacle(x,y);
+
+/* Source term */
+func f = 0.0;
+
+/* Analytical solution */
+real rs = 0.697865;
+func real exactSol(real xx,real yy) {
+  real rr = xx^2+yy^2;
+  real r = sqrt(rr);
+  
+  if ( r < rs ) return ( sqrt(1-rr) );
+  else {
+    return ( -rs^2/sqrt(1-rs^2)*log(0.5*r) );
+  }
+}
+
+uex = exactSol(x,y);
+
+/* Unconstrained variational problem */
+varf vObs(u,v) = int2d(Th)( dx(u)*dx(v)+dy(u)*dy(v) )
+                 + int2d(Th)(f*v)  // Watch out for the sign
+                 + on(REFDIR,u=uex);
+
+/* Variational form to construct mass matrix */
+varf vM(u,v) = int2d(Th)( u*v );
+                 
+/* Matrix and right-hand side */
+matrix ATGV     = vObs(Vh,Vh,tgv=TGV,solver=CG); // Version of A that will be updated depending on active set
+matrix A        = vObs(Vh,Vh,solver=CG);
+matrix M        = vM(Vh,Vh);
+real[int] b     = vObs(0,Vh,tgv=TGV);
+real[int] bTGV  = b;  // Version of b that will be updated depending on active set
+real[int] Adiag = A.diag;
+real[int] diagTGV(N);
+real[int] disc(N);
+real[int] Mdisc(N);
+
+/* Initialization */
+uold  = TGV;
+An    = 0.0;
+
+for (int it=0; it<MAXIT; it++) {
+    
+  /* Set constraint on active set on both matrix and rhs */
+  In        = 1.0 - An;
+  diagTGV   = Adiag .* In[];
+  diagTGV   += TGV*An[];
+  ATGV.diag = diagTGV;
+  bTGV      = m[] .* An[];
+  bTGV      *= TGV;
+  bTGV      += b .* In[];
+    
+  /* Calculate u */
+  set(ATGV,solver=CG);
+  u[] = ATGV^-1 * bTGV;
+  
+  /* Update lambda */
+  lambda[] = A*u[];
+  
+  /* Update active set */
+  An = ( lambda - c*(u-m)  > 0.0 ); // F.E. function which equals 1 if constraint is not saturated
+  
+  /* Calculate residual */
+  disc  = u[] - uold[];
+  Mdisc = M*disc;
+  res   = sqrt(Mdisc'*disc);
+  
+  cout<<"Iteration "<<it+1<<": residual: "<<res<<endl;
+  if ( res < TOL ) break;
+  
+  /* Prepare next iteration */
+  uold = u;  
+}
+
+/* Save mesh and solution */
+savemesh(Th,MESH);
+savesol(SOL,Th,u);
+savesol(SOLEX,Th,uex);

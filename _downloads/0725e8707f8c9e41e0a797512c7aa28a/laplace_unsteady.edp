@@ -1,0 +1,58 @@
+/* Resolution of the unsteady Laplace equation */
+load "medit"
+
+/* Output files */
+string MESH       = "./res/heat";
+string SOL        = "./res/heat";
+
+/* Definition of the boundary curves of the domain */
+border left(t=0.0,1.0){x=0.0; y=1.0-t; label=0;};
+border bot(t=0.0,2.0){x=t; y=0.0; label=0;};
+border right(t=0.0,1.0){x=2.0; y=t; label=0;};
+border top(t=0.0,2.0){x=2.0-t; y=1.0; label=0;};
+border c1(t=0.0,2*pi){x=1.5+0.25*cos(t);y=0.35+0.25*sin(t); label=1;};
+border c2(t=0.0,2*pi){x=0.5+0.15*cos(t);y=0.75+0.15*sin(t); label=2;};
+
+/* Build mesh, display and save as a .mesh file */
+mesh Th = buildmesh(left(25)+bot(50)+right(25)+top(50)+c1(40)+c2(25));
+
+/* Definition of Finite Element spaces and functions */
+fespace Vh(Th,P1);
+Vh u,uo,v;
+
+/* Computational parameters */
+int maxit = 100;
+real Tfin = 1.0;
+real dt = Tfin / maxit;
+int refsink = Th(0.5,0.75).region; // Label of the region containing the center (0.5,0.75) of the sink
+int refini = Th(1.5,0.35).region; // Label of the region containing the center (1.5,0.35) of the initial distribution
+
+/* Source term */
+func real f() {
+  return (-1.0);
+}
+
+/* Initial temperature distribution */
+uo = 10.0*(region==refini); // Function equal to 10 at the nodes of triangles in region refini
+
+/* Semi-discrete in time variational formulation of the heat equation */
+problem sdheat(u,v,solver=CG) = int2d(Th)(u*v)
+                                + int2d(Th) (dt*(dx(u)*dx(v)+dy(u)*dy(v)))
+                                - int2d(Th)(uo*v)
+                                - int2d(Th,refsink)(f()*v)
+                                + on(0,u=0);
+
+/* Main loop */
+for (int it=0; it<maxit; it++) {
+  sdheat;
+  uo = u;
+  // plot(Th,u,fill=1);
+  
+  /* Save solution */
+  savemesh(Th,MESH+"."+(it+1)+".mesh");
+  savesol(SOL+"."+(it+1)+".sol",Th,u);
+}
+
+/* Save data */
+savemesh(Th,MESH+"end.mesh");
+savesol(SOL+"end.sol",Th,u);

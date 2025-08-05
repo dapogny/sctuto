@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2.7. Turning to 3d Finite Element problems &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3. Structure mechanics" href="../Structure_Mechanics/index_structmech.html" />
+    <link rel="prev" title="2.6. The Level Set method: Part II" href="LSM2.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="turning-to-3d-finite-element-problems">
+<span id="sec-3dext"></span><h1><span class="section-number">2.7. </span>Turning to 3d Finite Element problems<a class="headerlink" href="#turning-to-3d-finite-element-problems" title="Link to this heading">¶</a></h1>
+<p>In this section, we describe how to adapt the material introduced in the previous sections to address 3d situations.</p>
+<p>The theory about the solution of Finite Element problems in 2d, discussed in <a class="reference internal" href="../Generalities/FEtheory.html#sec-fe"><span class="std std-numref">Section 1.3</span></a>, extends mutatis mutandis to the case of 3 space dimensions. This extensions is similarly straightforward in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span>, which conveniently conceals the underlying technical operations (assembly of the Finite Element matrices and vectors, inversion of large linear systems, etc.). However, a few other topics deserve comments, and notably that of mesh generation.</p>
+<p>Our guiding example throughout this section takes places in the computational domain <span class="math notranslate nohighlight">\(\Omega\)</span> depicted in <a class="reference internal" href="#fig-lshape3dlap"><span class="std std-numref">Fig. 2.23</span></a>. Its boundary is composed of three regions <span class="math notranslate nohighlight">\(\Gamma_D\)</span>, <span class="math notranslate nohighlight">\(\Gamma\)</span> and <span class="math notranslate nohighlight">\(\Gamma_N\)</span>, bearing homogeneous Dirichlet, homogeneous Neumann, and inhomogeneous Neumann boundary conditions, respectively. We aim to solve the following instance of the Laplace equation:</p>
+<div class="math notranslate nohighlight" id="equation-eq-laplace3d">
+<span class="eqno">(2.21)<a class="headerlink" href="#equation-eq-laplace3d" title="Link to this equation">¶</a></span>\[\begin{split}\left\{\begin{array}{cl}
+-\Delta u = 0 &amp; \text{in } \Omega, \\
+u = 0 &amp; \text{on } \Gamma_D, \\
+\frac{\partial u}{\partial n} = 0 &amp; \text{on } \Gamma, \\
+\frac{\partial u}{\partial n} = g &amp; \text{on } \Gamma_N,
+\end{array}
+\right.\end{split}\]</div>
+<p>for a given Neumann data <span class="math notranslate nohighlight">\(g: \Gamma_N \to \R\)</span>. The associated variational formulation reads:
+<div class="math notranslate nohighlight">
+\[\text{Search for } u \in H^1(\Omega) \text{ s.t. } \forall v \in H^1(\Omega), \quad \int_\Omega \nabla u \cdot \nabla v \:\d \x = \int_{\Gamma_N} gv \:\d s.\]</div>
+</p>
+<figure class="align-default" id="id1">
+<span id="fig-lshape3dlap"></span><a class="reference internal image-reference" href="../_images/Lshape3dLap.png"><img alt="../_images/Lshape3dLap.png" src="../_images/Lshape3dLap.png" style="width: 380.45px; height: 504.34999999999997px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.23 </span><span class="caption-text">Computational domain <span class="math notranslate nohighlight">\(\Omega\)</span> considered in the 3d experiments.</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The source code corresponding to this section is contained in the file <a class="reference download internal" download="" href="../_downloads/ee8a798d03500bc49d62f5ad09dfbe9c/3dex.edp"><code class="xref download docutils literal notranslate"><span class="pre">3dex.edp</span></code></a>.</p>
+<section id="construction-of-a-3d-mesh">
+<h2><span class="section-number">2.7.1. </span>Construction of a 3d mesh<a class="headerlink" href="#construction-of-a-3d-mesh" title="Link to this heading">¶</a></h2>
+<p>The creation of a mesh of the 3d domain <span class="math notranslate nohighlight">\(\Omega\)</span> is fairly more involved than in the 2d case in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span>, and a little care is in order.</p>
+<p>The process starts with the construction of a surface triangulation for the boundary <span class="math notranslate nohighlight">\(\partial \Omega\)</span>.
+In turn, this task is realized by decomposing <span class="math notranslate nohighlight">\(\partial\Omega\)</span> into several elementary panels, which are the 3d counterparts of the 2d <span class="math notranslate nohighlight">\(\texttt{border}\)</span> elements used in <a class="reference internal" href="../Generalities/laplace.html#sec-laplacestart"><span class="std std-numref">Section 1.4.2</span></a>. For instance, the L-shaped domain in <a class="reference internal" href="#fig-lshape3dlap"><span class="std std-numref">Fig. 2.23</span></a> is created from the assembly plan depicted on <a class="reference internal" href="#fig-lshape3dlayout"><span class="std std-numref">Fig. 2.24</span></a>.</p>
+<figure class="align-default" id="id2">
+<span id="fig-lshape3dlayout"></span><a class="reference internal image-reference" href="../_images/Lshape3dLayout.png"><img alt="../_images/Lshape3dLayout.png" src="../_images/Lshape3dLayout.png" style="width: 867.3px; height: 578.9px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.24 </span><span class="caption-text">Construction layout of the surface mesh for <span class="math notranslate nohighlight">\(\partial\Omega\)</span>. The normal vectors to <span class="math notranslate nohighlight">\(\partial \Omega\)</span>, pointing outward <span class="math notranslate nohighlight">\(\Omega\)</span> are represented by blue arrows. The conformity of the surface mesh resulting from this construction plan requires that the discretizations of the bottom part of  <span class="math notranslate nohighlight">\(\texttt{Thang2}\)</span> and the top part of <span class="math notranslate nohighlight">\(\texttt{Thang1}\)</span> agree.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Each panel is created by first constructing a 2d mesh along the lines of the previous <a class="reference internal" href="../Generalities/laplace.html#sec-laplacestart"><span class="std std-numref">Section 1.4.2</span></a>. The latter is the mapping to a surface mesh via a suitable transformation <span class="math notranslate nohighlight">\(\R^2 \to \R^3\)</span>, thanks to the command <code class="code docutils literal notranslate"><span class="pre">movemesh23</span></code>.
+The listing below exemplifies the syntax used to create the panels <span class="math notranslate nohighlight">\(\texttt{Thang1}\)</span> and <span class="math notranslate nohighlight">\(\texttt{Thang2}\)</span>.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cp">load</span><span class="w"> </span><span class="s">&quot;msh3&quot;</span>
+
+<span class="cm">/* Creation of the mesh of a 2d square */</span>
+<span class="kt">border</span><span class="w"> </span><span class="n">a</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="kr">x</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="kr">y</span><span class="o">=</span><span class="mf">1.0</span><span class="o">-</span><span class="kp">t</span><span class="p">;</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">0</span><span class="p">;};</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">b</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="kr">x</span><span class="o">=</span><span class="kp">t</span><span class="p">;</span><span class="w"> </span><span class="kr">y</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">0</span><span class="p">;};</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="kr">x</span><span class="o">=</span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="kr">y</span><span class="o">=</span><span class="kp">t</span><span class="p">;</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">0</span><span class="p">;};</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">d</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="kr">x</span><span class="o">=</span><span class="mf">1.0</span><span class="o">-</span><span class="kp">t</span><span class="p">;</span><span class="w"> </span><span class="kr">y</span><span class="o">=</span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">0</span><span class="p">;};</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">circ</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="kr">x</span><span class="o">=</span><span class="mf">0.5</span><span class="o">+</span><span class="mf">0.1</span><span class="o">*</span><span class="nf">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="kr">pi</span><span class="o">*</span><span class="kp">t</span><span class="p">);</span><span class="w"> </span><span class="kr">y</span><span class="o">=</span><span class="mf">0.5</span><span class="o">+</span><span class="mf">0.1</span><span class="o">*</span><span class="nf">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="kr">pi</span><span class="o">*</span><span class="kp">t</span><span class="p">);</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">0</span><span class="p">;};</span>
+
+<span class="kt">mesh</span><span class="w"> </span><span class="n">Th2ds</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="nf">buildmesh</span><span class="p">(</span><span class="n">a</span><span class="p">(</span><span class="kr">N</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">(</span><span class="kr">N</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c</span><span class="p">(</span><span class="kr">N</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nf">d</span><span class="p">(</span><span class="kr">N</span><span class="p">));</span>
+
+<span class="cm">/* Get surface mesh as the image of Th2ds via a suitable transformation $\R^2 \to \R^3$ */</span>
+<span class="n">meshS</span><span class="w"> </span><span class="n">Thang1</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nf">movemesh23</span><span class="p">(</span><span class="n">Th2ds</span><span class="p">,</span><span class="kp">transfo</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="o">+</span><span class="kr">x</span><span class="p">,</span><span class="kr">y</span><span class="p">,</span><span class="mf">1.0</span><span class="p">]);</span>
+<span class="n">meshS</span><span class="w"> </span><span class="n">Thang2</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nf">movemesh23</span><span class="p">(</span><span class="n">Th2ds</span><span class="p">,</span><span class="kp">transfo</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="kr">x</span><span class="p">,</span><span class="mf">1.0</span><span class="o">+</span><span class="kr">y</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p>The constituent surface panels of <span class="math notranslate nohighlight">\(\partial \Omega\)</span> are then glued into a single surface mesh via the following command:</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Total surface mesh */</span>
+<span class="n">meshS</span><span class="w"> </span><span class="n">Tht</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ThD</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ThSide1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ThSide2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ThBack</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ThBot</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Thang1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Thang2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Thf</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Two important features have to be taken into account in this construction process, which are illustrated on <a class="reference internal" href="#fig-lshape3dlayout"><span class="std std-numref">Fig. 2.24</span></a>.</p>
+<ul class="simple">
+<li><p>The total surface mesh must be conforming. One has thus to pay a close attention that the discretizations of a common border to two adjacent panels  be identical. This implies to choose the same number of discretization points for a common border in their declarations from different panels.</p></li>
+<li><p>The orientation of the different panels must be globally consistent: the unit normal vector to each panel, which is the image of the out-of-plane vector <span class="math notranslate nohighlight">\(\textbf{e}_3\)</span> by the underlying transformation <span class="math notranslate nohighlight">\(\R^2 \to \R^3\)</span> must be pointing outward <span class="math notranslate nohighlight">\(\Omega\)</span>. The optional argument <code class="code docutils literal notranslate"><span class="pre">orientation=-1</span></code> can be supplied to the <code class="code docutils literal notranslate"><span class="pre">movemesh23</span></code> command to change the orientation of a panel.</p></li>
+</ul>
+</div>
+<p>Once a conforming, oriented surface mesh for <span class="math notranslate nohighlight">\(\partial \Omega\)</span> is constructed, a tetrahedral mesh for the volume <span class="math notranslate nohighlight">\(\Omega\)</span> is created thanks to the <a class="reference external" href="https://wias-berlin.de/software/index.jsp?id=TetGen&amp;lang=1">tetgen</a> library, which is interfaced with <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> via the following command:</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Load tetgen library */</span>
+<span class="cp">load</span><span class="w"> </span><span class="s">&quot;tetgen&quot;</span>
+
+<span class="cm">/* Create 3d mesh */</span>
+<span class="kt">real</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="w"> </span><span class="n">dominfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.0001</span><span class="p">];</span>
+<span class="kt">mesh3</span><span class="w"> </span><span class="n">Th3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">tetg</span><span class="p">(</span><span class="n">Tht</span><span class="p">,</span><span class="kp">switch</span><span class="o">=</span><span class="s">&quot;pqaAAYYQ&quot;</span><span class="p">,</span><span class="kp">nbofregions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="kp">regionlist</span><span class="o">=</span><span class="n">dominfo</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Here, <span class="math notranslate nohighlight">\(\texttt{dominfo}\)</span> is an array with five real-valued entries:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The first three entries are the coordinates <span class="math notranslate nohighlight">\((x_1,x_2,x_3)\)</span> of a point <span class="math notranslate nohighlight">\(\x\)</span> lying inside the domain <span class="math notranslate nohighlight">\(\Omega\)</span>;</p></li>
+<li><p>The fourth entry is the desired label for the tetrahedra of the mesh;</p></li>
+<li><p>The last entry is the maximum volume for a tetrahedron of the mesh.</p></li>
+</ul>
+</div></blockquote>
+<p>For an explanation of the other parameters of this command (such as the number <span class="math notranslate nohighlight">\(\texttt{nbofregions}\)</span> of connected components of the <span class="math notranslate nohighlight">\(\Omega\)</span>), we refer to the <a class="reference external" href="https://doc.freefem.org/introduction/index.html">FreeFem documentation</a>.</p>
+<p>The result of this procedure is presented in <a class="reference internal" href="#fig-genmesh3d"><span class="std std-numref">Fig. 2.25</span></a>.</p>
+<figure class="align-default" id="id3">
+<span id="fig-genmesh3d"></span><a class="reference internal image-reference" href="../_images/genmesh3d.png"><img alt="../_images/genmesh3d.png" src="../_images/genmesh3d.png" style="width: 1129.8px; height: 392.7px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.25 </span><span class="caption-text">(a,b,c) Various stages of the construction of the surface mesh for <span class="math notranslate nohighlight">\(\partial \Omega\)</span>; (d) Cut in the tetrahedral mesh for <span class="math notranslate nohighlight">\(\Omega\)</span>.</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="d-visualization-with-texttt-medit">
+<span id="sec-visu3d"></span><h2><span class="section-number">2.7.2. </span>3d visualization with <span class="math notranslate nohighlight">\(\texttt{medit}\)</span><a class="headerlink" href="#d-visualization-with-texttt-medit" title="Link to this heading">¶</a></h2>
+<p>Like in the 2d case discussed in <a class="reference internal" href="../Generalities/visualization.html#sec-visu"><span class="std std-numref">Section 1.5</span></a>, the light and convenient tool <span class="math notranslate nohighlight">\(\texttt{medit}\)</span> allows to visualize three-dimensional meshes and solutions attached to their vertices, to make snapshots, create animations, etc. It notably makes it straightforward to display various viewpoints on the mesh by simple manipulations using the mouse.</p>
+<p>Calling <span class="math notranslate nohighlight">\(\texttt{medit}\)</span> by command line is identical to the 2d situation considered hitherto:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ffmedit domain.mesh</span>
+</pre></div>
+</div>
+<p>Again, if a <span class="math notranslate nohighlight">\(\texttt{domain.sol}\)</span> file is present in the same directory as the mesh <span class="math notranslate nohighlight">\(\texttt{domain.mesh}\)</span>, containing a solution defined at its vertices, it will be loaded automatically.</p>
+<p>Let us emphasize one useful feature that is quite special to the visualization of 3d meshes:
+cuts in the mesh can be realized by selecting <span class="math notranslate nohighlight">\(\texttt{toggle clip}\)</span> from the right-click menu. The clipping plane can be adjusted manually with the mouse, see <a class="reference internal" href="#fig-3dclip"><span class="std std-numref">Fig. 2.26</span></a>.</p>
+<figure class="align-default" id="id4">
+<span id="fig-3dclip"></span><a class="reference internal image-reference" href="../_images/3dclip.png"><img alt="../_images/3dclip.png" src="../_images/3dclip.png" style="width: 416.5px; height: 415.09999999999997px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.26 </span><span class="caption-text">Enabling the clipping mode and edition of the clipping plane in <span class="math notranslate nohighlight">\(\texttt{medit}\)</span>.</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="solution-of-the-finite-element-problem">
+<h2><span class="section-number">2.7.3. </span>Solution of the Finite Element problem<a class="headerlink" href="#solution-of-the-finite-element-problem" title="Link to this heading">¶</a></h2>
+<p>The resolution of the boundary-value problem <a class="reference internal" href="#equation-eq-laplace3d">(2.21)</a> on <span class="math notranslate nohighlight">\(\Omega\)</span> is now carried out by straightforward adaptations of the 2d syntax introduced in <a class="reference internal" href="../Generalities/laplace.html#sec-laplacestart"><span class="std std-numref">Section 1.4.2</span></a>.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="kt">fespace</span><span class="w"> </span><span class="nf">Vh</span><span class="p">(</span><span class="n">Th3</span><span class="p">,</span><span class="nc">P1</span><span class="p">);</span>
+<span class="n">Vh</span><span class="w"> </span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">;</span>
+
+<span class="kt">func</span><span class="w"> </span><span class="n">flux</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-1.0</span><span class="p">;</span>
+
+<span class="cm">/* Variational formulation in 3d */</span>
+<span class="kt">problem</span><span class="w"> </span><span class="nf">Laplace</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="kp">solver</span><span class="o">=</span><span class="kr">CG</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">int3d</span><span class="p">(</span><span class="n">Th3</span><span class="p">)(</span><span class="nf">dx</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="nf">dx</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">+</span><span class="nf">dy</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="nf">dy</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">+</span><span class="nf">dz</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="nf">dz</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+<span class="w">                               </span><span class="o">-</span><span class="w"> </span><span class="nf">int2d</span><span class="p">(</span><span class="n">Th3</span><span class="p">,</span><span class="n">REFNEU</span><span class="p">)(</span><span class="n">flux</span><span class="o">*</span><span class="n">v</span><span class="p">)</span>
+<span class="w">                               </span><span class="o">+</span><span class="w"> </span><span class="nf">on</span><span class="p">(</span><span class="n">REFDIR</span><span class="p">,</span><span class="n">u</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
+
+<span class="n">Laplace</span><span class="p">;</span>
+
+<span class="cm">/* Save solution */</span>
+<span class="nf">savesol</span><span class="p">(</span><span class="n">SOL</span><span class="p">,</span><span class="n">Th3</span><span class="p">,</span><span class="n">u</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The result is displayed in <a class="reference internal" href="#fig-lshape3dsol"><span class="std std-numref">Fig. 2.27</span></a>.</p>
+<figure class="align-default" id="id5">
+<span id="fig-lshape3dsol"></span><a class="reference internal image-reference" href="../_images/LShape3dsol.png"><img alt="../_images/LShape3dsol.png" src="../_images/LShape3dsol.png" style="width: 415.09999999999997px; height: 416.5px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.27 </span><span class="caption-text">Solution to the Laplace equation <a class="reference internal" href="#equation-eq-laplace3d">(2.21)</a> on the 3d geometry of <a class="reference internal" href="#fig-lshape3dlap"><span class="std std-numref">Fig. 2.23</span></a>.</span><a class="headerlink" href="#id5" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/index_gen.html">1. Generalities</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index_adv.html">2. Advanced features</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="imgmesh.html">2.1. Meshing images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="curvature.html">2.2. Curvature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nonlinear.html">2.3. Nonlinear problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variational_inequalities.html">2.4. Variational inequalities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM.html">2.5. Level Set method I</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM2.html">2.6. Level Set method II</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2.7. Going 3d</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_adv.html"><span class="section-number">2. </span>More advanced issues in scientific computing</a><ul>
+      <li>Previous: <a href="LSM2.html" title="previous chapter"><span class="section-number">2.6. </span>The Level Set method: Part II</a></li>
+      <li>Next: <a href="../Structure_Mechanics/index_structmech.html" title="next chapter"><span class="section-number">3. </span>Structure mechanics</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Advanced/3dext.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

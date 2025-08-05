@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>1.2. The Lax-Milgram variational theory &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="1.3. An introduction to the Finite Element method" href="FEtheory.html" />
+    <link rel="prev" title="1.1. A vade mecum of functional analysis" href="anafunc.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="the-lax-milgram-variational-theory">
+<span id="sec-lm"></span><h1><span class="section-number">1.2. </span>The Lax-Milgram variational theory<a class="headerlink" href="#the-lax-milgram-variational-theory" title="Link to this heading">¶</a></h1>
+<p>This section deals with the Lax-Milgram theory, which offers an elegant and efficient viewpoint on boundary value problems.
+It is in particular the conceptual basis of the Finite Element method for their numerical solution, which is the focus of the next <a class="reference internal" href="FEtheory.html#sec-fe"><span class="std std-numref">Section 1.3</span></a>.</p>
+<p>To set ideas, the guiding model of this presentation is the Laplace equation, equipped with homogeneous Dirichlet boundary conditions:</p>
+<div class="math notranslate nohighlight" id="equation-eq-lap">
+<span class="eqno">(1.3)<a class="headerlink" href="#equation-eq-lap" title="Link to this equation">¶</a></span>\[\begin{split}\left\{
+\begin{array}{cl}
+-\Delta u = f &amp; \text{in } \Omega, \\
+u=0 &amp; \text{on } \partial \Omega.
+\end{array}
+\right.\end{split}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(\Omega\)</span> is a bounded and Lipschitz domain in <span class="math notranslate nohighlight">\(\R^d\)</span> (<span class="math notranslate nohighlight">\(d=2\)</span> or <span class="math notranslate nohighlight">\(3\)</span>) and the source term <span class="math notranslate nohighlight">\(f\)</span> belongs to <span class="math notranslate nohighlight">\(L^2(\Omega)\)</span>.
+The variational point of view consists in looking at a boundary value problem such as <a class="reference internal" href="#equation-eq-lap">(1.3)</a> as a variational problem, of the form:</p>
+<div class="math notranslate nohighlight" id="equation-eq-lapvarflm">
+<span class="eqno">(1.4)<a class="headerlink" href="#equation-eq-lapvarflm" title="Link to this equation">¶</a></span>\[\text{Search for } u \in V \text{ s.t. } \forall v \in V, \:\: a(u,v) = \ell(v),\]</div>
+<dl class="simple">
+<dt>where</dt><dd><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(V\)</span> is a suitable functional space,</p></li>
+<li><p><span class="math notranslate nohighlight">\(a(\cdot,\cdot)\)</span> is a bilinear form on <span class="math notranslate nohighlight">\(V\)</span>, which encodes the differential operator at play (<span class="math notranslate nohighlight">\(-\Delta\)</span> in the present case),</p></li>
+<li><p><span class="math notranslate nohighlight">\(\ell : V \to \R\)</span> is a linear form, depending on the data of the problem (here, the source <span class="math notranslate nohighlight">\(f\)</span>).</p></li>
+</ul>
+</dd>
+</dl>
+<p>From the theoretical perspective, this variational framework makes it possible to derive simple and powerful conditions guaranteeing the well-posedness of a boundary value problem of the form <a class="reference internal" href="#equation-eq-lap">(1.3)</a>. In numerical practice, it is the basic ingredient of the Finite Element Method, as we shall see in the next <a class="reference internal" href="FEtheory.html#sec-fe"><span class="std std-numref">Section 1.3</span></a>.</p>
+<section id="from-classical-boundary-value-problems-to-their-variational-formulations">
+<span id="sec-bvptovarf"></span><h2><span class="section-number">1.2.1. </span>From classical boundary-value problems to their variational formulations<a class="headerlink" href="#from-classical-boundary-value-problems-to-their-variational-formulations" title="Link to this heading">¶</a></h2>
+<p>The variational point of view over boundary value problems originates from the idea of duality, underlying the <a class="reference internal" href="../Appendix/appPDE.html#app-distrib"><span class="std std-ref">theory of distributions</span></a>, that we have broached (and actually, carefully avoided) in <a class="reference internal" href="anafunc.html#sec-sobolev"><span class="std std-numref">Section 1.1.3.2</span></a>. A function <span class="math notranslate nohighlight">\(u\)</span> is seen through via its effect by integration against a collection of test functions. Pushing this idea a little further, the fulfillment of a boundary value problem is evaluated against suitable test functions.</p>
+<p>For concreteness, let us illustrate this idea with our model problem <a class="reference internal" href="#equation-eq-lap">(1.3)</a>. Assuming for the moment that the latter has a smooth solution, multiplication of the main equation by a smooth test function <span class="math notranslate nohighlight">\(v\)</span> yields:</p>
+<p><div class="math notranslate nohighlight">
+\[- \int_\Omega \Delta u v \:\d \x = \int_\Omega fv \:\d \x. \]</div>
+</p>
+<p>Now using the <a class="reference internal" href="anafunc.html#sec-green"><span class="std std-ref">Green’s formula</span></a>, we obtain:</p>
+<div class="math notranslate nohighlight" id="equation-eq-avtvar">
+<span class="eqno">(1.5)<a class="headerlink" href="#equation-eq-avtvar" title="Link to this equation">¶</a></span>\[- \int_{\partial \Omega} \frac{\partial u}{\partial n} v \:\d s + \int_\Omega \nabla u \cdot \nabla v \:\d \x = \int_\Omega f v \:\d \x,\]</div>
+<p>an equation that involves only the first-order derivatives of <span class="math notranslate nohighlight">\(u\)</span>. Since <span class="math notranslate nohighlight">\(u\)</span> satisfies the boundary condition <span class="math notranslate nohighlight">\(u=0\)</span> on <span class="math notranslate nohighlight">\(\partial \Omega\)</span>, it is tempting to require the same behavior from <span class="math notranslate nohighlight">\(v\)</span>, which yields:</p>
+<div class="math notranslate nohighlight" id="equation-eq-var">
+<span class="eqno">(1.6)<a class="headerlink" href="#equation-eq-var" title="Link to this equation">¶</a></span>\[\int_{\Omega}{\nabla u \cdot \nabla v \:\d\x} = \int_\Omega{fv\:\d\x}.\]</div>
+<dl class="simple">
+<dt>Let us now wonder under which conditions on the sought function <span class="math notranslate nohighlight">\(u\)</span> and the test function <span class="math notranslate nohighlight">\(v\)</span> the above identity <a class="reference internal" href="#equation-eq-var">(1.6)</a> actually makes sense.</dt><dd><ul class="simple">
+<li><p>The integral in the left-hand side of <a class="reference internal" href="#equation-eq-var">(1.6)</a> is well-defined as soon as the derivatives of <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span> belong to <span class="math notranslate nohighlight">\(L^2(\Omega)\)</span>, which is the case if <span class="math notranslate nohighlight">\(u,v \in H^1(\Omega)\)</span>.</p></li>
+<li><p>The integral in the right-hand side of <a class="reference internal" href="#equation-eq-var">(1.6)</a> makes sense, in particular, if <span class="math notranslate nohighlight">\(f \in L^2(\Omega)\)</span> and <span class="math notranslate nohighlight">\(v \in H^1(\Omega)\)</span>.</p></li>
+<li><p>The boundary condition <span class="math notranslate nohighlight">\(u=0\)</span> on <span class="math notranslate nohighlight">\(\partial \Omega\)</span> can be understood in the <a class="reference internal" href="anafunc.html#sec-traces"><span class="std std-ref">sense of traces</span></a> if <span class="math notranslate nohighlight">\(u\)</span> is assumed to lie in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>. Moreover, we managed to get rid of the boundary integral in <a class="reference internal" href="#equation-eq-avtvar">(1.5)</a> by assuming the same behavior for the test function <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>All in all, the expression <a class="reference internal" href="#equation-eq-var">(1.6)</a> entices us to search for a weak solution of <a class="reference internal" href="#equation-eq-lap">(1.3)</a> as the solution to the following variational problem, that is called the &quot;weak formulation&quot; of <a class="reference internal" href="#equation-eq-lap">(1.3)</a>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-vardefinitive">
+<span class="eqno">(1.7)<a class="headerlink" href="#equation-eq-vardefinitive" title="Link to this equation">¶</a></span>\[\text{Search for } u \in H^1_0(\Omega) \text{ s.t. } \forall v \in H^1_0(\Omega), \:\: \int_\Omega{\nabla u \cdot \nabla v \:\d\x} = \int_\Omega{fv\:\d\x}.\]</div>
+<p>In spite of its a priori unintuitive character, the above variational problem is much easier to analyze than the original version <a class="reference internal" href="#equation-eq-lap">(1.3)</a>. The main motivation of the above derivation is that there is a wonderful mathematical theory devoted to the well-posedness of such problems, as we are going to see in the sequel.</p>
+<p>Before we do so, let us insist that the above conversion of the original &quot;strong&quot; form of the problem <a class="reference internal" href="#equation-eq-lap">(1.3)</a> into its weak form <a class="reference internal" href="#equation-eq-vardefinitive">(1.7)</a> is merely formal: for instance, we have never claimed that a function <span class="math notranslate nohighlight">\(u\)</span> is solution to the former if and only if it is solution to the latter. Actually, we have not even specified what we mean for a function <span class="math notranslate nohighlight">\(u\)</span> to be a solution to <a class="reference internal" href="#equation-eq-lap">(1.3)</a> (whereas this notion is clear for the variational problem <a class="reference internal" href="#equation-eq-vardefinitive">(1.7)</a>)! The next proposition somehow elucidates this connection between both formulations with the help of the theory of distributions; it can be omitted on first reading.</p>
+<div class="proof proposition admonition" id="proposition-0">
+<p class="admonition-title"><span class="caption-number">Proposition 1.11 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(u\)</span> be a function in <span class="math notranslate nohighlight">\(H^1_0(\Omega)\)</span>; then <span class="math notranslate nohighlight">\(u\)</span> is one solution to the variational problem <a class="reference internal" href="#equation-eq-vardefinitive">(1.7)</a> if and only if it holds:</p>
+<p><div class="math notranslate nohighlight">
+\[-\Delta u = f \text{ in the sense of distributions on }\Omega.\]</div>
+</p>
+</section>
+</div><div class="dropdown admonition">
+<p class="admonition-title">Proof</p>
+<p>Let <span class="math notranslate nohighlight">\(u\)</span> be a function in <span class="math notranslate nohighlight">\(H^1_0(\Omega)\)</span>.</p>
+<p>If <span class="math notranslate nohighlight">\(u\)</span> satisfies <span class="math notranslate nohighlight">\(-\Delta u = f\)</span> in the sense of distributions in <span class="math notranslate nohighlight">\(\Omega\)</span>, then by definition of the Laplace operator in the sense of distributions, it holds:</p>
+<div class="math notranslate nohighlight" id="equation-eq-varfproofeqvar">
+<span class="eqno">(1.8)<a class="headerlink" href="#equation-eq-varfproofeqvar" title="Link to this equation">¶</a></span>\[\text{For all test function } \varphi \in \calC^\infty_c(\Omega), \quad \int_\Omega \nabla u \cdot \nabla \varphi \:\d \x = \int_\Omega f \varphi \:\d\x.\]</div>
+<p>Now since by definition <span class="math notranslate nohighlight">\(\calC^\infty(\Omega)\)</span> is dense in <span class="math notranslate nohighlight">\(H^1_0(\Omega)\)</span>, for all function <span class="math notranslate nohighlight">\(v \in H^1_0(\Omega)\)</span>, there exists a sequence <span class="math notranslate nohighlight">\(\varphi_n \in \calC^\infty(\Omega)\)</span> such that:</p>
+<p><div class="math notranslate nohighlight">
+\[\lvert\lvert v -\varphi_n \lvert\lvert_{H^1_0(\Omega)} \xrightarrow{n \to \infty} 0.\]</div>
+</p>
+<p>Hence, using the relation <a class="reference internal" href="#equation-eq-varfproofeqvar">(1.8)</a> for each <span class="math notranslate nohighlight">\(n\)</span> and letting <span class="math notranslate nohighlight">\(n\)</span> tend to infinity, we obtain that:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall \varphi \in H^1_0(\Omega), \quad \int_\Omega \nabla u \cdot \nabla v \:\d \x = \int_\Omega f \varphi \:\d\x,\]</div>
+</p>
+<p>i.e. <span class="math notranslate nohighlight">\(u\)</span> is one solution to the variational problem <a class="reference internal" href="#equation-eq-vardefinitive">(1.7)</a>.</p>
+<p>Conversely, if <span class="math notranslate nohighlight">\(u \in H^1_0(\Omega)\)</span> is one solution to <a class="reference internal" href="#equation-eq-vardefinitive">(1.7)</a>, then, in particular, it satisfies this problem for functions <span class="math notranslate nohighlight">\(\varphi \in \calC^\infty_c(\Omega)\)</span>, and so it satisfies <span class="math notranslate nohighlight">\(-\Delta u = f\)</span> in the sense of distributions in <span class="math notranslate nohighlight">\(\Omega\)</span>.</p>
+</div>
+<p>In this course, we shall not dwell on the equivalence between the &quot;classical&quot; strong form of a boundary-value problem and its variational counterpart, and we shall actually define a &quot;solution&quot; to a boundary-value problem as a solution to its variational form.</p>
+</section>
+<section id="the-abstract-lax-milgram-theory">
+<span id="sec-laxmilgram"></span><h2><span class="section-number">1.2.2. </span>The abstract Lax-Milgram theory<a class="headerlink" href="#the-abstract-lax-milgram-theory" title="Link to this heading">¶</a></h2>
+<p>This subsection deals with abstract variational problems. The setting is the following:
+let <span class="math notranslate nohighlight">\(V\)</span> be a (real) Hilbert space, <span class="math notranslate nohighlight">\(a(\cdot, \cdot) : V \times V \to \mathbb{R}\)</span> be a bilinear form, and <span class="math notranslate nohighlight">\(\ell : V \to \mathbb{R}\)</span> be a linear form. We consider a variational problem of the form:</p>
+<div class="math notranslate nohighlight" id="equation-eq-varpb">
+<span class="eqno">(1.9)<a class="headerlink" href="#equation-eq-varpb" title="Link to this equation">¶</a></span>\[\text{Search for } u \in V \text{ such that: } \forall v \in V, \:\: a(u,v) = \ell(v).\]</div>
+<p>In particular, this setting applies directly to the variational formulation <a class="reference internal" href="#equation-eq-var">(1.6)</a> for <a class="reference internal" href="#equation-eq-lap">(1.3)</a> by taking:</p>
+<div class="math notranslate nohighlight">
+\[V = H^1_0(\Omega), \:\: a(u,v) = \int_\Omega \nabla u \cdot \nabla v \:\d \x, \text{ and } \ell(v) = \int_\Omega fv\:\d\x.\]</div>
+<p>The well-known Lax-Milgram theorem gives sufficient conditions, which are often satisfied in practice, for this problem to be well-posed:</p>
+<div class="proof theorem admonition" id="theorem-1">
+<span id="th-laxmilgram"></span><p class="admonition-title"><span class="caption-number">Theorem 1.3 </span> (Lax Milgram)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(V\)</span> be a real Hilbert space, <span class="math notranslate nohighlight">\(a: V \times V \to \mathbb{R}\)</span> be a bilinear form, and <span class="math notranslate nohighlight">\(\ell: V \to \mathbb{R}\)</span> be a linear form. Assume that:</p>
+<blockquote>
+<div><ul>
+<li><p>The bilinear form <span class="math notranslate nohighlight">\(a\)</span> is continuous: there exists <span class="math notranslate nohighlight">\(M \geq 0\)</span> such that</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\forall u,v \in V, \:\: | a(u,v) | \leq M || u || || v ||.\]</div>
+</div></blockquote>
+</li>
+<li><p>The form <span class="math notranslate nohighlight">\(a\)</span> is coercive: there exists <span class="math notranslate nohighlight">\(\alpha &gt;0\)</span> such that:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\forall u \in V, \:\: \alpha || u ||^2 \leq a(u,u).\]</div>
+</div></blockquote>
+</li>
+<li><p>The linear form <span class="math notranslate nohighlight">\(\ell\)</span> is continuous.</p></li>
+</ul>
+</div></blockquote>
+<p>Then, there exists a unique function <span class="math notranslate nohighlight">\(u\)</span> satisfying <a class="reference internal" href="#equation-eq-varpb">(1.9)</a>. The latter additionally fulfills the following a priori estimate:</p>
+<div class="math notranslate nohighlight" id="equation-eq-stablm">
+<span class="eqno">(1.10)<a class="headerlink" href="#equation-eq-stablm" title="Link to this equation">¶</a></span>\[   \lvert\lvert u \lvert\lvert \leq \frac{1}{\alpha} \lvert\lvert \ell \lvert\lvert_{V^*}.\]</div>
+</section>
+</div><p>Let us check that the variational problem <a class="reference internal" href="#equation-eq-varpb">(1.9)</a> associated to the Laplace equation <a class="reference internal" href="#equation-eq-lap">(1.3)</a> satisfies the assumptions of the Lax-Milgram theorem:</p>
+<blockquote>
+<div><ul>
+<li><p>As we have seen in <a class="reference internal" href="anafunc.html#sec-sobolev"><span class="std std-numref">Section 1.1.3.2</span></a>, the space <span class="math notranslate nohighlight">\(V = H^1_0(\Omega)\)</span> is a Hilbert space.</p></li>
+<li><p>The form <span class="math notranslate nohighlight">\(a(\cdot, \cdot)\)</span> defined in <a class="reference internal" href="#equation-eq-lapvarflm">(1.4)</a> is coercive, since, for any <span class="math notranslate nohighlight">\(u \in V\)</span>,</p>
+<p><div class="math notranslate nohighlight">
+\[a(u,u) = \int_\Omega \lvert \nabla u \lvert^2\:\d\x \geq \alpha \lvert\lvert u \lvert\lvert^2_{H^1(\Omega)} \text{ for some constant } \alpha &gt;0, \]</div>
+</p>
+<p>as follows from the <a class="reference internal" href="anafunc.html#prop-poincare"><span class="std std-ref">Poincaré inequality</span></a>.</p>
+</li>
+<li><p>The linear form <span class="math notranslate nohighlight">\(\ell\)</span> is continuous, since by the Cauchy-Schwarz inequality, it holds:</p>
+<p><div class="math notranslate nohighlight">
+\[\lvert \ell(u)\lvert = \left\lvert \int_\Omega f u \:\d\x \right\lvert \leq \lvert\lvert f \lvert\lvert_{L^2(\Omega)}\lvert\lvert u \lvert\lvert_{L^2(\Omega)} \leq  \lvert\lvert f \lvert\lvert_{L^2(\Omega)}\lvert\lvert u \lvert\lvert_{H^1(\Omega)}.\]</div>
+</p>
+</li>
+</ul>
+</div></blockquote>
+<div class="proof remark admonition" id="remark-2">
+<p class="admonition-title"><span class="caption-number">Remark 1.2 </span></p>
+<section class="remark-content" id="proof-content">
+<ul class="simple">
+<li><p>The inequality <a class="reference internal" href="#equation-eq-stablm">(1.10)</a> is an important conclusion of the <a class="reference internal" href="#th-laxmilgram"><span class="std std-ref">Lax-Milgram theorem</span></a>. It indeed guarantees that the solution <span class="math notranslate nohighlight">\(u\)</span> to <a class="reference internal" href="#equation-eq-varpb">(1.9)</a> depends continuously on the &quot;data&quot; <span class="math notranslate nohighlight">\(\ell\)</span>, i.e. that the following linear mapping is continuous:</p></li>
+</ul>
+<p><div class="math notranslate nohighlight">
+\[V^* \ni \ell \mapsto \text{ the solution } u \text{ with right-hand side } \ell.\]</div>
+</p>
+<blockquote>
+<div><p>In particular, a small perturbation of the right-hand side <span class="math notranslate nohighlight">\(\ell\)</span> does not degrade &quot;too much&quot; the solution <span class="math notranslate nohighlight">\(u\)</span>.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>The conditions of the Lax-Milgram theorem are only sufficient, and not necessary: it may very well happen that the problem <a class="reference internal" href="#equation-eq-lapvarflm">(1.4)</a> be well-posed while <span class="math notranslate nohighlight">\(a\)</span> is not coercive. We shall return in a next chapter to other types of conditions ensuring this well-posedness.</p></li>
+</ul>
+</section>
+</div><p>The <a class="reference internal" href="#th-laxmilgram"><span class="std std-ref">Lax-Milgram theorem</span></a> has the following useful &quot;energetic version&quot;, which expresses the solution <span class="math notranslate nohighlight">\(u\)</span> to the variational problem <a class="reference internal" href="#equation-eq-varpb">(1.9)</a> as the unique minimizer of an energy functional.</p>
+<div class="proof lemma admonition" id="lemma-3">
+<span id="lem-corlm"></span><p class="admonition-title"><span class="caption-number">Lemma 1.1 </span></p>
+<section class="lemma-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(V\)</span> be a Hilbert space, and let <span class="math notranslate nohighlight">\(a(\cdot,\cdot): V \times V \to \R\)</span> and <span class="math notranslate nohighlight">\(\ell : V \to \R\)</span> be bilinear and linear forms on <span class="math notranslate nohighlight">\(V\)</span>, respectively. We assume that the hypotheses of the <a class="reference internal" href="#th-laxmilgram"><span class="std std-ref">Lax-Milgram theorem</span></a> are satisfied, and that, in addition, the bilinear form <span class="math notranslate nohighlight">\(a(\cdot,\cdot)\)</span> is symmetric, i.e.</p>
+<p><div class="math notranslate nohighlight">
+\[\forall u, v \in V, \quad a(u,v) = a(v,u).\]</div>
+</p>
+<p>Then, the energy functional <span class="math notranslate nohighlight">\(J:V \to \R\)</span> defined by</p>
+<p><div class="math notranslate nohighlight">
+\[J(u) = \frac{1}{2} a(u,u) - \ell(u)\]</div>
+</p>
+<p>has a unique minimizer over <span class="math notranslate nohighlight">\(V\)</span>, which is the unique solution to the variational problem <a class="reference internal" href="#equation-eq-varpb">(1.9)</a>.</p>
+</section>
+</div><div class="dropdown admonition">
+<p class="admonition-title">Proof</p>
+<p>Let <span class="math notranslate nohighlight">\(u^* \in V\)</span> be the unique solution to <a class="reference internal" href="#equation-eq-varpb">(1.9)</a>, and let <span class="math notranslate nohighlight">\(u\)</span> be any minimizer of <span class="math notranslate nohighlight">\(J\)</span> over <span class="math notranslate nohighlight">\(V\)</span>, if any. We aim to show that  <span class="math notranslate nohighlight">\(u=u^*\)</span>.</p>
+<p>The minimality of <span class="math notranslate nohighlight">\(J\)</span> at <span class="math notranslate nohighlight">\(u\)</span> implies that, for any <span class="math notranslate nohighlight">\(v \in V\)</span> and <span class="math notranslate nohighlight">\(t &gt;0\)</span>, it holds:</p>
+<p><div class="math notranslate nohighlight">
+\[J(u+tv) \geq J(u),\]</div>
+</p>
+<p>By expanding the definition of <span class="math notranslate nohighlight">\(J\)</span>, using the symmetry of <span class="math notranslate nohighlight">\(a(\cdot,\cdot)\)</span> and rearranging, we obtain:</p>
+<p><div class="math notranslate nohighlight">
+\[t a(u,v) + \frac{t^2}{2} a(v,v) - t \ell(v) \geq 0.\]</div>
+</p>
+<p>Now dividing both sides by <span class="math notranslate nohighlight">\(t&gt;0\)</span> and letting <span class="math notranslate nohighlight">\(t\)</span> tend to <span class="math notranslate nohighlight">\(0\)</span>, it follows:</p>
+<p><div class="math notranslate nohighlight">
+\[a(u,v) - \ell(v) \geq 0.\]</div>
+</p>
+<p>Since the above reasoning is valid for arbitrary <span class="math notranslate nohighlight">\(v\in V\)</span>, repeating the argument with <span class="math notranslate nohighlight">\(-v\)</span> in place of <span class="math notranslate nohighlight">\(v\)</span>, we actually obtain:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall v \in V, \quad a(u,v) = \ell(v).\]</div>
+</p>
+<p>Thus, we have proved that if <span class="math notranslate nohighlight">\(u\)</span> is a minimizer of <span class="math notranslate nohighlight">\(J\)</span> over <span class="math notranslate nohighlight">\(V\)</span>, it is necessarily one solution to the variational problem <a class="reference internal" href="#equation-eq-varpb">(1.9)</a>, which is unique by <a class="reference internal" href="#th-laxmilgram"><span class="std std-numref">theorem 1.3</span></a>. Hence, <span class="math notranslate nohighlight">\(u=u^*\)</span>.</p>
+<p>Conversely, let us prove that <span class="math notranslate nohighlight">\(u^*\)</span> is one minimizer of <span class="math notranslate nohighlight">\(J\)</span>. Repetition of the above calculation yields:</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{ccl}
+\forall v \in V, \quad J(u^* + v) - J(v) &amp;=&amp; \underbrace{a(u^*,v)-\ell(v)}_{=0} + \frac{1}{2} a(v,v)\\
+&amp;\geq&amp; 0.\\
+\end{array}\end{split}\]</div>
+</p>
+<p>Hence, <span class="math notranslate nohighlight">\(u^*\)</span> is one minimizer of <span class="math notranslate nohighlight">\(J\)</span>, which ends the proof.</p>
+</div>
+</section>
+<section id="a-worked-example-homogeneous-neumann-boundary-conditions">
+<span id="sec-varpbneu"></span><h2><span class="section-number">1.2.3. </span>A worked example: homogeneous Neumann boundary conditions<a class="headerlink" href="#a-worked-example-homogeneous-neumann-boundary-conditions" title="Link to this heading">¶</a></h2>
+<p>Let us now consider the following Laplace-like problem, featuring homogeneous Neumann boundary conditions:</p>
+<div class="math notranslate nohighlight" id="equation-eq-lapneumann">
+<span class="eqno">(1.11)<a class="headerlink" href="#equation-eq-lapneumann" title="Link to this equation">¶</a></span>\[\begin{split}\left\{
+\begin{array}{cl}
+-\Delta u + u = f &amp; \text{in } \Omega, \\
+\frac{\partial u}{\partial n}=0 &amp; \text{on } \partial \Omega,
+\end{array}
+\right.\end{split}\]</div>
+<p>where the source term <span class="math notranslate nohighlight">\(f\)</span> belongs to <span class="math notranslate nohighlight">\(L^2(\Omega)\)</span>. Note the presence of a <span class="math notranslate nohighlight">\(0^{\text{th}}\)</span>-order term in the main equation of <a class="reference internal" href="#equation-eq-lapneumann">(1.11)</a>, whose relevance will show up a little later.</p>
+<p>To construct a variational formulation for this problem, we multiply the main equation with a smooth test function <span class="math notranslate nohighlight">\(v \in \calC^\infty(\overline \Omega)\)</span>, and we integrate. This yields:</p>
+<p><div class="math notranslate nohighlight">
+\[-\int_\Omega \Delta u v \:\d \x + \int_\Omega uv \:\d \x = \int_\Omega fv \:\d \x.\]</div>
+</p>
+<p>An application of <a class="reference internal" href="anafunc.html#th-green"><span class="std std-ref">Green’s formula</span></a> now yields:</p>
+<div class="math notranslate nohighlight" id="equation-eq-lapneumannvarf">
+<span class="eqno">(1.12)<a class="headerlink" href="#equation-eq-lapneumannvarf" title="Link to this equation">¶</a></span>\[\int_\Omega \nabla u \cdot \nabla v \:\d \x + \int_\Omega uv \:\d \x = \int_\Omega fv \:\d \x,\]</div>
+<p>where the boundary integral vanishes because of the boundary condition <span class="math notranslate nohighlight">\(\frac{\partial u}{\partial n} = 0\)</span> on <span class="math notranslate nohighlight">\(\partial \Omega\)</span>.</p>
+<p>Let us now look at closer at the above variational problem, and wonder under which conditions it fits into the framework of the Lax-Milgram theory. At first, so that all the terms in there make sense, <span class="math notranslate nohighlight">\(u\)</span> and the test function <span class="math notranslate nohighlight">\(v\)</span> should be chosen in the space <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> of functions having derivatives in <span class="math notranslate nohighlight">\(L^2(\Omega)\)</span>. Let us now verify that this formulation fulfills the assumptions of the <a class="reference internal" href="#th-laxmilgram"><span class="std std-ref">Lax-Milgram theorem</span></a>:</p>
+<blockquote>
+<div><ul>
+<li><p>The bilinear form <span class="math notranslate nohighlight">\(a(u,v)\)</span> is continuous on <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>.</p></li>
+<li><p>It is coercive, indeed:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall u \in H^1(\Omega), \quad a(u,u) = \int_\Omega u^2 \:\d\x + \int_\Omega \lvert \nabla u \lvert^2 \:\d \x = \lvert\lvert u \lvert\lvert^2_{H^1(\Omega)}. \]</div>
+</p>
+<p>This feature is due to the addition of a <span class="math notranslate nohighlight">\(0^{\text{th}}\)</span>-order term in the main equation of <a class="reference internal" href="#equation-eq-lapneumann">(1.11)</a>.</p>
+</li>
+<li><p>The linear form <span class="math notranslate nohighlight">\(\ell\)</span> is continuous on <span class="math notranslate nohighlight">\(L^2(\Omega)\)</span>, as in the previous section.</p></li>
+</ul>
+</div></blockquote>
+<p>Hence, the problem <a class="reference internal" href="#equation-eq-lapneumannvarf">(1.12)</a> is well-posed.</p>
+<div class="proof remark admonition" id="remark-4">
+<span id="rm-eqstrongweakneu"></span><p class="admonition-title"><span class="caption-number">Remark 1.3 </span></p>
+<section class="remark-content" id="proof-content">
+<p>Let us briefly comment about the equivalence between the strong form <a class="reference internal" href="#equation-eq-lapneumann">(1.11)</a> of the Neumann problem and its weak form <a class="reference internal" href="#equation-eq-lapneumannvarf">(1.12)</a>:</p>
+<ul class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(u\)</span> is a function in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> satisfying the problem <a class="reference internal" href="#equation-eq-lapneumann">(1.11)</a>, then the main equation shows that <span class="math notranslate nohighlight">\(\nabla u \in \Hdiv(\Omega)\)</span>. Therefore, the normal trace <span class="math notranslate nohighlight">\(\frac{\partial u}{\partial n} = \nabla u \cdot \n\)</span> is well-defined as an element in <span class="math notranslate nohighlight">\(H^{-1/2}(\partial \Omega)\)</span>, and the boundary condition in <a class="reference internal" href="#equation-eq-lapneumann">(1.11)</a> makes sense in this space.</p></li>
+<li><p>On the contrary, if <span class="math notranslate nohighlight">\(u\)</span> is a function in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> satisfying the variational problem <a class="reference internal" href="#equation-eq-lapneumannvarf">(1.12)</a>, then it follows immediately that <span class="math notranslate nohighlight">\(\nabla u\)</span> belongs to <span class="math notranslate nohighlight">\(\Hdiv(\Omega)\)</span>. The first line of <a class="reference internal" href="#equation-eq-lapneumann">(1.11)</a> holds true in the sense of distributions by restricting test functions to elements in <span class="math notranslate nohighlight">\(\calC^\infty_c(\Omega)\)</span>, and the boundary conditions holds true in <span class="math notranslate nohighlight">\(H^{-1/2}(\partial \Omega)\)</span> on account of the trace theorem for functions in <span class="math notranslate nohighlight">\(\Hdiv(\Omega)\)</span>, see <a class="reference internal" href="anafunc.html#prop-tracehdiv"><span class="std std-numref">proposition 1.7</span></a>.</p></li>
+</ul>
+</section>
+</div><div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<blockquote>
+<div><p>In this exercise, the boundary <span class="math notranslate nohighlight">\(\partial\Omega\)</span> of the domain <span class="math notranslate nohighlight">\(\Omega\)</span> is made of two complementary open regions <span class="math notranslate nohighlight">\(\Gamma_D\)</span>, <span class="math notranslate nohighlight">\(\Gamma_N\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[\partial \Omega = \overline{\Gamma_D} \cup \overline{\Gamma_N}, \text{ where } \Gamma_D \cap \Gamma_N = \emptyset. \]</div>
+</p>
+<p>We consider the following mixed Dirichlet-Neumann problem:</p>
+<div class="math notranslate nohighlight" id="equation-eq-mixedlaplace">
+<span class="eqno">(1.13)<a class="headerlink" href="#equation-eq-mixedlaplace" title="Link to this equation">¶</a></span>\[\begin{split}\left\{
+\begin{array}{cl}
+-\Delta u = f &amp; \text{in } \Omega, \\
+u=0 &amp; \text{on } \Gamma_D,\\
+\frac{\partial u}{\partial n}=0 &amp; \text{on } \Gamma_N.
+\end{array}
+\right.\end{split}\]</div>
+</div></blockquote>
+<p>1 - Prove that the function space <span class="math notranslate nohighlight">\(H^1_{\Gamma_D}(\Omega)\)</span>, defined by:</p>
+<p><div class="math notranslate nohighlight">
+\[H^1_{\Gamma_D}(\Omega)  = \left\{u \in H^1(\Omega) \text{ s.t. } u =0 \text{ on } \Gamma_D \right\}\]</div>
+</p>
+<p>is a Hilbert space when equipped with the classical inner product of <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>.</p>
+<p>2 - Propose a variational formulation for the above mixed problem.</p>
+<p>3 - Use the Lax-Milgram theorem to prove the well-posedness of this variational problem.</p>
+</div>
+<div class="dropdown admonition">
+<p class="admonition-title">Correction</p>
+<p>1 - This follows from the fact that <span class="math notranslate nohighlight">\(H^1_{\Gamma_D}(\Omega)\)</span> is a closed subspace of <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>, since we already know from <a class="reference internal" href="anafunc.html#sec-sobolev"><span class="std std-numref">Section 1.1.3.2</span></a> that the latter is a Hilbert space. To see thus, let <span class="math notranslate nohighlight">\(u_n \in H^1_{\Gamma_D}(\Omega)\)</span> be a sequence of functions converging in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> to some element <span class="math notranslate nohighlight">\(u\in H^1(\Omega)\)</span>. By the continuity of the trace operator, since all the traces <span class="math notranslate nohighlight">\(u_n \lvert_{\partial \Omega}\)</span> vanish on <span class="math notranslate nohighlight">\(\Gamma_D\)</span>, then so does <span class="math notranslate nohighlight">\(u\lvert_{\partial \Omega}\)</span>, and so <span class="math notranslate nohighlight">\(u \in H^1_{\Gamma_D}(\Omega)\)</span>.</p>
+<p>2 - Like in the previous sections, we proceed in a formal manner. Let <span class="math notranslate nohighlight">\(\varphi \in \calC^\infty(\overline\Omega)\)</span> be a smooth function up to the boundary <span class="math notranslate nohighlight">\(\partial \Omega\)</span>. Multiplying the main equation of <a class="reference internal" href="#equation-eq-mixedlaplace">(1.13)</a> by <span class="math notranslate nohighlight">\(\varphi\)</span> and integrating, we obtain:</p>
+<p><div class="math notranslate nohighlight">
+\[-\int_\Omega \Delta u \:\varphi \:\d \x = \int_\Omega f\varphi \:\d \x; \]</div>
+</p>
+<p>now using <a class="reference internal" href="anafunc.html#sec-green"><span class="std std-ref">Green’s formula</span></a>, if follows:</p>
+<p><div class="math notranslate nohighlight">
+\[- \int_{\partial \Omega} \frac{\partial u}{\partial n} \varphi \:\d s + \int_\Omega \nabla u \cdot \nabla \varphi \:\d \x = \int_\Omega f \varphi \:\d \x, \]</div>
+</p>
+<p>and invoking the homogeneous Neumann boundary condition on <span class="math notranslate nohighlight">\(\Gamma_N\)</span>, this reduces to:</p>
+<p><div class="math notranslate nohighlight">
+\[- \int_{\Gamma_N} \frac{\partial u}{\partial n} \varphi \:\d s + \int_\Omega \nabla u \cdot \nabla \varphi \:\d \x = \int_\Omega f \varphi \:\d \x. \]</div>
+</p>
+<p>At this point, we note that, in light of the assumption of the <a class="reference internal" href="#th-laxmilgram"><span class="std std-ref">Lax-Milgram theorem</span></a>, we would like that the first boundary integral in this formulation vanish, and that the test function <span class="math notranslate nohighlight">\(\varphi\)</span> somehow &quot;resemble&quot; the sought function <span class="math notranslate nohighlight">\(u\)</span>. Both aims can be fulfilled by imposing <span class="math notranslate nohighlight">\(\varphi\)</span> to vanish on <span class="math notranslate nohighlight">\(\Gamma_D\)</span>, i.e. taking <span class="math notranslate nohighlight">\(\varphi \in H^1_{\Gamma_D}(\Omega)\)</span>.</p>
+<p>All things considered, we propose the following variational formulation for the problem <a class="reference internal" href="#equation-eq-mixedlaplace">(1.13)</a>:</p>
+<p><div class="math notranslate nohighlight">
+\[\text{Search for } u \in H^1_{\Gamma_D}(\Omega) \text{ s.t. for all } v \in H^1_{\Gamma_D}(\Omega),\quad  \int_\Omega \nabla u \cdot \nabla \varphi \:\d \x = \int_\Omega f \varphi \:\d \x. \]</div>
+</p>
+<p>3 - We have already proved that <span class="math notranslate nohighlight">\(H^1_{\Gamma_D}(\Omega)\)</span> is a Hilbert space. The continuity of the bilinear and linear forms involved in the formulation are proved exactly as in the model setting of <a class="reference internal" href="#sec-laxmilgram"><span class="std std-numref">Section 1.2.2</span></a>. When it comes to the coercivity of the bilinear form, we have, for al <span class="math notranslate nohighlight">\(u \in H^1_{\Gamma_D}(\Omega)\)</span>,</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{ccl}
+\displaystyle\int_\Omega \lvert\nabla u \lvert^2 \:\d \x &amp;=&amp; \displaystyle\frac12 \displaystyle\int_\Omega \lvert\nabla u \lvert^2 \:\d \x + \displaystyle\frac12 \int_\Omega \lvert\nabla u \lvert^2 \:\d \x \\
+&amp;\geq&amp; \displaystyle\frac12 \displaystyle\int_\Omega \lvert\nabla u \lvert^2 \:\d \x + c\displaystyle \int_\Omega u^2 \:\d \x \\
+&amp;\geq&amp; \min(\frac12,c) \lvert\lvert u \lvert\lvert^2_{H^1_{\Gamma_D}(\Omega)},
+\end{array}\end{split}\]</div>
+</p>
+<p>where we have used the adapted version of Poincaré’s inequality from <a class="reference internal" href="anafunc.html#prop-poincaregammad"><span class="std std-numref">proposition 1.9</span></a> to pass from the first line to the second one.</p>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index_gen.html">1. Generalities</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="anafunc.html">1.1. Functional analysis</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1.2. Lax-Milgram framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEtheory.html">1.3. The Finite Element method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="laplace.html">1.4. Laplace equation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization.html">1.5. Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">1.6. Meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen.html">1.7. Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dirpen.html">1.8. Penalization for Dirichlet conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="laplace_pure_Neumann.html">1.9. Pure Neumann</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Advanced/index_adv.html">2. Advanced features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_gen.html"><span class="section-number">1. </span>Getting started</a><ul>
+      <li>Previous: <a href="anafunc.html" title="previous chapter"><span class="section-number">1.1. </span>A vade mecum of functional analysis</a></li>
+      <li>Next: <a href="FEtheory.html" title="next chapter"><span class="section-number">1.3. </span>An introduction to the Finite Element method</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Generalities/varpbs.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

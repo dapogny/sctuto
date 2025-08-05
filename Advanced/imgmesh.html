@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2.1. Creating a mesh from an image &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2.2. Calculating curvature" href="curvature.html" />
+    <link rel="prev" title="2. More advanced issues in scientific computing" href="index_adv.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="creating-a-mesh-from-an-image">
+<span id="sec-img2mesh"></span><h1><span class="section-number">2.1. </span>Creating a mesh from an image<a class="headerlink" href="#creating-a-mesh-from-an-image" title="Link to this heading">¶</a></h1>
+<p>Throughout the situations considered in <a class="reference internal" href="../Generalities/index_gen.html#chap-start"><span class="std std-numref">Section 1</span></a>, the computational domain <span class="math notranslate nohighlight">\(\Omega\)</span> was generally simple enough (e.g. a mesh, a rectangle, …) so that it could be meshed from a parametrization of its boundary, as presented in <a class="reference internal" href="../Generalities/laplace.html#sec-laplacestart"><span class="std std-numref">Section 1.4.2</span></a>.
+In many instances however, it is relevant to work with domains that are more peculiar.
+In this perspective, this section discusses a method for constructing a mesh from the input of a black-and-white image of a 2d domain <span class="math notranslate nohighlight">\(\Omega\)</span>.</p>
+<p>The complete script of the proposed method can be downloaded <a class="reference download internal" download="" href="../_downloads/dd38dfa4d39c937902d88de7162c5c4f/img2msh.edp"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a> and we comment about its most salient features below.</p>
+<p>The procedure hinges on convenient built-in commands in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span>. These work on images under the <span class="math notranslate nohighlight">\(\texttt{.pgm}\)</span> format; since images are usually rather supplied as <span class="math notranslate nohighlight">\(\texttt{.jpg}\)</span> files, we first use a conversion program in command line. This tool is part of the open-source library <a class="reference external" href="https://imagemagick.org/index.php">ImageMagick</a> , which should be installed before running the script below.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Create a mesh from the datum of a black-and-white image (in jpg)</span>
+<span class="cm"> !!!! The command line &quot;convert&quot; from ImageMagick must be available !!!! */</span>
+<span class="cp">load</span><span class="w"> </span><span class="s">&quot;ppm2rnm&quot;</span>
+<span class="cp">load</span><span class="w"> </span><span class="s">&quot;</span><span class="nf">isoline</span><span class="s">&quot;</span>
+<span class="cp">load</span><span class="w"> </span><span class="s">&quot;</span><span class="nf">medit</span><span class="s">&quot;</span>
+
+<span class="cm">/* Decide whether to mesh the image (1) or its complement (0) */</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">mshimg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="cm">/* Convert input image into pgm format */</span>
+<span class="kt">string</span><span class="w"> </span><span class="n">INPUT</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;obs.jpg&quot;</span><span class="p">;</span>
+<span class="kt">string</span><span class="w"> </span><span class="n">INPUTPGM</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;obs.pgm&quot;</span><span class="p">;</span>
+<span class="kt">string</span><span class="w"> </span><span class="n">OUTPUT</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;obs.mesh&quot;</span><span class="p">;</span>
+
+<span class="nf">exec</span><span class="p">(</span><span class="s">&quot;convert &quot;</span><span class="o">+</span><span class="n">INPUT</span><span class="o">+</span><span class="s">&quot; &quot;</span><span class="o">+</span><span class="n">INPUTPGM</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The next sequence of instructions reads the image as a 2d array of pixels; it creates a mesh <span class="math notranslate nohighlight">\(\calT_h\)</span> adjusted to the size of this array, and defines a <span class="math notranslate nohighlight">\(\P_1\)</span> Finite Element function, whose values at its vertices are the intensity values of the image – ranging from <span class="math notranslate nohighlight">\(0\)</span> (for black) to <span class="math notranslate nohighlight">\(1\)</span> (for white).</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Read image and get data */</span>
+<span class="kt">real</span><span class="p">[</span><span class="kt">int</span><span class="p">,</span><span class="kt">int</span><span class="p">]</span><span class="w"> </span><span class="n">img</span><span class="p">(</span><span class="n">INPUTPGM</span><span class="p">);</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">nx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">img</span><span class="p">.</span><span class="kr">n</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">ny</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">img</span><span class="p">.</span><span class="kr">m</span><span class="p">;</span>
+
+<span class="cm">/* Creation of a square mesh adapted to the pixellisation of the image */</span>
+<span class="kt">mesh</span><span class="w"> </span><span class="n">Th</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">square</span><span class="p">(</span><span class="n">nx</span><span class="mi">-1</span><span class="p">,</span><span class="n">ny</span><span class="mi">-1</span><span class="p">,[(</span><span class="n">nx</span><span class="mi">-1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="kr">x</span><span class="p">),(</span><span class="n">ny</span><span class="mi">-1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="kr">y</span><span class="p">)]);</span>
+<span class="kt">fespace</span><span class="w"> </span><span class="nf">Vh</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="nc">P1</span><span class="p">);</span>
+<span class="n">Vh</span><span class="w"> </span><span class="n">u</span><span class="p">;</span>
+<span class="n">u</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">img</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> function <code class="code docutils literal notranslate"><span class="pre">isoline</span></code> then allows to extract the <span class="math notranslate nohighlight">\(0.5\)</span> isoline of the image Finite Element function <span class="math notranslate nohighlight">\(\texttt{u}\)</span> as a collection of parametrized curves.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Extraction of the 0.5 isoline */</span>
+<span class="kt">real</span><span class="p">[</span><span class="kt">int</span><span class="p">,</span><span class="kt">int</span><span class="p">]</span><span class="w"> </span><span class="n">ver</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c1">// Table for the vertices of the isoline (will be resized automatically)</span>
+<span class="kt">int</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="w"> </span><span class="kr">be</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c1">// Table for the beginning and end of each curve portion (will be resized automatically)</span>
+<span class="kt">real</span><span class="w"> </span><span class="n">thres</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="p">;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">nc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">isoline</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="n">u</span><span class="p">,</span><span class="kp">iso</span><span class="o">=</span><span class="n">thres</span><span class="p">,</span><span class="kp">close</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ver</span><span class="p">,</span><span class="kp">beginend</span><span class="o">=</span><span class="kr">be</span><span class="p">,</span><span class="kp">smoothing</span><span class="o">=</span><span class="mf">0.1</span><span class="p">);</span>
+
+<span class="cm">/* Endpoints of the longest isoline */</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">ip0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">be</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">ip1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">be</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="mi">-1</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">npc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="p">;</span><span class="w"> </span><span class="c1">// Desired number of vertices on the boundary</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">npb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">50</span><span class="p">;</span><span class="w"> </span><span class="c1">// Desired number of vertices on the outer border</span>
+
+<span class="cm">/* Parametrization of the border from the datum of the boundary points */</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">BIso</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="kr">P</span><span class="o">=</span><span class="n">Curve</span><span class="p">(</span><span class="n">ver</span><span class="p">,</span><span class="n">ip0</span><span class="p">,</span><span class="n">ip1</span><span class="p">,</span><span class="kp">t</span><span class="p">);</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="cm">/* border left(t=0,1) {x=0.0; y=ny-ny*t; label=0; }</span>
+<span class="cm">border bot(t=0,1) {x=nx*t; y=0.0; label=0; }</span>
+<span class="cm">border right(t=0,1) {x=nx; y=ny*t; label=0; }</span>
+<span class="cm">border top(t=0,1) {x=nx-nx*t; y=ny; label=0; }*/</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">left</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="kr">x</span><span class="o">=</span><span class="mf">-0.5</span><span class="o">*</span><span class="n">nx</span><span class="p">;</span><span class="w"> </span><span class="kr">y</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">ny</span><span class="o">-</span><span class="n">ny</span><span class="o">*</span><span class="kp">t</span><span class="p">;</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">bot</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="kr">x</span><span class="o">=</span><span class="mf">-0.5</span><span class="o">*</span><span class="n">nx</span><span class="o">+</span><span class="n">nx</span><span class="o">*</span><span class="kp">t</span><span class="p">;</span><span class="w"> </span><span class="kr">y</span><span class="o">=-</span><span class="n">ny</span><span class="p">;</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">right</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="kr">x</span><span class="o">=</span><span class="mf">1.5</span><span class="o">*</span><span class="n">nx</span><span class="p">;</span><span class="w"> </span><span class="kr">y</span><span class="o">=-</span><span class="n">ny</span><span class="o">+</span><span class="n">ny</span><span class="o">*</span><span class="kp">t</span><span class="p">;</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">2</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="kt">border</span><span class="w"> </span><span class="nf">top</span><span class="p">(</span><span class="kp">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="kr">x</span><span class="o">=</span><span class="mf">1.5</span><span class="o">*</span><span class="n">nx</span><span class="o">-</span><span class="n">nx</span><span class="o">*</span><span class="kp">t</span><span class="p">;</span><span class="w"> </span><span class="kr">y</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">ny</span><span class="p">;</span><span class="w"> </span><span class="kr">label</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+<p>We eventually create the mesh of the image (or that of its complement) from the above set of boundary curves.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Creation of the mesh */</span>
+<span class="kt">mesh</span><span class="w"> </span><span class="n">Thfig</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">mshimg</span><span class="w"> </span><span class="p">)</span>
+<span class="w">  </span><span class="n">Thfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">buildmesh</span><span class="p">(</span><span class="n">BIso</span><span class="p">(</span><span class="o">-</span><span class="n">npc</span><span class="p">));</span>
+<span class="k">else</span>
+<span class="w">  </span><span class="n">Thfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">buildmesh</span><span class="p">(</span><span class="n">left</span><span class="p">(</span><span class="n">npb</span><span class="p">)</span><span class="o">+</span><span class="n">bot</span><span class="p">(</span><span class="n">npb</span><span class="p">)</span><span class="o">+</span><span class="n">right</span><span class="p">(</span><span class="n">npb</span><span class="p">)</span><span class="o">+</span><span class="n">top</span><span class="p">(</span><span class="n">npb</span><span class="p">)</span><span class="o">+</span><span class="n">BIso</span><span class="p">(</span><span class="n">npc</span><span class="p">));</span>
+
+<span class="cm">/* Scaling Thfig between 0 and 1 */</span>
+<span class="kt">real</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="w"> </span><span class="kp">bb</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+<span class="n">boundingbox</span><span class="p">(</span><span class="n">Thfig</span><span class="p">,</span><span class="kp">bb</span><span class="p">);</span><span class="w"> </span><span class="c1">// bb[0] = xmin, bb[1] = xmax, bb[2] = ymin, bb[3] = ymax</span>
+
+<span class="kt">real</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="w"> </span><span class="n">gc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="kp">bb</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="kp">bb</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="kp">bb</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="kp">bb</span><span class="p">[</span><span class="mi">3</span><span class="p">])];</span>
+<span class="kt">real</span><span class="w"> </span><span class="nf">dd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">max</span><span class="p">(</span><span class="kp">bb</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="kp">bb</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="kp">bb</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">-</span><span class="kp">bb</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+<span class="nf">dd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="o">/</span><span class="nf">dd</span><span class="p">;</span>
+
+<span class="n">Thfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">movemesh</span><span class="p">(</span><span class="n">Thfig</span><span class="p">,[</span><span class="nf">dd</span><span class="o">*</span><span class="p">(</span><span class="kr">x</span><span class="o">-</span><span class="n">gc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="nf">dd</span><span class="o">*</span><span class="p">(</span><span class="kr">y</span><span class="o">-</span><span class="n">gc</span><span class="p">[</span><span class="mi">1</span><span class="p">])]);</span>
+
+<span class="cm">/* Save mesh */</span>
+<span class="nf">savemesh</span><span class="p">(</span><span class="n">Thfig</span><span class="p">,</span><span class="n">OUTPUT</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>An example, using this <a class="reference download internal" download="" href="../_downloads/1ba8e6ee77d8e89f27fba8976dfd4f06/obs.jpg"><code class="xref download docutils literal notranslate"><span class="pre">image</span></code></a> is depicted in <a class="reference internal" href="#fig-img2mesh"><span class="std std-numref">Fig. 2.1</span></a>.</p>
+<figure class="align-default" id="id1">
+<span id="fig-img2mesh"></span><a class="reference internal image-reference" href="../_images/figimg2mesh.png"><img alt="../_images/figimg2mesh.png" src="../_images/figimg2mesh.png" style="width: 1138.1999999999998px; height: 212.79999999999998px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.1 </span><span class="caption-text">(Left) A 2d domain <span class="math notranslate nohighlight">\(\Omega\)</span> supplied as a black-and-white picture (<span class="math notranslate nohighlight">\(\texttt{.jpg}\)</span> format); (middle) Mesh of <span class="math notranslate nohighlight">\(\Omega\)</span>; (right) Mesh of the complement of <span class="math notranslate nohighlight">\(\Omega\)</span> within a box.</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/index_gen.html">1. Generalities</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index_adv.html">2. Advanced features</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2.1. Meshing images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="curvature.html">2.2. Curvature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nonlinear.html">2.3. Nonlinear problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variational_inequalities.html">2.4. Variational inequalities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM.html">2.5. Level Set method I</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM2.html">2.6. Level Set method II</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3dext.html">2.7. Going 3d</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_adv.html"><span class="section-number">2. </span>More advanced issues in scientific computing</a><ul>
+      <li>Previous: <a href="index_adv.html" title="previous chapter"><span class="section-number">2. </span>More advanced issues in scientific computing</a></li>
+      <li>Next: <a href="curvature.html" title="next chapter"><span class="section-number">2.2. </span>Calculating curvature</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Advanced/imgmesh.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

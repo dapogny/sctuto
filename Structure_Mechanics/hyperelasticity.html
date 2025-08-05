@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3.3. Hyperelasticity &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3.4. Contact problems: another use of variational inequalities" href="contact.html" />
+    <link rel="prev" title="3.2. Resolution of the linear elasticity system with the Finite Element Method" href="elasFE.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="hyperelasticity">
+<span id="sec-hyperelasticity"></span><h1><span class="section-number">3.3. </span>Hyperelasticity<a class="headerlink" href="#hyperelasticity" title="Link to this heading">¶</a></h1>
+<section id="solving-a-non-linear-elasticity-problem-by-newton-s-method">
+<span id="sec-newtonnlelas"></span><h2><span class="section-number">3.3.1. </span>Solving a non linear elasticity problem by Newton’s method<a class="headerlink" href="#solving-a-non-linear-elasticity-problem-by-newton-s-method" title="Link to this heading">¶</a></h2>
+<p>In this section, we exemplify the use of Newton’s method for the solution of a nonlinear elasticity problem, see <a class="reference internal" href="../Advanced/nonlinear.html#sec-newton"><span class="std std-numref">Section 2.3.1</span></a> for generalities about this method.</p>
+</section>
+<section id="energy-minimization-in-hyperelasticity">
+<span id="sec-hyperelas"></span><h2><span class="section-number">3.3.2. </span>Energy minimization in hyperelasticity<a class="headerlink" href="#energy-minimization-in-hyperelasticity" title="Link to this heading">¶</a></h2>
+<p>We take advantage of the properties of hyperelastic materials, where the constitutive relation stems from the minimization of an energy functional.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/index_gen.html">1. Generalities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Advanced/index_adv.html">2. Advanced features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index_structmech.html">3. Structure mechanics</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="elasticity.html">3.1. Linear elasticity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elasFE.html">3.2. Finite Elements for linear elasticity</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">3.3. Hyperelasticity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contact.html">3.4. Contact</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_structmech.html"><span class="section-number">3. </span>Structure mechanics</a><ul>
+      <li>Previous: <a href="elasFE.html" title="previous chapter"><span class="section-number">3.2. </span>Resolution of the linear elasticity system with the Finite Element Method</a></li>
+      <li>Next: <a href="contact.html" title="next chapter"><span class="section-number">3.4. </span>Contact problems: another use of variational inequalities</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Structure_Mechanics/hyperelasticity.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2.3. A first encounter with nonlinear problems &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2.4. A glimpse of variational inequalities" href="variational_inequalities.html" />
+    <link rel="prev" title="2.2. Calculating curvature" href="curvature.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="a-first-encounter-with-nonlinear-problems">
+<span id="sec-nonlinear"></span><h1><span class="section-number">2.3. </span>A first encounter with nonlinear problems<a class="headerlink" href="#a-first-encounter-with-nonlinear-problems" title="Link to this heading">¶</a></h1>
+<p>This section deals with nonlinear variational problems, essentially exemplifying the use of Newton’s method in this context.
+We shall retrieve similar techniques later on, in our study of <a class="reference internal" href="../Structure_Mechanics/hyperelasticity.html#sec-hyperelasticity"><span class="std std-ref">non linear elasticity problems</span></a> or the <a class="reference internal" href="../Structure_Mechanics/hyperelasticity.html#sec-hyperelasticity"><span class="std std-ref">Navier-Stokes equations</span></a>.</p>
+<p>A good reference about the use of Newton’s method in multiple contexts is <span id="id1">[<a class="reference internal" href="../Generalities/bibliography.html#id8" title="Peter Deuflhard. Newton methods for nonlinear problems: affine invariance and adaptive algorithms. Volume 35. Springer Science &amp; Business Media, 2011.">Deu11</a>]</span>.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="../_images/under_work.png"><img alt="../_images/under_work.png" src="../_images/under_work.png" style="width: 269.2px; height: 320.0px;" />
+</a>
+</figure>
+<section id="the-newton-raphson-method">
+<span id="sec-newton"></span><h2><span class="section-number">2.3.1. </span>The Newton-Raphson method<a class="headerlink" href="#the-newton-raphson-method" title="Link to this heading">¶</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(X, Y\)</span> be two Banach spaces and let <span class="math notranslate nohighlight">\(F : X \to Y\)</span> be a differentiable mapping; we search for a solution <span class="math notranslate nohighlight">\(x \in X\)</span> to the (a priori nonlinear) equation:</p>
+<div class="math notranslate nohighlight" id="equation-eq-newtonsearch">
+<span class="eqno">(2.1)<a class="headerlink" href="#equation-eq-newtonsearch" title="Link to this equation">¶</a></span>\[\text{Search for } x \in X, \:\:\text{ s.t. }\:\: F(x) = 0.\]</div>
+<p>To achieve this goal, the Newton-Raphson method starts from an initial guess <span class="math notranslate nohighlight">\(x_0\)</span>, and then produces a series of points <span class="math notranslate nohighlight">\(x^n\)</span>, <span class="math notranslate nohighlight">\(n = 0,...,\)</span> where each successive term <span class="math notranslate nohighlight">\(x^{n+1}\)</span> is obtained from <span class="math notranslate nohighlight">\(x^n\)</span> via application of a &quot;small&quot; correction <span class="math notranslate nohighlight">\(h^n\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[x^{n+1} = x^n + h^n.\]</div>
+</p>
+<p>The correction <span class="math notranslate nohighlight">\(h^n\)</span> is calculated from a linearization of the original equation <a class="reference internal" href="#equation-eq-newtonsearch">(2.1)</a> about the current iterate <span class="math notranslate nohighlight">\(x^n\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[F(x^n + h^n) = 0 \text{ is replaced by } F(x^n) + F^\prime(x^n)(h^n) = 0;\]</div>
+</p>
+<p>in other terms, we solve the following equation:</p>
+<div class="math notranslate nohighlight" id="equation-eq-newtonlin">
+<span class="eqno">(2.2)<a class="headerlink" href="#equation-eq-newtonlin" title="Link to this equation">¶</a></span>\[F^\prime(x^n)(h^n) =−F(x^n).\]</div>
+<p>The Newton-Raphson method reads as follows.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Initialization: Select an initial guess <span class="math notranslate nohighlight">\(x^0 \in X\)</span>.</p></li>
+<li><p>For <span class="math notranslate nohighlight">\(n=0,\ldots,\)</span> until convergence:</p>
+<ul>
+<li><p>Calculate the solution <span class="math notranslate nohighlight">\(h^n\)</span> to the linearized equation <a class="reference internal" href="#equation-eq-newtonlin">(2.2)</a>.</p></li>
+<li><p>Set <span class="math notranslate nohighlight">\(x^{n+1} = x^n + h^n\)</span>.</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+<p>This procedure converges quite fast—in principle—to one solution to the equation (3.2.3). Let us em-
+phasize on one major drawback of the Newton-Raphson procedure. Depending on the particular function
+A(x) and the initial guess x0, this procedure may experience diﬃculties in convergence.</p>
+<p>Talk about continuation – sometimes called &quot;homotopy&quot; in the literature.</p>
+</section>
+<section id="an-application-example-a-non-linear-laplace-equation">
+<h2><span class="section-number">2.3.2. </span>An application example: a non linear Laplace equation<a class="headerlink" href="#an-application-example-a-non-linear-laplace-equation" title="Link to this heading">¶</a></h2>
+<p>This problem originates from magnetostatics.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/index_gen.html">1. Generalities</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index_adv.html">2. Advanced features</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="imgmesh.html">2.1. Meshing images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="curvature.html">2.2. Curvature</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2.3. Nonlinear problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variational_inequalities.html">2.4. Variational inequalities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM.html">2.5. Level Set method I</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM2.html">2.6. Level Set method II</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3dext.html">2.7. Going 3d</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_adv.html"><span class="section-number">2. </span>More advanced issues in scientific computing</a><ul>
+      <li>Previous: <a href="curvature.html" title="previous chapter"><span class="section-number">2.2. </span>Calculating curvature</a></li>
+      <li>Next: <a href="variational_inequalities.html" title="next chapter"><span class="section-number">2.4. </span>A glimpse of variational inequalities</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Advanced/nonlinear.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

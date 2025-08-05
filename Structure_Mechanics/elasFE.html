@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3.2. Resolution of the linear elasticity system with the Finite Element Method &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3.3. Hyperelasticity" href="hyperelasticity.html" />
+    <link rel="prev" title="3.1. An introduction to linear elasticity" href="elasticity.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="resolution-of-the-linear-elasticity-system-with-the-finite-element-method">
+<span id="sec-feelas"></span><h1><span class="section-number">3.2. </span>Resolution of the linear elasticity system with the Finite Element Method<a class="headerlink" href="#resolution-of-the-linear-elasticity-system-with-the-finite-element-method" title="Link to this heading">¶</a></h1>
+<p>This section deals with the use of the Finite Element Method for the solution of the linear elasticity system.
+Much of the treatment of this system is very similar to that of the Laplace equation and its avatars, discussed in <a class="reference internal" href="../Generalities/laplace.html#sec-lap"><span class="std std-numref">Section 1.4</span></a>.</p>
+<section id="the-variational-setting-for-linear-elasticity">
+<h2><span class="section-number">3.2.1. </span>The variational setting for linear elasticity<a class="headerlink" href="#the-variational-setting-for-linear-elasticity" title="Link to this heading">¶</a></h2>
+<p>The variational formulation for this problem reads:
+<div class="math notranslate nohighlight">
+\[\text{Search for } \u \in H^1_{\Gamma_D}(\Omega)^d \text{ s.t. } \forall \v \in H^1_{\Gamma_D}(\Omega)^d, \quad \int_\Omega Ae(\u) : e(\v) \:\d \x = \int_\Omega \f \cdot \v \:\d \x + \int_{\Gamma_N} \g \cdot \v \:\d s \]</div>
+</p>
+<p>The well-posedness of this problem follows from the classical Lax-Milgram theory, described in <a class="reference internal" href="../Generalities/varpbs.html#sec-lm"><span class="std std-numref">Section 1.2</span></a>. The only missing ingredient is the following result.</p>
+<div class="proof proposition admonition" id="proposition-0">
+<p class="admonition-title"><span class="caption-number">Proposition 3.2 </span> (Korn’s inequality)</p>
+<section class="proposition-content" id="proof-content">
+<p>Assume that <span class="math notranslate nohighlight">\(\Gamma_D\)</span> has non empty surface measure. Then there exists a constant <span class="math notranslate nohighlight">\(C &gt;0\)</span> such that:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall \u \in H^1_{\Gamma_D}(\Omega)^d, \quad \lvert\lvert \u \lvert\lvert_{H^1(\Omega)^d} ^2 \leq C \int_\Omega \lvert\lvert e(\u) \lvert\lvert^2 \:\d \x.\]</div>
+</p>
+</section>
+</div><p>The intuition about this result is the following: the displacement functions such that <span class="math notranslate nohighlight">\(e(\u)=0\)</span> are the rigid-body motions, i.e. the compositions with translations and rotations. The rigid-body motions that vanish on a region of <span class="math notranslate nohighlight">\(\Gamma_D\)</span> with positive surface measure must be zero.</p>
+<p>Making this idea mathematically rigorous is quite difficult, and it goes beyond the scope of this book; we refer to Th. 6.3.4 in <span id="id1">[<a class="reference internal" href="../Generalities/bibliography.html#id7" title="Philippe G Ciarlet. Mathematical elasticity: Three-dimensional elasticity. SIAM, 2021.">Cia21</a>]</span>.</p>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<p>Prove the well-posedness of the variational problem by admitting Korn’s inequality.</p>
+</div>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise (A study of rigid-body motions)</p>
+<p>Bla bla</p>
+</div>
+</section>
+<section id="resolution-of-a-basic-problem-in-linear-elasticity">
+<h2><span class="section-number">3.2.2. </span>Resolution of a basic problem in linear elasticity<a class="headerlink" href="#resolution-of-a-basic-problem-in-linear-elasticity" title="Link to this heading">¶</a></h2>
+<section id="a-basic-resolution-example">
+<span id="sec-feelasbasic"></span><h3><span class="section-number">3.2.2.1. </span>A basic resolution example<a class="headerlink" href="#a-basic-resolution-example" title="Link to this heading">¶</a></h3>
+<p>Use of variational formulations over tensor product spaces.</p>
+<p>Situation; connecting rod in internal combustion engines?
+The small end of the rod is connected to the piston, and it undergoes linear motion (i.e inhomogeneous Neumann).
+The big end is connected to the cranckpin (homogeneous Dirichlet B.C.), and the goal of the device is to convert the input linear motion into rotational motion.</p>
+<p>Calculation of stress</p>
+</section>
+<section id="a-complement-about-vizualization-of-vector-fields">
+<span id="sec-visuelas"></span><h3><span class="section-number">3.2.2.2. </span>A complement about vizualization of vector fields<a class="headerlink" href="#a-complement-about-vizualization-of-vector-fields" title="Link to this heading">¶</a></h3>
+<p>Vizualization:
+- Vector fields with medit
+- How to toggle a displacement with medit.</p>
+</section>
+</section>
+<section id="a-bimaterial-situation">
+<h2><span class="section-number">3.2.3. </span>A bimaterial situation<a class="headerlink" href="#a-bimaterial-situation" title="Link to this heading">¶</a></h2>
+<p>Or multi-material, like in ferrite.
+Observe the deformations of the different materials, depending on the Young’s modulus.</p>
+</section>
+<section id="vibrations-in-an-elastic-structure">
+<h2><span class="section-number">3.2.4. </span>Vibrations in an elastic structure<a class="headerlink" href="#vibrations-in-an-elastic-structure" title="Link to this heading">¶</a></h2>
+<p>This section deals with the calculation of eigenvalues of the linear elasticity system. It is the counterpart in this physical context of <a class="reference internal" href="../Generalities/eigen.html#sec-eigen"><span class="std std-numref">Section 1.7</span></a>.</p>
+<section id="a-few-words-about-resonance-of-mechanical-structures">
+<h3><span class="section-number">3.2.4.1. </span>A few words about resonance of mechanical structures<a class="headerlink" href="#a-few-words-about-resonance-of-mechanical-structures" title="Link to this heading">¶</a></h3>
+<p>Such modal analysis is very important in structural engineering, where for instance, a structure may continue to vibrate and take the form of the corresponding mode, when submitted to motion at this particular frequency (earthquake, pedestrians on a bridge).</p>
+<p>Resonance frequencies are particularly harmful, especially when damping is low. Then, even a very small amount of input energy can result in large deformations.</p>
+<p>Let us consider a volumic load <span class="math notranslate nohighlight">\(\f(t,\x)\)</span> depending on time and space. One can prove that the elastic displacement is the solution <span class="math notranslate nohighlight">\(\u(t,\x)\)</span> to the time-dependent version of the linear elasticity system:</p>
+<p><div class="math notranslate nohighlight">
+\[\frac{\partial^2 \u}{\partial t^2}(t,\x) - \dv(\sigma)(t,\x) = \f(t,\x). \]</div>
+</p>
+</section>
+<section id="numerical-computation-of-structural-resonances">
+<h3><span class="section-number">3.2.4.2. </span>Numerical computation of structural resonances<a class="headerlink" href="#numerical-computation-of-structural-resonances" title="Link to this heading">¶</a></h3>
+<p>Shear wall example (crane? Mast?)</p>
+</section>
+</section>
+<section id="the-ersatz-material-method">
+<h2><span class="section-number">3.2.5. </span>The ersatz material method<a class="headerlink" href="#the-ersatz-material-method" title="Link to this heading">¶</a></h2>
+</section>
+<section id="a-3d-example">
+<h2><span class="section-number">3.2.6. </span>A 3d example<a class="headerlink" href="#a-3d-example" title="Link to this heading">¶</a></h2>
+<p>A beam with an I shaped cross-section.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/index_gen.html">1. Generalities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Advanced/index_adv.html">2. Advanced features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index_structmech.html">3. Structure mechanics</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="elasticity.html">3.1. Linear elasticity</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">3.2. Finite Elements for linear elasticity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hyperelasticity.html">3.3. Hyperelasticity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contact.html">3.4. Contact</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_structmech.html"><span class="section-number">3. </span>Structure mechanics</a><ul>
+      <li>Previous: <a href="elasticity.html" title="previous chapter"><span class="section-number">3.1. </span>An introduction to linear elasticity</a></li>
+      <li>Next: <a href="hyperelasticity.html" title="next chapter"><span class="section-number">3.3. </span>Hyperelasticity</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Structure_Mechanics/elasFE.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

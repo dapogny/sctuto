@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>1.1. A vade mecum of functional analysis &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="1.2. The Lax-Milgram variational theory" href="varpbs.html" />
+    <link rel="prev" title="1. Getting started" href="index_gen.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="a-vade-mecum-of-functional-analysis">
+<span id="sec-anafunc"></span><h1><span class="section-number">1.1. </span>A vade mecum of functional analysis<a class="headerlink" href="#a-vade-mecum-of-functional-analysis" title="Link to this heading">¶</a></h1>
+<p>This section introduces the necessary mathematical background underlying the developments of this book,and it sets the main notation used throughout.</p>
+<table class="borderless docutils align-default">
+<colgroup>
+<col style="width: 15.8%" />
+<col style="width: 84.2%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><a class="reference internal image-reference" href="../_images/warning.png"><img alt="../_images/warning.png" src="../_images/warning.png" style="width: 151.6px; height: 120.0px;" />
+</a>
+</td>
+<td><p>The topics of this section are very abstract, and they are certainly difficult for the unfamiliar reader with functional analysis. This dry presentation is not meant to be thoroughly perused prior the (more applied) subsequent chapters. It is rather advised to refer to it when needed: these concepts hopefully get clearer when illustrated by concrete situations. On the other hand, the reader with a firm mathematical background will perhaps feel a bit frustrated about the lack of exhaustivity (and sometimes of precision) of this account. More exhaustive details about differential calculus and functional analysis are provided in the <a class="reference internal" href="../Appendix/index_app.html#sec-app"><span class="std std-ref">appendix</span></a>. We also refer to classical presentations such as Chapter 4 in <span id="id1">[<a class="reference internal" href="bibliography.html#id2" title="Grégoire Allaire. Numerical analysis and optimization: an introduction to mathematical modelling and numerical simulation. OUP Oxford, 2007.">All07</a>]</span> and the textbook <span id="id2">[<a class="reference internal" href="bibliography.html#id5" title="Haim Brezis. Functional analysis, Sobolev spaces and partial differential equations. Springer Science &amp; Business Media, 2010.">Bre10</a>]</span> about these subjects.</p></td>
+</tr>
+</tbody>
+</table>
+<section id="setting">
+<h2><span class="section-number">1.1.1. </span>Setting<a class="headerlink" href="#setting" title="Link to this heading">¶</a></h2>
+<p>The scene unfolds in the physical space <span class="math notranslate nohighlight">\(\R^d\)</span>, where <span class="math notranslate nohighlight">\(d=2\)</span> or <span class="math notranslate nohighlight">\(3\)</span> in practice.
+We denote by <span class="math notranslate nohighlight">\(\be_1,\ldots,\be_d\)</span> the usual coordinate vectors, i.e.
+<div class="math notranslate nohighlight">
+\[\be_1 = (1,0,\ldots,0) , \:\: \be_2 = (0,1,0\ldots,0), \ldots,\:\: \be_d = (0,\ldots,0,1).\]</div>
+
+The coordinates of a point (or a vector) <span class="math notranslate nohighlight">\(\x \in \R^d\)</span> in this basis are denoted by <span class="math notranslate nohighlight">\(\x = (x_1,\ldots,x_d)\)</span>.</p>
+<p>Throughout this section, <span class="math notranslate nohighlight">\(\Omega\)</span> is a bounded Lipschitz (open) domain of <span class="math notranslate nohighlight">\(\R^d\)</span>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The boundary <span class="math notranslate nohighlight">\(\partial\Omega\)</span> of <span class="math notranslate nohighlight">\(\Omega\)</span> is smooth, except perhaps at a finite number of corners in 2d, or corners and ridges in 3d, see <a class="reference internal" href="#lipdomain"><span class="std std-numref">Fig. 1.1</span></a>. For instance, polyhedra are Lipschitz domains.</p></li>
+<li><p>We denote by <span class="math notranslate nohighlight">\(\n = (n_1,\ldots,n_d) : \partial \Omega \to \R^d\)</span> the unit normal vector field to <span class="math notranslate nohighlight">\(\partial \Omega\)</span>, pointing outward <span class="math notranslate nohighlight">\(\Omega\)</span>. The vector <span class="math notranslate nohighlight">\(\n(\x)\)</span> is defined at almost every point <span class="math notranslate nohighlight">\(\x \in \partial \Omega\)</span>, except at corners or ridges.</p></li>
+<li><p>The integration of a function <span class="math notranslate nohighlight">\(u\)</span> on the boundary of <span class="math notranslate nohighlight">\(\Omega\)</span> is denoted by:
+<div class="math notranslate nohighlight">
+\[\int_{\partial\Omega} u \:\d s, \]</div>
+
+where the symbol <span class="math notranslate nohighlight">\(\d s\)</span> refers to the surface measure on <span class="math notranslate nohighlight">\(\partial\Omega\)</span>.</p></li>
+</ul>
+</div></blockquote>
+<figure class="align-default" id="id3">
+<span id="lipdomain"></span><a class="reference internal image-reference" href="../_images/Lipschitzdom.png"><img alt="../_images/Lipschitzdom.png" src="../_images/Lipschitzdom.png" style="width: 708.75px; height: 301.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.1 </span><span class="caption-text">(Left) The boundary of a 2d Lipschitz domain is a smooth curve, except at some vertices (in blue); (right) The boundary of a 3d Lipschitz domain is a smooth hypersurface, except at corners (blue points) and ridges (blue lines)</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="differentiable-functions-notations-and-the-green-s-formula">
+<span id="sec-green"></span><h2><span class="section-number">1.1.2. </span>Differentiable functions, notations, and the Green’s formula<a class="headerlink" href="#differentiable-functions-notations-and-the-green-s-formula" title="Link to this heading">¶</a></h2>
+<p>We presently recall a few classical notions about multivariable calculus (notably, derivatives), and set the related notions used throughout these tutorials.</p>
+<section id="classical-spaces-of-continuous-and-differentiable-functions">
+<h3><span class="section-number">1.1.2.1. </span>Classical spaces of continuous and differentiable functions<a class="headerlink" href="#classical-spaces-of-continuous-and-differentiable-functions" title="Link to this heading">¶</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(u\)</span> be a function from <span class="math notranslate nohighlight">\(\Omega \subset \R^d\)</span> into <span class="math notranslate nohighlight">\(\R\)</span>.</p>
+<blockquote>
+<div><ul>
+<li><p>For <span class="math notranslate nohighlight">\(j=1,\ldots,d\)</span>, the partial derivative of <span class="math notranslate nohighlight">\(u\)</span> in the <span class="math notranslate nohighlight">\(j^{\text{th}}\)</span> direction at a given point <span class="math notranslate nohighlight">\(\x \in \Omega\)</span>, if it exists, is defined by the following limit:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight" id="equation-eq-dudxi">
+<span class="eqno">(1.1)<a class="headerlink" href="#equation-eq-dudxi" title="Link to this equation">¶</a></span>\[\frac{\partial u}{\partial x_j}(\x) = \lim\limits_{t\to 0} \frac{u(\x + t \be_j) - u(\x)}{t},\]</div>
+</div></blockquote>
+<p>see <a class="reference internal" href="#fig-ccbar"><span class="std std-numref">Fig. 1.2</span></a> (left).</p>
+</li>
+<li><p>When all the partial derivatives <span class="math notranslate nohighlight">\(\frac{\partial u}{\partial x_1}(\x),\ldots,\frac{\partial u}{\partial x_d}(\x)\)</span> exist, <span class="math notranslate nohighlight">\(u\)</span> is called differentiable at <span class="math notranslate nohighlight">\(\x\)</span>, and its gradient at <span class="math notranslate nohighlight">\(\x\)</span> is the vector</p></li>
+</ul>
+</div></blockquote>
+<p><div class="math notranslate nohighlight">
+\[\nabla u(\x) := \left(\frac{\partial u}{\partial x_1}(\x),\ldots,\frac{\partial u}{\partial x_d}(\x)\right) \in \R^d.\]</div>
+</p>
+<blockquote>
+<div><ul>
+<li><p>The function <span class="math notranslate nohighlight">\(u\)</span> is said to be continuously differentiable on <span class="math notranslate nohighlight">\(\Omega\)</span>, or of class <span class="math notranslate nohighlight">\(\calC^1\)</span> on <span class="math notranslate nohighlight">\(\Omega\)</span>, if it is differentiable at every point <span class="math notranslate nohighlight">\(\x \in \Omega\)</span>, and if all the functions <span class="math notranslate nohighlight">\(\x \mapsto \frac{\partial u}{\partial x_j}(\x)\)</span> are continuous on <span class="math notranslate nohighlight">\(\Omega\)</span>.</p></li>
+<li><p>The function <span class="math notranslate nohighlight">\(u\)</span> is said to be twice continuously differentiable on <span class="math notranslate nohighlight">\(\Omega\)</span>, or of class <span class="math notranslate nohighlight">\(\calC^2\)</span> on <span class="math notranslate nohighlight">\(\Omega\)</span>, if <span class="math notranslate nohighlight">\(u\)</span> and the functions <span class="math notranslate nohighlight">\(\x \mapsto \frac{\partial u}{\partial x_j}(\x)\)</span> are continuously differentiable on <span class="math notranslate nohighlight">\(\Omega\)</span>.</p></li>
+<li><p>The notion of <span class="math notranslate nohighlight">\(k\)</span> times continuously differentiable functions (or functions of class <span class="math notranslate nohighlight">\(\calC^k\)</span>) on <span class="math notranslate nohighlight">\(\Omega\)</span> is defined likewise, for <span class="math notranslate nohighlight">\(k \geq 3\)</span>. The partial derivative of such a function <span class="math notranslate nohighlight">\(u\)</span> of order <span class="math notranslate nohighlight">\(\alpha_1\)</span> with respect to the first variable, …,  and of order <span class="math notranslate nohighlight">\(\alpha_d\)</span> with respect to the <span class="math notranslate nohighlight">\(d^{\text{th}}\)</span> variable is denoted by:</p>
+<p><div class="math notranslate nohighlight">
+\[\frac{\partial^\alpha u}{\partial x^{\alpha}} (\x), \quad \x \in \Omega, \:\: \alpha = (\alpha_1,\ldots,\alpha_d) \in \mathbb{N}^d.\]</div>
+</p>
+</li>
+</ul>
+</div></blockquote>
+<p>Let now <span class="math notranslate nohighlight">\(\u : \Omega \to \R^d\)</span> be a vector field on <span class="math notranslate nohighlight">\(\Omega\)</span>. The wording &quot;vector field&quot; means that <span class="math notranslate nohighlight">\(\u\)</span> is made of <span class="math notranslate nohighlight">\(d\)</span> real-valued coordinate functions <span class="math notranslate nohighlight">\(\u = (u_1,\ldots,u_d)\)</span>. Then,</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(u\)</span> is called differentiable at some point <span class="math notranslate nohighlight">\(\x \in \Omega\)</span> if for every <span class="math notranslate nohighlight">\(i=1,\ldots,d\)</span>, the real-valued function <span class="math notranslate nohighlight">\(u_i : \Omega \to \R\)</span> is differentiable at <span class="math notranslate nohighlight">\(\x\)</span>.</p></li>
+<li><p>When this is the case, the derivative of <span class="math notranslate nohighlight">\(\u\)</span> at <span class="math notranslate nohighlight">\(\x\)</span> is the <span class="math notranslate nohighlight">\(d \times d\)</span> matrix <span class="math notranslate nohighlight">\(\nabla \u(\x) \in \R^{d\times d}\)</span> given by:</p></li>
+</ul>
+</div></blockquote>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\nabla \u(\x) = \left(\frac{\partial u_i}{\partial x_j}(\x)\right)_{i,j=1,\ldots,d}= \left(
+\begin{array}{cccc}
+\frac{\partial u_1}{\partial x_1}(\x) &amp; \frac{\partial u_1}{\partial x_2}(\x) &amp; \ldots &amp; \frac{\partial u_1}{\partial x_d}(\x)  \\
+\vdots &amp; &amp; &amp;\vdots \\
+\frac{\partial u_d}{\partial x_1}(\x) &amp; \frac{\partial u_d}{\partial x_2}(\x) &amp; \ldots &amp; \frac{\partial u_d}{\partial x_d}(\x)
+\end{array}
+\right), \end{split}\]</div>
+</p>
+<blockquote>
+<div><blockquote>
+<div><p>i.e. the <span class="math notranslate nohighlight">\(i^{\text{th}}\)</span> line of <span class="math notranslate nohighlight">\(\nabla \u(\x)\)</span> is the gradient of the real-valued function <span class="math notranslate nohighlight">\(u_i\)</span> at <span class="math notranslate nohighlight">\(\x\)</span>.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>For <span class="math notranslate nohighlight">\(k \geq 1\)</span>, <span class="math notranslate nohighlight">\(\u\)</span> is said to be <span class="math notranslate nohighlight">\(k\)</span> times continuously differentiable (or of class <span class="math notranslate nohighlight">\(\calC^k\)</span>) if all its coordinate functions <span class="math notranslate nohighlight">\(u_1,\ldots,u_d\)</span> are themselves <span class="math notranslate nohighlight">\(k\)</span> times continuously differentiable.</p></li>
+</ul>
+</div></blockquote>
+<p>Let us now recall the main differential operators, i.e. operators acting on functions or vector fields via some of their partial derivatives. These are consistently involved in the applications of the next sections.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The divergence of a vector field <span class="math notranslate nohighlight">\(\u: \Omega \to \R^d\)</span> is real-valued function <span class="math notranslate nohighlight">\(\dv(\u) : \Omega \to \R\)</span> defined as the trace of the matrix <span class="math notranslate nohighlight">\(\nabla \u\)</span>, that is:</p></li>
+</ul>
+</div></blockquote>
+<p><div class="math notranslate nohighlight">
+\[\dv(\u)(\x) = \sum\limits_{i=1}^d \frac{\partial u_i}{\partial x_i}(\x), \quad \x \in \Omega.\]</div>
+</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The Laplacian <span class="math notranslate nohighlight">\(\Delta u\)</span> of a real-valued function <span class="math notranslate nohighlight">\(u:\Omega \to \R\)</span> of class <span class="math notranslate nohighlight">\(\calC^1\)</span> is the real-valued function defined by:</p></li>
+</ul>
+</div></blockquote>
+<p><div class="math notranslate nohighlight">
+\[\Delta u(\x) = \sum\limits_{i=1}^d \frac{\partial^2 u}{\partial x_i^2}(\x), \quad \x \in \Omega.\]</div>
+</p>
+<p>Throughout this book, we adopt the following notations:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>For any integer <span class="math notranslate nohighlight">\(k \geq 0\)</span>, <span class="math notranslate nohighlight">\(\calC^k(\Omega)\)</span> is the space of <span class="math notranslate nohighlight">\(k\)</span> times continuously differentiable functions <span class="math notranslate nohighlight">\(u: \Omega \to \R\)</span> on <span class="math notranslate nohighlight">\(\Omega\)</span>.</p></li>
+<li><p>For any <span class="math notranslate nohighlight">\(k \geq 0\)</span>, <span class="math notranslate nohighlight">\(\calC^k_c(\Omega)\)</span> is the space of <span class="math notranslate nohighlight">\(k\)</span> times continuously differentiable functions with compact support inside <span class="math notranslate nohighlight">\(\Omega\)</span>: <span class="math notranslate nohighlight">\(u\in \calC^k(\Omega)\)</span> if <span class="math notranslate nohighlight">\(u\)</span> is of class <span class="math notranslate nohighlight">\(\calC^k\)</span> on <span class="math notranslate nohighlight">\(\Omega\)</span> and there exists a compact subset <span class="math notranslate nohighlight">\(K \subset \Omega\)</span> such that <span class="math notranslate nohighlight">\(u(\x) = 0\)</span> for <span class="math notranslate nohighlight">\(x \in \Omega \setminus K\)</span>.</p></li>
+</ul>
+</div></blockquote>
+<p>Before ending this section, let us stress a quite subtle point. The derivative of a function <span class="math notranslate nohighlight">\(u:\Omega \to \R\)</span>, as defined above, only makes sense at points <span class="math notranslate nohighlight">\(\x \in \Omega\)</span> lying inside the domain <span class="math notranslate nohighlight">\(\Omega\)</span>, not on its boundary. Note indeed that the definition <a class="reference internal" href="#equation-eq-dudxi">(1.1)</a> of <span class="math notranslate nohighlight">\(\frac{\partial u}{\partial x_j}(\x)\)</span> involves the values of <span class="math notranslate nohighlight">\(u\)</span> at points that are &quot; close&quot; to <span class="math notranslate nohighlight">\(\x\)</span> in every direction. It is convenient to give a meaning for functions <span class="math notranslate nohighlight">\(u:\Omega \to \R\)</span> to be differentiable up to the boundary <span class="math notranslate nohighlight">\(\partial \Omega\)</span>, see <a class="reference internal" href="#fig-ccbar"><span class="std std-numref">Fig. 1.2</span></a> (right) for an illustration.</p>
+<div class="proof definition admonition" id="definition-0">
+<span id="def-ckbdy"></span><p class="admonition-title"><span class="caption-number">Definition 1.1 </span></p>
+<section class="definition-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(k \geq 0\)</span> be an integer. A function <span class="math notranslate nohighlight">\(u : \Omega \to \R\)</span> is called <span class="math notranslate nohighlight">\(k\)</span> times continuously differentiable up to the boundary <span class="math notranslate nohighlight">\(\partial \Omega\)</span> if there exists an open neighborhood <span class="math notranslate nohighlight">\(U\)</span> of <span class="math notranslate nohighlight">\(\overline\Omega\)</span> in <span class="math notranslate nohighlight">\(\R^d\)</span> and a function <span class="math notranslate nohighlight">\(\widetilde u : U \to \R\)</span> of class <span class="math notranslate nohighlight">\(\calC^k\)</span> on <span class="math notranslate nohighlight">\(U\)</span> such that the restriction <span class="math notranslate nohighlight">\(\widetilde{u} \lvert_\Omega\)</span> coincides with <span class="math notranslate nohighlight">\(u\)</span>. We denote the space of such functions by <span class="math notranslate nohighlight">\(\calC^k(\overline{\Omega})\)</span>.</p>
+</section>
+</div><figure class="align-default" id="id4">
+<span id="fig-ccbar"></span><a class="reference internal image-reference" href="../_images/CCbar.png"><img alt="../_images/CCbar.png" src="../_images/CCbar.png" style="width: 966.0px; height: 346.2px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.2 </span><span class="caption-text">(Left) The definition of the partial derivatives of <span class="math notranslate nohighlight">\(u\)</span> at <span class="math notranslate nohighlight">\(\x\)</span> require that <span class="math notranslate nohighlight">\(u\)</span> be defined on a small neighborhood around <span class="math notranslate nohighlight">\(\x\)</span>; (right) The derivative of <span class="math notranslate nohighlight">\(u\)</span> at a boundary point <span class="math notranslate nohighlight">\(y \in \partial \Omega\)</span> involves an extension of <span class="math notranslate nohighlight">\(u\)</span> to a slightly larger open set <span class="math notranslate nohighlight">\(U\)</span>.</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="the-green-s-formula">
+<h3><span class="section-number">1.1.2.2. </span>The Green’s formula<a class="headerlink" href="#the-green-s-formula" title="Link to this heading">¶</a></h3>
+<p>The Green’s formula is the generalization to multivariable calculus of the ubiquitous integration by parts formula on the real line.
+Among other things, it is the main tool which will allow us to pass from the &quot;classical&quot;, strong form of a boundary value problem to its weak, variational form, see <a class="reference internal" href="varpbs.html#sec-lm"><span class="std std-numref">Section 1.2</span></a>.</p>
+<div class="proof theorem admonition" id="theorem-1">
+<span id="th-green"></span><p class="admonition-title"><span class="caption-number">Theorem 1.1 </span> (Green’s formula)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(u\)</span> be a function in <span class="math notranslate nohighlight">\(\mathcal{C}^1(\overline{\Omega})\)</span>. Then, for every index <span class="math notranslate nohighlight">\(i=1,\ldots,d\)</span>, one has:</p>
+<p><div class="math notranslate nohighlight">
+\[\int_\Omega{\frac{\partial u}{\partial x_i}\:\d \x}  = \int_{\partial \Omega}{u n_i \:\d s}.\]</div>
+</p>
+</section>
+</div><p>The Green’s formula is accompanied with numerous avatars, and we next state the most useful ones.</p>
+<div class="proof corollary admonition" id="corollary-2">
+<span id="cor-green"></span><p class="admonition-title"><span class="caption-number">Corollary 1.1 </span></p>
+<section class="corollary-content" id="proof-content">
+<ul>
+<li><p>Let <span class="math notranslate nohighlight">\(u,v\)</span> be two functions in <span class="math notranslate nohighlight">\(\mathcal{C}^1(\overline{\Omega})\)</span>. Then the following formula holds true for each <span class="math notranslate nohighlight">\(i=1,\ldots,d\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[\int_\Omega{\frac{\partial u}{\partial x_i} v \:\d\x}  = \int_{\partial \Omega}{v n_i \:\d s} - \int_\Omega{u \frac{\partial v}{\partial x_i} \:\d\x}.\]</div>
+</p>
+</li>
+<li><p>The Laplace operator <span class="math notranslate nohighlight">\(\Delta\)</span> satisfies the following identity: for all functions <span class="math notranslate nohighlight">\(u,v\)</span> in <span class="math notranslate nohighlight">\(\mathcal{C}^2(\overline{\Omega})\)</span>,</p>
+<p><div class="math notranslate nohighlight">
+\[\int_{\Omega}{\Delta u \: v \:\d\x} = \int_{\partial\Omega}{\frac{\partial u}{\partial n }v \:\d s} - \int_\Omega{\nabla u \cdot \nabla v \:\d\x}.\]</div>
+</p>
+</li>
+</ul>
+</section>
+</div><div class="dropdown admonition">
+<p class="admonition-title">Sketch of proof</p>
+<p>The first formula is obtained by applying the Green’s formula of <a class="reference internal" href="#th-green"><span class="std std-numref">theorem 1.1</span></a> to the function <span class="math notranslate nohighlight">\(uv\)</span> instead of <span class="math notranslate nohighlight">\(u\)</span>, and then rearranging terms.</p>
+<p>To obtain the second formula, one takes <span class="math notranslate nohighlight">\(\frac{\partial u}{\partial x_i}\)</span> in place of <span class="math notranslate nohighlight">\(u\)</span> in the Green’s formula, and sums over <span class="math notranslate nohighlight">\(i=1,\ldots,d\)</span>.</p>
+</div>
+<div class="proof remark admonition" id="remark-3">
+<p class="admonition-title"><span class="caption-number">Remark 1.1 </span></p>
+<section class="remark-content" id="proof-content">
+<p>The first formula in <a class="reference internal" href="#cor-green"><span class="std std-numref">corollary 1.1</span></a> is exactly the multi-dimensional generalization of the familiar integration by parts formula, involving two functions <span class="math notranslate nohighlight">\(u,v : [a,b] \to \R\)</span> on an interval <span class="math notranslate nohighlight">\([a,b] \subset \R\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[\int_a^b u^\prime(x) v(x) \d x = (u(b)v(b) - u(a)v(a)) - \int_a^b u(x) v^\prime(x)\: \d x.\]</div>
+</p>
+<p>Indeed, in this case, <span class="math notranslate nohighlight">\(\frac{\partial u}{\partial x_1}\)</span> and <span class="math notranslate nohighlight">\(\frac{\partial v}{\partial x_1}\)</span> are the familiar derivatives <span class="math notranslate nohighlight">\(u^\prime\)</span> and <span class="math notranslate nohighlight">\(v^\prime\)</span>, and the unit normal &quot;vector&quot; <span class="math notranslate nohighlight">\(n\)</span> to <span class="math notranslate nohighlight">\([a,b]\)</span> is the scalar <span class="math notranslate nohighlight">\(n(a) = -1\)</span>, <span class="math notranslate nohighlight">\(n(b)=1\)</span>.</p>
+</section>
+</div></section>
+</section>
+<section id="functional-spaces">
+<h2><span class="section-number">1.1.3. </span>Functional spaces<a class="headerlink" href="#functional-spaces" title="Link to this heading">¶</a></h2>
+<p>As we shall discuss from <a class="reference internal" href="varpbs.html#sec-lm"><span class="std std-numref">Section 1.2</span></a>, the mathematical formulation and the analysis of the Finite Element Method make extensive use of various spaces of functions, and notably Lebesgue and Sobolev spaces, that we briefly present in this section.</p>
+<section id="lebesgue-spaces">
+<h3><span class="section-number">1.1.3.1. </span>Lebesgue spaces<a class="headerlink" href="#lebesgue-spaces" title="Link to this heading">¶</a></h3>
+<p>The Lebesgue spaces are made of functions whose integrals are well-defined and convenient to handle.</p>
+<div class="proof definition admonition" id="definition-4">
+<p class="admonition-title"><span class="caption-number">Definition 1.2 </span></p>
+<section class="definition-content" id="proof-content">
+<ul>
+<li><p>Let <span class="math notranslate nohighlight">\(1 \leq p &lt; \infty\)</span>; the Lebesgue space <span class="math notranslate nohighlight">\(L^p(\Omega)\)</span> is the Banach space of functions whose <span class="math notranslate nohighlight">\(p^{\text{th}}\)</span> power is integrable over <span class="math notranslate nohighlight">\(\Omega\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[L^p(\Omega) := \left\{u: \Omega \to \R, \:\: \lvert\lvert u \lvert\lvert_{L^p(\Omega)} &lt; \infty \right\}, \text{ with the norm } \lvert\lvert u\lvert\lvert_{L^p(\Omega)} := \left( \int_\Omega \lvert u \lvert^p \:\d \x\right)^{\frac{1}{p}}.\]</div>
+</p>
+</li>
+<li><p>The Lebesgue space <span class="math notranslate nohighlight">\(L^\infty(\Omega)\)</span> is the Banach space of measurable functions on <span class="math notranslate nohighlight">\(\Omega\)</span> which are essentially bounded, i.e.</p>
+<p><div class="math notranslate nohighlight">
+\[L^\infty(\Omega) := \left\{u: \Omega \to \R, \:\: \lvert\lvert u \lvert\lvert_{L^\infty(\Omega)} &lt; \infty \right\}, \text{ with the norm }  \lvert\lvert u \lvert\lvert_{L^\infty(\Omega)} := \inf\left\{ m &gt;0 \text{ s.t. } \lvert u(\x) \lvert &lt; m \text{ for a.e. } \x \in \Omega \right\}.\]</div>
+</p>
+</li>
+</ul>
+</section>
+</div><p>A few remarks are in order:</p>
+<blockquote>
+<div><ul>
+<li><p>The case <span class="math notranslate nohighlight">\(p=2\)</span> is particularly useful in applications. In most physical contexts indeed, squared quantities account for energy: one may for instance think of the kinetic energy of a particle, which is essentially equal to the square of its velocity. From the mathematical viewpoint, <span class="math notranslate nohighlight">\(L^2(\Omega)\)</span> enjoys the rich structure of a <a class="reference internal" href="../Appendix/calculus.html#sec-hilbert"><span class="std std-ref">Hilbert space</span></a> structure, when it is equipped with the inner product:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall u,v \in L^2(\Omega),\quad (u,v)_{L^2(\Omega)} := \int_\Omega{uv \:\d\x},\]</div>
+</p>
+<p>so that, obviously, <span class="math notranslate nohighlight">\(\lvert\lvert u \lvert\lvert_{L^2(\Omega)} = (u,u)_{L^2(\Omega)}^{1/2}\)</span>.</p>
+</li>
+<li><p>The space <span class="math notranslate nohighlight">\(L^\infty(\Omega)\)</span> is that of bounded functions on <span class="math notranslate nohighlight">\(\Omega\)</span>. The above technical definition makes this intuition rigorous in the general context of functions defined almost everywhere, that could take arbitrarily large values on subsets of measure <span class="math notranslate nohighlight">\(0\)</span>. Functions in the space <span class="math notranslate nohighlight">\(L^\infty(\Omega)\)</span> are called essentially bounded, i.e. they are bounded except on a subset of <span class="math notranslate nohighlight">\(\Omega\)</span> with measure <span class="math notranslate nohighlight">\(0\)</span>.</p></li>
+</ul>
+</div></blockquote>
+<p>The next statement shows that functions in the space <span class="math notranslate nohighlight">\(L^p(\Omega)\)</span> can be approximated by infinitely smooth functions, except in the critical case where <span class="math notranslate nohighlight">\(p=\infty\)</span>.</p>
+<div class="proof proposition admonition" id="proposition-5">
+<span id="prop-denslp"></span><p class="admonition-title"><span class="caption-number">Proposition 1.1 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(1 \leq p &lt; \infty\)</span>. Then the space <span class="math notranslate nohighlight">\(\calC^\infty_c(\Omega)\)</span> of smooth functions with compact support inside <span class="math notranslate nohighlight">\(\Omega\)</span> is dense is <span class="math notranslate nohighlight">\(L^p(\Omega)\)</span>, i.e.</p>
+<p><div class="math notranslate nohighlight">
+\[\forall u \in L^p(\Omega), \text{ there exists a sequence } u_n \in \calC^\infty_c(\Omega) \:\text{ s.t. }\: \lvert\lvert u_n - u\lvert\lvert_{L^p(\Omega)} \xrightarrow{n\to\infty} 0. \]</div>
+</p>
+</section>
+</div><p>We eventually recall an important inequality, which somehow reflects the &quot;duality&quot; between Lebesgue spaces:</p>
+<div class="proof proposition admonition" id="proposition-6">
+<p class="admonition-title"><span class="caption-number">Proposition 1.2 </span> (Hölder’s inequality)</p>
+<section class="proposition-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(p,q\)</span> be two real indices in <span class="math notranslate nohighlight">\([1,\infty]\)</span>, such that <span class="math notranslate nohighlight">\(\frac{1}{p} + \frac{1}{q} = 1\)</span>. Then for all functions <span class="math notranslate nohighlight">\(u \in L^p(\Omega)\)</span> and <span class="math notranslate nohighlight">\(v \in L^q(\Omega)\)</span>, the product <span class="math notranslate nohighlight">\(uv\)</span> belongs to <span class="math notranslate nohighlight">\(L^1(\Omega)\)</span> and:</p>
+<p><div class="math notranslate nohighlight">
+\[\underbrace{\int_\Omega \lvert u(\x) v(\x) \lvert \:\d \x}_{\lvert\lvert uv\lvert\lvert_{L^1(\Omega)}} \leq \underbrace{\left( \int_\Omega \lvert u(\x)\lvert^p \:\d \x\right)^{\frac{1}{p}}}_{=\lvert\lvert u \lvert\lvert_{L^p(\Omega)}} \underbrace{\left( \int_\Omega \lvert v(\x)\lvert^q \:\d \x\right)^{\frac{1}{q}}}_{\lvert\lvert v\lvert\lvert_{L^q(\Omega)}}. \]</div>
+</p>
+</section>
+</div><p>A few remarks are in order about Hölder’s inequality:</p>
+<blockquote>
+<div><ul>
+<li><p>if <span class="math notranslate nohighlight">\(p=q=2\)</span>, it is exactly the familiar Cauchy-Schwarz inequality for functions <span class="math notranslate nohighlight">\(u,v \in L^2(\Omega)\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall u,v \in L^2(\Omega), \quad \int_\Omega u(\x) v (\x)\:\d\x \leq \left( \int_\Omega \lvert u(\x)\lvert^2 \:\d\x\right)^{\frac{1}{2}} \left(\int_\Omega \lvert v(\x)\lvert^2 \d\x\right)^{\frac{1}{2}}.\]</div>
+</p>
+</li>
+<li><p>The case where <span class="math notranslate nohighlight">\(p=1\)</span> and <span class="math notranslate nohighlight">\(q=\infty\)</span> is no less interesting. Hölder’s inequality thus writes:</p></li>
+</ul>
+<p><div class="math notranslate nohighlight">
+\[\forall u\in L^1(\Omega), \: v \in L^\infty(\Omega), \quad \int_\Omega u(\x) v(\x) \:\d x  \leq \lvert\lvert v \lvert\lvert_{L^\infty(\Omega)} \int_\Omega \lvert u (\x) \lvert\:\d\x, \]</div>
+</p>
+<blockquote>
+<div><p>a quite intuitive result, at least in the situation where <span class="math notranslate nohighlight">\(v\)</span> is continuous (and bounded).</p>
+</div></blockquote>
+</div></blockquote>
+<p>The following exercise deals with the important fact that, because of the boundedness of the domain <span class="math notranslate nohighlight">\(\Omega\)</span>, the Lebesgue space <span class="math notranslate nohighlight">\(L^p(\Omega)\)</span> is embedded in all the spaces with weaker exponents.</p>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<p>Recall that the domain <span class="math notranslate nohighlight">\(\Omega\)</span> is bounded, and let <span class="math notranslate nohighlight">\(a, b\)</span> be two real values such that <span class="math notranslate nohighlight">\(1 \leq a \leq b \leq \infty\)</span>. Prove that the space <span class="math notranslate nohighlight">\(L^b(\Omega)\)</span> is continuously embedded in <span class="math notranslate nohighlight">\(L^a(\Omega)\)</span>, i.e.</p>
+<p><div class="math notranslate nohighlight">
+\[\text{There exists a constant }C_{a,b} \text{ s.t. for all } u \in L^b(\Omega), \: u \in L^a(\Omega) \text{ and }\:\: \lvert\lvert u \lvert\lvert_{L^a(\Omega)} \leq C_{a,b} \lvert\lvert u \lvert\lvert_{L^b(\Omega)}. \]</div>
+</p>
+</div>
+<div class="dropdown admonition">
+<p class="admonition-title">Correction</p>
+<p>Let <span class="math notranslate nohighlight">\(u\)</span> be a function in <span class="math notranslate nohighlight">\(L^b(\Omega)\)</span>. Then, one can write</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\lvert u(\x) \lvert^a = \lvert u(\x) \lvert^a \cdot 1, \text{ where } \left\{
+\begin{array}{cl}
+\lvert u(\x) \lvert^a \in L^{\frac{b}{a}}(\Omega),&amp; \text{ since } \lvert\lvert \lvert u \lvert ^a \lvert\lvert_{L^{b/a}(\Omega)}  = \left(\displaystyle\int_\Omega \lvert u(\x)\lvert^b \:\d \x \right)^{\frac{a}{b}} &lt; \infty,\\
+1 \in L^{\frac{b}{b-a}}(\Omega) &amp; \text{with } \lvert\lvert 1 \lvert\lvert_{L^{\frac{b}{b-a}}(\Omega)} = \lvert \Omega \lvert^{\frac{b-a}{b}}, \\
+\frac{1}{b/a} + \frac{1}{b/(b-a)} = \frac{a}{b} + \frac{b-a}{b}= 1. &amp;
+\end{array}
+\right. \end{split}\]</div>
+</p>
+<p>Hence, Hölder’s inequality yields:</p>
+<p><div class="math notranslate nohighlight">
+\[\left(\int_\Omega \lvert u(\x) \lvert^a \:\d \x \right)^{\frac{1}{a}} \leq C_{a,b} \left(\int_\Omega \lvert u(\x) \lvert^b \:\d \x \right)^{\frac{1}{b}} \text{ with } C_{a,b} := \lvert \Omega \lvert^{\frac{b-a}{ab}},\]</div>
+</p>
+<p>which is the expected result.</p>
+</div>
+</section>
+<section id="sobolev-spaces-on-domains">
+<span id="sec-sobolev"></span><h3><span class="section-number">1.1.3.2. </span>Sobolev spaces on domains<a class="headerlink" href="#sobolev-spaces-on-domains" title="Link to this heading">¶</a></h3>
+<p>Sobolev spaces spring from the key idea of duality, which underlies the mathematical theory of distributions. In loose terms, this modern viewpoint drops the &quot;classical&quot; understanding of a function <span class="math notranslate nohighlight">\(u:\Omega \to \R\)</span>, associating a value <span class="math notranslate nohighlight">\(u(\x)\)</span> at (almost all) points <span class="math notranslate nohighlight">\(\x \in \Omega\)</span>. Instead, <span class="math notranslate nohighlight">\(u\)</span> is seen through the collection of its averages
+<div class="math notranslate nohighlight">
+\[\varphi \mapsto \int_\Omega u \varphi \:\d \x,\]</div>
+
+weighted by &quot;sufficiently many&quot; test functions <span class="math notranslate nohighlight">\(\varphi\)</span>.
+Operations on a function <span class="math notranslate nohighlight">\(u\)</span>, such as differentiation or multiplication by a smooth function, are defined in terms of the effect induced (by transposition) on the test functions <span class="math notranslate nohighlight">\(\varphi\)</span>.</p>
+<p>In this book, we shall avoid to resort to the fascinating, but difficult theory of distributions; the curious reader can consult the <a class="reference internal" href="../Appendix/appPDE.html#app-distrib"><span class="std std-ref">dedicated appendix</span></a> and the references provided therein. For the present purpose, let us extract from this theory the notion of weak derivative for a function <span class="math notranslate nohighlight">\(u\)</span> which solely belongs to <span class="math notranslate nohighlight">\(L^p(\Omega)\)</span>, and may in particular be discontinuous.</p>
+<p>If <span class="math notranslate nohighlight">\(u\)</span> were to be a function of class <span class="math notranslate nohighlight">\(\calC^1\)</span> on <span class="math notranslate nohighlight">\(\Omega\)</span>, then the <a class="reference internal" href="#th-green"><span class="std std-ref">Green’s formula</span></a> would yield:</p>
+<p><div class="math notranslate nohighlight">
+\[\text{For all test functions } \varphi \in \calC^\infty_c(\Omega), \quad \int_\Omega \frac{\partial u}{\partial x_i} \varphi \:\d \x = -\int_\Omega u \frac{\partial \varphi}{\partial x_i} \:\d \x.\]</div>
+</p>
+<p>The key observation is that the right-hand side of the above identity makes sense under very weak assumptions about <span class="math notranslate nohighlight">\(u\)</span>, contrary to its left-hand side: this right-hand side makes sense as soon as <span class="math notranslate nohighlight">\(u\)</span> belongs to <span class="math notranslate nohighlight">\(L^1(\Omega)\)</span>. Hence, this relation can actually be thought of as a definition for the existence of a derivative for <span class="math notranslate nohighlight">\(u\)</span>.</p>
+<div class="proof definition admonition" id="definition-7">
+<p class="admonition-title"><span class="caption-number">Definition 1.3 </span></p>
+<section class="definition-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(1 \leq p \leq \infty\)</span>; then:</p>
+<blockquote>
+<div><ul>
+<li><p>A function <span class="math notranslate nohighlight">\(u \in L^p(\Omega)\)</span> is said to have a <span class="math notranslate nohighlight">\(i^{\text{th}}\)</span> partial derivative in <span class="math notranslate nohighlight">\(L^p(\Omega)\)</span> if there exists a function <span class="math notranslate nohighlight">\(v_i \in L^p(\Omega)\)</span> such that:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall \varphi \in {\mathcal C}_c^\infty(\Omega),\:\: \int_{\Omega}{u \frac{\partial \varphi}{\partial x_i} \:\d\x} = -\int_{\Omega}{v_i \varphi \: \d\x}.\]</div>
+</p>
+<p>We denote this function by <span class="math notranslate nohighlight">\(\frac{\partial u}{\partial x_i}:= v_i\)</span>. With a slight abuse of notation, the fact that <span class="math notranslate nohighlight">\(u\in L^p(\Omega)\)</span> have a <span class="math notranslate nohighlight">\(i^{\text{th}}\)</span> partial derivative in <span class="math notranslate nohighlight">\(L^p(\Omega)\)</span> is denoted by <span class="math notranslate nohighlight">\(\frac{\partial u}{\partial x_i} \in L^p(\Omega)\)</span>.</p>
+</li>
+<li><p>The Sobolev space <span class="math notranslate nohighlight">\(W^{1,p}(\Omega)\)</span> is the space of functions in <span class="math notranslate nohighlight">\(L^p(\Omega)\)</span> whose first-order partial derivatives <span class="math notranslate nohighlight">\(\frac{\partial u}{\partial x_1},\ldots,\frac{\partial u}{\partial x_d}\)</span> belong to <span class="math notranslate nohighlight">\(L^p(\Omega)\)</span>, that is:</p>
+<p><div class="math notranslate nohighlight">
+\[W^{1,p}(\Omega) = \left\{u \in L^p(\Omega), \:\: \frac{\partial u}{\partial x_i} \in L^p(\Omega), \quad i=1,\ldots,d  \right\}.\]</div>
+</p>
+<p>The space <span class="math notranslate nohighlight">\(W^{1,p}(\Omega)\)</span> is a Banach space when it is equipped with the norm:</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\lvert\lvert u \lvert\lvert_{W^{1,p}(\Omega)} := \left\{\begin{array}{cl}
+\left( \displaystyle\int_{\Omega}{ \lvert u \lvert^p \:\d\x} + \sum\limits_{i=1}^d{\displaystyle\int_{\Omega}{ \left \lvert \frac{\partial u}{\partial x_i} \right\lvert^p \:\d\x}}\right)^{\frac{1}{p}} &amp; \text{if } 1\leq p&lt;\infty, \\
+\lvert\lvert u \lvert\lvert_{L^\infty(\Omega)} + \sup\limits_{i=1,\ldots,d} \left\lvert\left\lvert \frac{\partial u}{\partial x_i} \right\lvert\right\lvert_{L^\infty(\Omega)}&amp; \text{if } p=\infty\end{array}\right.\end{split}\]</div>
+</p>
+</li>
+</ul>
+</div></blockquote>
+</section>
+</div><p>The following facts are worth mentioning:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>According to the previous discussion, if <span class="math notranslate nohighlight">\(u\)</span> is continuously differentiable up to <span class="math notranslate nohighlight">\(\partial \Omega\)</span> in the classical sense of <a class="reference internal" href="#def-ckbdy"><span class="std std-numref">definition 1.1</span></a>, i.e. <span class="math notranslate nohighlight">\(u\in\calC^1(\overline\Omega)\)</span>, then <span class="math notranslate nohighlight">\(u\)</span> belongs to <span class="math notranslate nohighlight">\(W^{1,p}(\Omega)\)</span> for all <span class="math notranslate nohighlight">\(1 \leq p \leq \infty\)</span>.</p></li>
+<li><p>Again, the particular case where <span class="math notranslate nohighlight">\(p=2\)</span> is especially interesting. The norm <span class="math notranslate nohighlight">\(\lvert\lvert \cdot \lvert\lvert_{W^{1,2}(\Omega)}\)</span> is induced by the following inner product:</p></li>
+</ul>
+</div></blockquote>
+<p><div class="math notranslate nohighlight">
+\[\lvert\lvert u \lvert\lvert^2_{W^{1,2}(\Omega)} = ( u,u )_{W^{1,2}(\Omega)}, \text{ where } (u,v)_{W^{1,2}(\Omega)} := \int_{\Omega}{(uv + \nabla u \cdot \nabla v) \:\d\x}.\]</div>
+</p>
+<blockquote>
+<div><blockquote>
+<div><p>The Sobolev space <span class="math notranslate nohighlight">\(W^{1,2}(\Omega)\)</span> is then a Hilbert space, which is often denoted by <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Higher-order differentiability spaces <span class="math notranslate nohighlight">\(W^{m,p}(\Omega)\)</span> (which are also denoted by <span class="math notranslate nohighlight">\(H^m(\Omega)\)</span> when <span class="math notranslate nohighlight">\(p=2\)</span>) are defined in a similar way: we denote by <span class="math notranslate nohighlight">\(W^{m,p}(\Omega)\)</span> (resp. <span class="math notranslate nohighlight">\(H^m(\Omega)\)</span>) the Banach space of functions whose derivatives up to order <span class="math notranslate nohighlight">\(m\)</span> are in <span class="math notranslate nohighlight">\(L^p(\Omega)\)</span> (resp. in <span class="math notranslate nohighlight">\(L^2(\Omega)\)</span>):</p></li>
+</ul>
+<p><div class="math notranslate nohighlight">
+\[W^{m,p}(\Omega) = \left\{ u \in L^p(\Omega) \text{ s.t. } \frac{\partial^\alpha u}{\partial x^\alpha} \in L^p(\Omega) \text{ for all } \lvert \alpha \lvert \leq m\right\}.\]</div>
+</p>
+</div></blockquote>
+<p>Let us finally mention the following important density result, whereby <span class="math notranslate nohighlight">\(W^{m,p}(\Omega)\)</span> functions can be approximated by &quot;classical&quot; smooth functions.</p>
+<div class="proof theorem admonition" id="theorem-8">
+<span id="th-denswmp"></span><p class="admonition-title"><span class="caption-number">Theorem 1.2 </span></p>
+<section class="theorem-content" id="proof-content">
+<p>For all <span class="math notranslate nohighlight">\(m\geq 1\)</span> and <span class="math notranslate nohighlight">\(1\leq p&lt;\infty\)</span>, the space <span class="math notranslate nohighlight">\(\calC^\infty(\overline{\Omega})\)</span> is dense in <span class="math notranslate nohighlight">\(W^{m,p}(\Omega)\)</span>, i.e.:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall u \in W^{m,p}(\Omega), \text{ there exists a sequence } u_n \in \calC^\infty(\overline{\Omega}) \: \text{ s.t } \:\lvert\lvert u - u_n \lvert\lvert_{W^{m,p}(\Omega)} \: \xrightarrow{n\to \infty} \: 0.\]</div>
+</p>
+</section>
+</div><p>Note the difference with the corresponding result for the Lebesgue spaces <span class="math notranslate nohighlight">\(L^p\)</span> (<a class="reference internal" href="#prop-denslp"><span class="std std-numref">proposition 1.1</span></a>): functions in <span class="math notranslate nohighlight">\(W^{m,p}(\Omega)\)</span> can only be approximated by functions which are smooth up to the boundary, and not be the more particular class of functions with compact support inside <span class="math notranslate nohighlight">\(\Omega\)</span>. Only particular functions in <span class="math notranslate nohighlight">\(W^{m,p}(\Omega)\)</span> could be approximated by such functions, as we shall see in <a class="reference internal" href="#sec-h10"><span class="std std-numref">Section 1.1.3.4.1</span></a>.</p>
+</section>
+<section id="sobolev-spaces-on-the-boundary-of-a-domain-and-traces">
+<span id="sec-traces"></span><h3><span class="section-number">1.1.3.3. </span>Sobolev spaces on the boundary of a domain and traces<a class="headerlink" href="#sobolev-spaces-on-the-boundary-of-a-domain-and-traces" title="Link to this heading">¶</a></h3>
+<p>In general, functions <span class="math notranslate nohighlight">\(u \in H^1(\Omega)\)</span> (more generally, functions in <span class="math notranslate nohighlight">\(W^{1,p}(\Omega)\)</span>)
+may fail to be continuous, and even take infinitely large values, as exemplified by the following exercise:</p>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<p>Let <span class="math notranslate nohighlight">\(\Omega\)</span> be the unit ball in <span class="math notranslate nohighlight">\(\R^2\)</span>, and consider the fonction</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\forall \x \in \Omega \setminus \left\{0\right\}, \quad u(\x) = \left\{ \begin{array}{cl}
+\log\lvert \log\lvert \x\lvert\lvert &amp; \text{if } \lvert \x \lvert &lt;\frac12, \\
+\log\log 2 &amp; \text{otherwise.}
+\end{array}\right.\end{split}\]</div>
+</p>
+<ol class="arabic simple">
+<li><p>Calculate the gradient of <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p>Show that <span class="math notranslate nohighlight">\(u\)</span> is unbounded.</p></li>
+<li><p>Show that <span class="math notranslate nohighlight">\(u\)</span> belongs to <span class="math notranslate nohighlight">\(L^2(\Omega)\)</span>.</p></li>
+<li><p>Show that <span class="math notranslate nohighlight">\(u\)</span> belongs to <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>.</p></li>
+<li><p>Let now <span class="math notranslate nohighlight">\(\Omega\)</span> be the unit ball of <span class="math notranslate nohighlight">\(\R^d\)</span>, <span class="math notranslate nohighlight">\(d\geq 3\)</span>. Give an example of a function <span class="math notranslate nohighlight">\(u:\Omega \to \R\)</span> which is unbounded but belongs to <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>.</p></li>
+</ol>
+</div>
+<div class="dropdown admonition">
+<p class="admonition-title">Correction</p>
+<ol class="arabic">
+<li><p>An elementary calculation shows that:</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\nabla u(\x) = \left\{ \begin{array}{cl}
+\frac{\x}{\lvert \x\lvert^2 \log\lvert \x\lvert} &amp; \text{if } \lvert \x \lvert &lt;\frac12, \\
+\bz &amp; \text{otherwise.}
+\end{array}\right.\end{split}\]</div>
+</p>
+</li>
+<li><p>The classical limits of the <span class="math notranslate nohighlight">\(\log\)</span> function imply that:
+<div class="math notranslate nohighlight">
+\[\lim\limits_{\x\to\bz} u(\x) = +\infty.\]</div>
+</p></li>
+<li><p>The function <span class="math notranslate nohighlight">\(u\)</span> is continuous, thus bounded, on any compact set of the form <span class="math notranslate nohighlight">\(\overline\Omega \setminus B(\bz,\e)\)</span> for <span class="math notranslate nohighlight">\(0&lt;\e&lt;1\)</span>, and so it is bounded on these. Hence, it is enough to prove that the integral of <span class="math notranslate nohighlight">\(u^2\)</span> is bounded on a sufficiently small ball <span class="math notranslate nohighlight">\(B(\bz,\e)\)</span>. To achieve this, classical results about the behavior of the <span class="math notranslate nohighlight">\(\log\)</span> function in the neighborhood of <span class="math notranslate nohighlight">\(\x=0\)</span> show that:
+<div class="math notranslate nohighlight">
+\[\forall \x \in B(\bz,\e), \quad \lvert \log\lvert \x \lvert \lvert \leq \frac{1}{\lvert \x \lvert}, \]</div>
+
+and so:
+<div class="math notranslate nohighlight">
+\[\forall \x \in B(\bz,\e), \quad (\log\lvert \log\lvert \x \lvert)^2 \leq (\log\lvert \x \lvert)^2. \]</div>
+
+It follows that
+<div class="math notranslate nohighlight">
+\[\int_{B(\bz,\e)} \lvert u(\x) \lvert^2 \:\d x \leq \int_{B(\bz,\e)} (\log\lvert \x \lvert)^2\:\d x &lt; \infty,\]</div>
+
+where we have used, again, the classical properties of the logarithm.</p></li>
+<li><p>A calculation in polar coordinates yields:
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{ccl}
+\displaystyle\int_\Omega \lvert \nabla u(\x) \lvert^2 \:\d \x &amp;=&amp; \displaystyle\int_{B(0,\frac12)} \frac{1}{\lvert \x\lvert^2 (\log\lvert \x\lvert)^2} \:\d x\\
+&amp;=&amp; 2\pi\displaystyle\int_0^{\frac12} \frac{1}{r(\log\lvert r\lvert)^2} \:\d r\\
+&amp;=&amp; 2\pi \left[ - \frac{1}{\log r}\right]_0^{\frac12}\\
+&amp;=&amp; \frac{2\pi}{\log 2}.
+\end{array} \end{split}\]</div>
+</p></li>
+<li><p>The same argument as above works with the function <span class="math notranslate nohighlight">\(u\)</span> defined by:
+<div class="math notranslate nohighlight">
+\[\begin{split}\forall \x \in \Omega \setminus \left\{0\right\}, \quad u(\x) = \left\{ \begin{array}{cl}
+\log\lvert \x\lvert &amp; \text{if } \lvert \x \lvert &lt;\frac12, \\
+-\log 2 &amp; \text{otherwise.}
+\end{array}\right.\end{split}\]</div>
+</p></li>
+</ol>
+</div>
+<p>On the other hand, the set where functions in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> are discontinuous cannot be &quot;too large&quot;. In particular, it is possible to consider their values on codimension <span class="math notranslate nohighlight">\(1\)</span> objects (that is, curves in 2d, or surfaces in 3d), in the particular sense of traces:</p>
+<div class="proof proposition admonition" id="proposition-9">
+<p class="admonition-title"><span class="caption-number">Proposition 1.3 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>There exists a unique linear and continuous mapping <span class="math notranslate nohighlight">\(\gamma: H^1(\Omega) \to L^2(\partial \Omega)\)</span> such that, for any differentiable function <span class="math notranslate nohighlight">\(u \in {\mathcal C}^1(\overline{\Omega})\)</span> up to the boundary <span class="math notranslate nohighlight">\(\partial\Omega\)</span>, it holds:</p>
+<div class="math notranslate nohighlight">
+\[\gamma(u) = u|_{\partial \Omega}.\]</div>
+<p>This mapping is called the trace operator on <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>. We denote by <span class="math notranslate nohighlight">\(H^{1/2}(\partial \Omega)\)</span> its range:</p>
+<div class="math notranslate nohighlight">
+\[H^{\frac{1}{2}}(\partial \Omega) = \left\{ \varphi \in L^2(\partial\Omega), \:\: \exists u \in H^1(\Omega) \text{ s.t. } \gamma(u) = \varphi \right\}.\]</div>
+<p>It is a Hilbert space when equipped with the quotient norm:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\lvert\lvert \varphi \lvert\lvert_{H^{\frac{1}{2}}(\partial \Omega)} := \inf_{u \in H^1(\Omega) \atop \gamma(u) = \varphi}{|| u ||_{H^1(\Omega)}}.\]</div>
+</div></blockquote>
+</section>
+</div><p>Most often, we shall simply denote by <span class="math notranslate nohighlight">\(u|_{\partial\Omega}\)</span>, or simply <span class="math notranslate nohighlight">\(u\)</span> the trace of a function <span class="math notranslate nohighlight">\(u \in H^1(\Omega)\)</span> on <span class="math notranslate nohighlight">\(\partial \Omega\)</span>.</p>
+<p>We also denote by <span class="math notranslate nohighlight">\(H^{-\frac{1}{2}}(\partial \Omega)\)</span> the dual space of <span class="math notranslate nohighlight">\(H^{\frac{1}{2}}(\partial \Omega)\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[H^{-\frac{1}{2}}(\partial \Omega) = \left\{\ell : H^{\frac{1}{2}}(\partial \Omega) \to \R \text{ is linear and continuous}\right\}, \]</div>
+</p>
+<p>equipped with the norm:</p>
+<p><div class="math notranslate nohighlight">
+\[\lvert\lvert \ell \lvert\lvert_{H^{-\frac{1}{2}}(\partial \Omega)} = \sup\limits_{v \in H^{\frac{1}{2}}(\partial \Omega) \atop \ell \neq 0} \frac{\lvert \ell(v) \lvert}{\lvert\lvert v \lvert\lvert_{H^{\frac{1}{2}}(\partial \Omega)}}. \]</div>
+</p>
+</section>
+<section id="two-additional-sobolev-spaces">
+<h3><span class="section-number">1.1.3.4. </span>Two additional Sobolev spaces<a class="headerlink" href="#two-additional-sobolev-spaces" title="Link to this heading">¶</a></h3>
+<p>In this section, we describe two other Sobolev spaces, which are frequently encountered in applications.</p>
+<section id="the-space-h-1-0-omega-of-h-1-functions-with-vanishing-trace">
+<span id="sec-h10"></span><h4><span class="section-number">1.1.3.4.1. </span>The space <span class="math notranslate nohighlight">\(H^1_0(\Omega)\)</span> of <span class="math notranslate nohighlight">\(H^1\)</span> functions with vanishing trace<a class="headerlink" href="#the-space-h-1-0-omega-of-h-1-functions-with-vanishing-trace" title="Link to this heading">¶</a></h4>
+<div class="proof proposition admonition" id="proposition-10">
+<p class="admonition-title"><span class="caption-number">Proposition 1.4 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>The Sobolev space <span class="math notranslate nohighlight">\(H^1_0(\Omega)\)</span> is the subspace of <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> composed of functions with vanishing trace on <span class="math notranslate nohighlight">\(\partial \Omega\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[H^1_0(\Omega) = \left\{ u \in H^1(\Omega), \:\: u \lvert_{\partial\Omega} = 0 \right\}.\]</div>
+</p>
+</section>
+</div><p>An alternative and no less important viewpoint about <span class="math notranslate nohighlight">\(H^1_0(\Omega)\)</span> consists in seeing this space as the closure of smooth functions with compact support in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>.</p>
+<div class="proof proposition admonition" id="proposition-11">
+<p class="admonition-title"><span class="caption-number">Proposition 1.5 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>The space <span class="math notranslate nohighlight">\(\mathcal{C}^\infty_c(\Omega)\)</span> is dense in <span class="math notranslate nohighlight">\(H^1_0(\Omega)\)</span>, i.e. for any function <span class="math notranslate nohighlight">\(u \in H^1_0(\Omega)\)</span>, there exists a sequence <span class="math notranslate nohighlight">\(u_n\)</span> of functions in <span class="math notranslate nohighlight">\(\calC^\infty_c(\Omega)\)</span> such that:</p>
+<p><div class="math notranslate nohighlight">
+\[\lvert\lvert u_n - u \lvert\lvert_{H^1(\Omega)} \xrightarrow{n \to 0} 0.\]</div>
+</p>
+</section>
+</div><p>It is important to appraise the difference between this result and the general density <a class="reference internal" href="#th-denswmp"><span class="std std-numref">theorem 1.2</span></a>. According to the latter, a function <span class="math notranslate nohighlight">\(u\)</span> in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span> can be closely approximated by a function <span class="math notranslate nohighlight">\(u_n \in \calC^\infty(\overline\Omega)\)</span>, which is smooth up to the boundary <span class="math notranslate nohighlight">\(\partial \Omega\)</span>. If <span class="math notranslate nohighlight">\(u\)</span> belongs to the more precise space <span class="math notranslate nohighlight">\(H^1_0(\Omega)\)</span>, this function <span class="math notranslate nohighlight">\(u_n\)</span> can be assumed to vanish outside a compact subset of <span class="math notranslate nohighlight">\(\Omega\)</span>, and in particular to vanish &quot;close&quot; to the boundary <span class="math notranslate nohighlight">\(\partial\Omega\)</span>.</p>
+<p>We denote by <span class="math notranslate nohighlight">\(H^{-1}(\Omega)\)</span> the dual space of <span class="math notranslate nohighlight">\(H^1_0(\Omega)\)</span>, that is, the vector space of continuous and linear forms on <span class="math notranslate nohighlight">\(H^1_0(\Omega)\)</span>. Note that <span class="math notranslate nohighlight">\(H^{-1}(\Omega)\)</span> is not the dual space of <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>. The following exercise deals with a nice characterization of <span class="math notranslate nohighlight">\(H^{-1}(\Omega)\)</span> as the space of derivatives of <span class="math notranslate nohighlight">\(L^2\)</span> functions:</p>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Let <span class="math notranslate nohighlight">\(u\)</span> be a function in <span class="math notranslate nohighlight">\(L^2(\Omega)\)</span>; show that the following mapping is an element in the dual space <span class="math notranslate nohighlight">\(H^{-1}(\Omega)\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[H^1_0(\Omega) \ni v \mapsto  \int_\Omega uv \:\d \x \in \R. \]</div>
+</p>
+</li>
+<li><p>Let <span class="math notranslate nohighlight">\(i=1,\ldots,d\)</span> and let <span class="math notranslate nohighlight">\(u_i \in L^2(\Omega)\)</span>; show that the following mapping is in the dual space <span class="math notranslate nohighlight">\(H^{-1}(\Omega)\)</span>:</p>
+<blockquote>
+<div><p><div class="math notranslate nohighlight">
+\[H^1_0(\Omega) \ni v \mapsto  -\int_\Omega u \frac{\partial v}{\partial x_i} \:\d \x \in \R. \]</div>
+</p>
+</div></blockquote>
+</li>
+<li><p>Show that the formulas from the above two questions also define elements in the dual space <span class="math notranslate nohighlight">\(H^1(\Omega)^*\)</span> of <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>.</p></li>
+<li><p>Show that the mapping</p>
+<p><div class="math notranslate nohighlight">
+\[v \mapsto \int_{\partial \Omega} v \:\d s \]</div>
+</p>
+<p>is in the dual space <span class="math notranslate nohighlight">\(H^{-\frac{1}{2}}(\partial \Omega)\)</span> and also in the dual space of <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>, but that it is equal to <span class="math notranslate nohighlight">\(0\)</span> when it is seen as an element in <span class="math notranslate nohighlight">\(H^{-1}(\Omega)\)</span>.</p>
+</li>
+</ol>
+</div></blockquote>
+</div>
+</section>
+<section id="the-space-hdiv-omega-of-vector-fields-with-l-2-divergence">
+<h4><span class="section-number">1.1.3.4.2. </span>The space <span class="math notranslate nohighlight">\(\Hdiv(\Omega)\)</span> of vector fields with <span class="math notranslate nohighlight">\(L^2\)</span> divergence<a class="headerlink" href="#the-space-hdiv-omega-of-vector-fields-with-l-2-divergence" title="Link to this heading">¶</a></h4>
+<p>The last class of Sobolev spaces that will be needed in this course is a little more subtle; it is in particular related to the definition of normal traces of vector fields and normal derivatives of functions on <span class="math notranslate nohighlight">\(\partial \Omega\)</span>.</p>
+<div class="proof definition admonition" id="definition-12">
+<p class="admonition-title"><span class="caption-number">Definition 1.4 </span></p>
+<section class="definition-content" id="proof-content">
+<p>We denote by <span class="math notranslate nohighlight">\(\Hdiv(\Omega)\)</span> the space of vector fields <span class="math notranslate nohighlight">\(\sigma =(\sigma_1,\ldots,\sigma_d): \Omega \to \R^d\)</span> in <span class="math notranslate nohighlight">\(L^2(\Omega)^d\)</span>, whose weak divergence <span class="math notranslate nohighlight">\(\dv(\sigma)\)</span> belongs to <span class="math notranslate nohighlight">\(L^2(\Omega)\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[\Hdiv(\Omega) = \left\{ \sigma \in L^2(\Omega)^d \text{ s.t. } \dv(\sigma) = \sum\limits_{i=1}^d \frac{\partial \sigma_i}{\partial x_i} \in L^2(\Omega)\right\}. \]</div>
+</p>
+<p>The space <span class="math notranslate nohighlight">\(\Hdiv(\Omega)\)</span> is a Hilbert space when it is equipped with the inner product <span class="math notranslate nohighlight">\((\cdot,\cdot)_{\Hdiv(\Omega)}\)</span> and associated norm <span class="math notranslate nohighlight">\(\lvert\lvert \cdot \lvert\lvert_{\Hdiv(\Omega)}\)</span> defined by:</p>
+<p><div class="math notranslate nohighlight">
+\[(\sigma,\xi)_{\Hdiv(\Omega)} = \int_\Omega \sigma \cdot \xi \:\d \x + \int_\Omega \dv(\sigma)\dv(\xi) \:\d \x, \quad \lvert\lvert \sigma\lvert\lvert_{\Hdiv(\Omega)}^2 = (\sigma,\sigma)_{\Hdiv(\Omega)}.\]</div>
+</p>
+</section>
+</div><p>An important property of this space is the following density result.</p>
+<div class="proof proposition admonition" id="proposition-13">
+<p class="admonition-title"><span class="caption-number">Proposition 1.6 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>The subset <span class="math notranslate nohighlight">\(\calC^\infty(\overline\Omega)^d\)</span> of smooth vector fields up to <span class="math notranslate nohighlight">\(\partial \Omega\)</span> is dense in <span class="math notranslate nohighlight">\(\Hdiv(\Omega)\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall \sigma \in \Hdiv(\Omega), \text{ there exists a sequence } \sigma_n \in \calC^\infty(\overline\Omega)^d \text{ s.t. } \lvert\lvert \sigma - \sigma_n \lvert\lvert_{\Hdiv(\Omega)} \xrightarrow{n \to \infty} 0. \]</div>
+</p>
+</section>
+</div><p>We now turn to the notion of normal trace.</p>
+<div class="proof proposition admonition" id="proposition-14">
+<span id="prop-tracehdiv"></span><p class="admonition-title"><span class="caption-number">Proposition 1.7 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>There exists a mapping <span class="math notranslate nohighlight">\(\gamma_n: \Hdiv(\Omega) \to H^{-1/2}(\partial \Omega)\)</span> such that, for any smooth vector field <span class="math notranslate nohighlight">\(\sigma \in {\mathcal C}^\infty(\overline{\Omega})^d\)</span> up to the boundary <span class="math notranslate nohighlight">\(\partial\Omega\)</span>, it holds:</p>
+<p><div class="math notranslate nohighlight">
+\[\gamma_n(\sigma) = \sigma \cdot \n.\]</div>
+</p>
+<p>The normal trace of <span class="math notranslate nohighlight">\(\sigma\)</span> is often simply denoted by <span class="math notranslate nohighlight">\(\sigma\cdot\n\)</span>.</p>
+<p>It satisfies the following identity: for all <span class="math notranslate nohighlight">\(\sigma \in \Hdiv(\Omega)\)</span> and <span class="math notranslate nohighlight">\(u \in H^1(\Omega)\)</span>:
+<div class="math notranslate nohighlight">
+\[\int_{\partial\Omega} \sigma\cdot \n \: u \:\d s = \int_\Omega \dv(\sigma) u \:\d \x + \int_\Omega \sigma \cdot \nabla u \:\d \x.\]</div>
+</p>
+</section>
+</div></section>
+</section>
+</section>
+<section id="the-poincare-s-inequality">
+<h2><span class="section-number">1.1.4. </span>The Poincaré’s inequality<a class="headerlink" href="#the-poincare-s-inequality" title="Link to this heading">¶</a></h2>
+<p>The Poincaré’s inequality is a general fact that allows to control the values of a function vanishing on <span class="math notranslate nohighlight">\(\partial \Omega\)</span> by those of its gradient.</p>
+<div class="proof proposition admonition" id="proposition-15">
+<span id="prop-poincare"></span><p class="admonition-title"><span class="caption-number">Proposition 1.8 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>There exists a constant <span class="math notranslate nohighlight">\(C&gt;0\)</span> (which only depends on <span class="math notranslate nohighlight">\(\Omega\)</span>) such that:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall u \in H^1_0(\Omega), \:\: \int_{\Omega} u^2 \:\d\x \leq C \int_{\Omega}\vert\nabla u\lvert^2\:\d\x.\]</div>
+</p>
+</section>
+</div><p>An intuitive explanation of Poincaré’s inequality goes as follows: let <span class="math notranslate nohighlight">\(u\)</span> be a function in <span class="math notranslate nohighlight">\(H^1_0(\Omega)\)</span> such that <span class="math notranslate nohighlight">\(\int_\Omega{\lvert\nabla u\lvert ^2\:\d \x} = 0\)</span>.
+Then <span class="math notranslate nohighlight">\(\nabla u = \bz\)</span> on <span class="math notranslate nohighlight">\(\Omega\)</span> and <span class="math notranslate nohighlight">\(u\)</span> is a constant function. Since it has null trace on <span class="math notranslate nohighlight">\(\partial \Omega\)</span>, this constant must be <span class="math notranslate nohighlight">\(0\)</span>.
+More generally, if the gradient <span class="math notranslate nohighlight">\(\nabla u\)</span> has small norm, then the values of <span class="math notranslate nohighlight">\(u\)</span> cannot differ too much
+from those taken on <span class="math notranslate nohighlight">\(\partial \Omega\)</span>, and so they must also be small. Hence, <a class="reference internal" href="#prop-poincare"><span class="std std-numref">proposition 1.8</span></a>
+is a quantitive indicator of how the smallness of the gradient of an <span class="math notranslate nohighlight">\(H^1_0(\Omega)\)</span> function <span class="math notranslate nohighlight">\(u\)</span> imposes the values of <span class="math notranslate nohighlight">\(u\)</span> itself to be small.</p>
+<p>The instructive proof of this result makes this intuition rigorous.</p>
+<div class="dropdown admonition">
+<p class="admonition-title">Sketch of proof</p>
+<p>The proof makes use of the notions of compactness and weak convergence, recalled in <a class="reference internal" href="../Appendix/companafunc.html#sec-compact"><span class="std std-numref">Section 6.2.4</span></a>.</p>
+<p>We proceed by contradiction, assuming that a constant <span class="math notranslate nohighlight">\(C\)</span> as in the statement does not exist. Then, for each integer <span class="math notranslate nohighlight">\(n\)</span>, there exists a function <span class="math notranslate nohighlight">\(u_n \in H^1_0(\Omega)\)</span> such that:</p>
+<p><div class="math notranslate nohighlight">
+\[\int_\Omega (u_n)^2 \:\d\x \geq n \int_\Omega\lvert\nabla u_n\lvert^2\:\d\x. \]</div>
+</p>
+<p>Up to normalizing <span class="math notranslate nohighlight">\(u_n\)</span>, we may as well assume that</p>
+<div class="math notranslate nohighlight" id="equation-eq-normpoincare">
+<span class="eqno">(1.2)<a class="headerlink" href="#equation-eq-normpoincare" title="Link to this equation">¶</a></span>\[\int_\Omega (u_n)^2 \:\d \x = 1, \text{ and so } \int_\Omega \lvert \nabla u_n \lvert^2 \:\d \x \leq \frac{1}{n}.\]</div>
+<p>In particular, the sequence <span class="math notranslate nohighlight">\(u_n\)</span> is bounded in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>, and so by <a class="reference internal" href="../Appendix/companafunc.html#prop-seqcompactbounded"><span class="std std-numref">proposition 6.2</span></a>, there exists a subsequence of <span class="math notranslate nohighlight">\(n\)</span>, still indexed by <span class="math notranslate nohighlight">\(n\)</span>, and a function <span class="math notranslate nohighlight">\(u \in H^1_0(\Omega)\)</span> such that</p>
+<p><div class="math notranslate nohighlight">
+\[u_n \xrightarrow{n\to 0} u \text{ weakly in } H^1(\Omega).\]</div>
+</p>
+<p>Let us now pass to the limit in the relation characterizing the weak derivative of <span class="math notranslate nohighlight">\(u\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[\int_\Omega \frac{\partial u}{\partial x_i} \varphi \:\d x = \lim\limits_{n\to \infty} \int_\Omega \frac{\partial u_n}{\partial x_i} \varphi \:\d x =0,\]</div>
+</p>
+<p>where the last equality follows from <a class="reference internal" href="#equation-eq-normpoincare">(1.2)</a> and the Cauchy-Schwarz inequality. This proves that <span class="math notranslate nohighlight">\(\nabla u=0\)</span>, and since <span class="math notranslate nohighlight">\(u \in H^1_0(\Omega)\)</span>, <span class="math notranslate nohighlight">\(u=0\)</span>.</p>
+<p>However, by the <a class="reference internal" href="../Appendix/companafunc.html#th-rellich"><span class="std std-ref">Rellich theorem</span></a>, it also holds true that <span class="math notranslate nohighlight">\(u_n\)</span> converges strongly in <span class="math notranslate nohighlight">\(L^2(\Omega)\)</span>.
+Hence, passing to the limit in <a class="reference internal" href="#equation-eq-normpoincare">(1.2)</a>, we obtain:</p>
+<p><div class="math notranslate nohighlight">
+\[\int_\Omega u^2 \:\d \x = \lim\limits_{n\to \infty} \int_\Omega \lvert u_n\lvert^2 \:\d \x = 1,\]</div>
+</p>
+<p>which contradicts the above finding. Hence, the assumption whereby a constant <span class="math notranslate nohighlight">\(C&gt;0\)</span> as in the statement of Poincaré’s inequality does not exist is incorrect, and this terminates the proof.</p>
+</div>
+<p>The above Poincaré’s inequality has a large number of avatars, generally stating that</p>
+<p><div class="math notranslate nohighlight">
+\[\text{&quot;If the gradient of a function } u \text{ is small and } u \text{ takes small values somewhere, then } u \text{ must be small everywhere.&quot;}\]</div>
+</p>
+<p>For instance, <a class="reference internal" href="#prop-poincare"><span class="std std-numref">proposition 1.8</span></a> can be extended to functions <span class="math notranslate nohighlight">\(u\)</span> vanishing only on one part of <span class="math notranslate nohighlight">\(\partial\Omega\)</span>:</p>
+<div class="proof proposition admonition" id="proposition-16">
+<span id="prop-poincaregammad"></span><p class="admonition-title"><span class="caption-number">Proposition 1.9 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>Let the domain <span class="math notranslate nohighlight">\(\Omega\)</span> be connected, and let <span class="math notranslate nohighlight">\(\Gamma_D \subset \partial \Omega\)</span> be a subset of <span class="math notranslate nohighlight">\(\partial \Omega\)</span> with positive surface measure. Then, there exists a constant <span class="math notranslate nohighlight">\(C&gt;0\)</span> (depending on <span class="math notranslate nohighlight">\(\Gamma_D\)</span>) such that:</p>
+<p><div class="math notranslate nohighlight">
+\[\text{For all functions } u \in H^1(\Omega) \text{ s.t. } u=0 \text{ on }\Gamma_D, \:\: \int_\Omega{ \left\lvert u \right\lvert ^2 \:\d\x}  \leq C \int_\Omega{\lvert \nabla u\lvert^2\:\d\x}.\]</div>
+</p>
+</section>
+</div><p>On a different note, the following Poincaré-Wirtinger inequality offers another way to &quot;impose that <span class="math notranslate nohighlight">\(u\)</span> be small somewhere&quot;.</p>
+<div class="proof proposition admonition" id="proposition-17">
+<span id="prop-poincarewirtinger"></span><p class="admonition-title"><span class="caption-number">Proposition 1.10 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>Let the domain <span class="math notranslate nohighlight">\(\Omega\)</span> be connected. There exists a constant <span class="math notranslate nohighlight">\(C&gt;0\)</span> such that:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall u \in H^1(\Omega), \:\: \int_\Omega{ \left\lvert u - \frac{1}{\lvert\Omega\lvert} \int_\Omega{u \:\d \x}\right\lvert ^2 \:\d \x}  \leq C \int_\Omega{\lvert\nabla u\lvert^2\:\d \x}.\]</div>
+</p>
+</section>
+</div><div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<p>Prove <a class="reference internal" href="#prop-poincaregammad"><span class="std std-numref">proposition 1.9</span></a> and <a class="reference internal" href="#prop-poincarewirtinger"><span class="std std-numref">proposition 1.10</span></a> by taking inspiration from the sketch of proof of <a class="reference internal" href="#prop-poincare"><span class="std std-numref">proposition 1.8</span></a>.</p>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index_gen.html">1. Generalities</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1.1. Functional analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varpbs.html">1.2. Lax-Milgram framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEtheory.html">1.3. The Finite Element method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="laplace.html">1.4. Laplace equation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization.html">1.5. Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">1.6. Meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen.html">1.7. Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dirpen.html">1.8. Penalization for Dirichlet conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="laplace_pure_Neumann.html">1.9. Pure Neumann</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Advanced/index_adv.html">2. Advanced features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_gen.html"><span class="section-number">1. </span>Getting started</a><ul>
+      <li>Previous: <a href="index_gen.html" title="previous chapter"><span class="section-number">1. </span>Getting started</a></li>
+      <li>Next: <a href="varpbs.html" title="next chapter"><span class="section-number">1.2. </span>The Lax-Milgram variational theory</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Generalities/anafunc.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

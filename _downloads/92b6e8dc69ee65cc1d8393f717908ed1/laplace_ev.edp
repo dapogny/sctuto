@@ -1,0 +1,53 @@
+/* Resolution of the eigenvalue problem for the Laplace equation */
+load "medit"
+
+/* Building mesh */
+int N=20;
+real d=0.1, a=1.5, b=2, c=0.7, e=0.01;
+
+func real st(real t) {
+  return sin(pi*t)-pi/2;
+}
+
+border Out(t=0,2*pi) { x=a*cos(t); y=b*sin(t); label=0; }
+border Eye1(t=0,2*pi) { x=0.2*cos(t)-0.5; y=0.2*sin(t)+0.5; label=0;}
+border Eye2(t=0,2*pi) { x=0.2*cos(t)+0.5; y=0.2*sin(t)+0.5; label=0;}
+border top(t=-0.5,0.5) { x=(1-d)*c*cos(st(t)); y=(1-d)*c*sin(st(t)); label=0; }
+border Corn1(t=0,1){x=((1-d)+d*t)*c*cos(st(0.5));y=((1-d)+d*t)*c*sin(st(0.5)); label=0; }
+border bot(t=0.5,-0.5) { x=c*cos(st(t)); y=c*sin(st(t)); label=0; }
+border Corn2(t=0,1) { x=(1-d*t)*c*cos(st(-0.5)); y=(1-d*t)*c*sin(st(-0.5)); label=0;}
+
+mesh Th=buildmesh(Out(10*N)+top(2*N)+Corn1(3)+bot(2*N)+Corn2(3)+Eye1(-2*N)+Eye2(-2*N));
+
+/* Finite Element space */
+fespace Vh(Th,P1);
+
+/* Variational formulations for the stiffness and mass matrices; 
+ the homogeneous Dirichlet boundary condition has to be put only on the stiffness matrix */
+varf stiffness(u,v) = int2d(Th)(dx(u)*dx(v)+dy(u)*dy(v))
+                      + on(0,u=0.0);
+
+varf mass(u,v) = int2d(Th)(u*v);
+
+/* Getting matrices */
+matrix A = stiffness(Vh,Vh,solver=CG);
+matrix B = mass(Vh,Vh,solver=CG);
+
+/* Setting parameters */
+int nev = 20; // Number of computed eigenvalues
+real[int] ev(nev); // Table of the computed eigenvalues
+Vh[int] eV(nev); // Table for the eigenvectors
+real sigma = 0.0; // Value around which the eigenvalues are computed.
+string s;
+
+/* Solving matrix eigenvalue problem */
+int k = EigenValue(A,B,sym=true,sigma=sigma,value=ev,vector=eV,tol=1e-10,maxit=0,ncv=0);
+
+/* Save data */
+savemesh(Th,"smile.mesh");
+
+for (int k=0; k<nev; k++) {
+  cout << "Eigenvalue "<<k<<": "<<ev[k]<<endl;
+  s = "smile."+k+".sol";
+  savesol(s,Th,eV[k]);
+}

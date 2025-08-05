@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2.5. The Level Set method: Part I &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2.6. The Level Set method: Part II" href="LSM2.html" />
+    <link rel="prev" title="2.4. A glimpse of variational inequalities" href="variational_inequalities.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="the-level-set-method-part-i">
+<span id="sec-lsm"></span><h1><span class="section-number">2.5. </span>The Level Set method: Part I<a class="headerlink" href="#the-level-set-method-part-i" title="Link to this heading">¶</a></h1>
+<p>The topic in the spotlight of this section is the Level Set Method. In a nutshell, this general philosophy advocates to represent a domain implicitly  to track its evolution in time.</p>
+<p>This section is the first of a two-part discussion: basic facts are presented about implicit representations and operations based on the latter in <a class="reference internal" href="#sec-imprep"><span class="std std-numref">Section 2.5.1</span></a> and <a class="reference internal" href="#sec-opimpgeom"><span class="std std-numref">Section 2.5.2</span></a>; the development of fictitious domain methods for the resolution of boundary-value problems is then detailed in <a class="reference internal" href="#sec-ficimpref"><span class="std std-numref">Section 2.5.3</span></a>. The next <a class="reference internal" href="LSM2.html#sec-lsm2"><span class="std std-numref">Section 2.6</span></a> deals with more advanced features, and notably the treatment of evolving domain problems with the Level Set Method.</p>
+<p>Before getting into the core of the matter, let us highlight a few useful references. The Level Set Method was introduced in the seminal article <span id="id1">[<a class="reference internal" href="../Generalities/bibliography.html#id14" title="Stanley Osher and James A Sethian. Fronts propagating with curvature-dependent speed: algorithms based on hamilton-jacobi formulations. Journal of computational physics, 79(1):12–49, 1988.">OS88</a>]</span>; the comprehensive books <span id="id2">[<a class="reference internal" href="../Generalities/bibliography.html#id16" title="James Albert Sethian. Level set methods and fast marching methods: evolving interfaces in computational geometry, fluid mechanics, computer vision, and materials science. Volume 3. Cambridge university press, 1999.">Set99</a>]</span> and <span id="id3">[<a class="reference internal" href="../Generalities/bibliography.html#id15" title="Stanley Osher and Ronald Fedkiw. Level set methods and dynamic implicit surfaces. Volume 153. Springer Science &amp; Business Media, 2006.">OF06</a>]</span> are very valuable complements to the succinct presentation of this tutorial. The reader might also find interest in the <a class="reference external" href="https://membres-ljk.imag.fr/Charles.Dapogny/cours/CoursLS2.pdf">slides</a> of a graduate course given by the author at Université Grenoble-Alpes.</p>
+<section id="implicit-representation">
+<span id="sec-imprep"></span><h2><span class="section-number">2.5.1. </span>Implicit representation<a class="headerlink" href="#implicit-representation" title="Link to this heading">¶</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(D\)</span> be a bounded domain in <span class="math notranslate nohighlight">\(\R^d\)</span>, where <span class="math notranslate nohighlight">\(d=2\)</span> or <span class="math notranslate nohighlight">\(3\)</span>, containing the domain of interest <span class="math notranslate nohighlight">\(\Omega \subset D\)</span>. The Level Set Method consists in looking to <span class="math notranslate nohighlight">\(\Omega\)</span> as the negative subset of a &quot;Level Set function&quot; <span class="math notranslate nohighlight">\(\phi: D \to \R\)</span>, that is:</p>
+<div class="math notranslate nohighlight" id="equation-eq-ls">
+<span class="eqno">(2.7)<a class="headerlink" href="#equation-eq-ls" title="Link to this equation">¶</a></span>\[\begin{split}\left\{\begin{array}{cl}
+\phi(\x) &lt; 0 &amp; \text{if } \x \in \Omega,\\
+\phi(\x) = 0 &amp; \text{if } \x \in \partial\Omega,\\
+\phi(\x) &gt; 0 &amp; \text{otherwise.}\end{array}\right.\end{split}\]</div>
+<p>This change of viewpoints is illustrated on <a class="reference internal" href="#fig-illusls"><span class="std std-numref">Fig. 2.8</span></a>.</p>
+<figure class="align-default" id="id4">
+<span id="fig-illusls"></span><a class="reference internal image-reference" href="../_images/illusLS.png"><img alt="../_images/illusLS.png" src="../_images/illusLS.png" style="width: 712.0px; height: 366.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.8 </span><span class="caption-text">(Left) One 2d domain <span class="math notranslate nohighlight">\(\Omega\)</span>; (right) graph of an associated Level Set function <span class="math notranslate nohighlight">\(\phi: D\to \R\)</span>.</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="handling-geometry-with-level-set-functions">
+<span id="sec-opimpgeom"></span><h2><span class="section-number">2.5.2. </span>Handling geometry with Level Set functions<a class="headerlink" href="#handling-geometry-with-level-set-functions" title="Link to this heading">¶</a></h2>
+<p>One might fear that switching from a conventional to a Level Set representation of a domain entails a loss of information about its geometry. This is fortunately not the case, and we present below a few geometric operations that can be conveniently carried out from Level Set functions.</p>
+<section id="the-normal-vector">
+<span id="sec-normalls"></span><h3><span class="section-number">2.5.2.1. </span>The normal vector<a class="headerlink" href="#the-normal-vector" title="Link to this heading">¶</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(\Omega \subset \R^d\)</span> be a smooth bounded domain, and let <span class="math notranslate nohighlight">\(\phi : \R^d \to \R\)</span> be an associated smooth Level Set function (i.e. <a class="reference internal" href="#equation-eq-ls">(2.7)</a> holds); we also assume that the gradient of <span class="math notranslate nohighlight">\(\phi\)</span> does not vanish in a neighborhood of <span class="math notranslate nohighlight">\(\partial \Omega\)</span>.</p>
+<p>The unit normal vector <span class="math notranslate nohighlight">\(\n(\x)\)</span> to <span class="math notranslate nohighlight">\(\partial \Omega\)</span> pointing outward <span class="math notranslate nohighlight">\(\Omega\)</span> is then expressed in terms of <span class="math notranslate nohighlight">\(\phi\)</span> as:</p>
+<div class="math notranslate nohighlight" id="equation-eq-normalls">
+<span class="eqno">(2.8)<a class="headerlink" href="#equation-eq-normalls" title="Link to this equation">¶</a></span>\[\forall \x \in \partial \Omega, \quad \n(\x) = \frac{\nabla \phi(\x)}{\lvert \nabla\phi(\x)\lvert},\]</div>
+<p>see <a class="reference internal" href="#fig-normalls"><span class="std std-numref">Fig. 2.9</span></a> for an intuition.</p>
+<figure class="align-default" id="id5">
+<span id="fig-normalls"></span><a class="reference internal image-reference" href="../_images/normls.png"><img alt="../_images/normls.png" src="../_images/normls.png" style="width: 324.0px; height: 277.2px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.9 </span><span class="caption-text">The unit normal vector <span class="math notranslate nohighlight">\(\n(\x)\)</span> to <span class="math notranslate nohighlight">\(\partial \Omega\)</span> at <span class="math notranslate nohighlight">\(\x \in \partial \Omega\)</span> is the direction of largest variations of the values of <span class="math notranslate nohighlight">\(\phi\)</span> near <span class="math notranslate nohighlight">\(\x\)</span> (which is <span class="math notranslate nohighlight">\(\nabla\phi(\x)\)</span>); it is also orthogonal to the isosurfaces of <span class="math notranslate nohighlight">\(\phi\)</span>.</span><a class="headerlink" href="#id5" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Note that the above right-hand side is actually well-defined in the whole computational domain <span class="math notranslate nohighlight">\(D\)</span>, at least at those points <span class="math notranslate nohighlight">\(\x\)</span> where <span class="math notranslate nohighlight">\(\nabla \phi(\x)\)</span> does not vanish, so that <a class="reference internal" href="#equation-eq-normalls">(2.8)</a> actually accounts for an extension of the unit normal vector <span class="math notranslate nohighlight">\(\n\)</span> to <span class="math notranslate nohighlight">\(D\)</span>.</p>
+</section>
+<section id="the-mean-curvature">
+<span id="sec-curvaturels"></span><h3><span class="section-number">2.5.2.2. </span>The mean curvature<a class="headerlink" href="#the-mean-curvature" title="Link to this heading">¶</a></h3>
+<p>In the same context as in the previous section, the mean curvature of <span class="math notranslate nohighlight">\(\partial\Omega\)</span> can be calculated from the (admitted) following formula:</p>
+<div class="math notranslate nohighlight" id="equation-eq-curvls">
+<span class="eqno">(2.9)<a class="headerlink" href="#equation-eq-curvls" title="Link to this equation">¶</a></span>\[\forall \x \in \partial \Omega, \quad \kappa(\x) = \dv \left(\frac{\nabla \phi}{\lvert\nabla \phi \lvert} \right)(\x).\]</div>
+<p>Like the formula <a class="reference internal" href="#equation-eq-normalls">(2.8)</a> for <span class="math notranslate nohighlight">\(\n(\x)\)</span>, this expression actually accounts for a natural extension of the mean curvature away from the boundary <span class="math notranslate nohighlight">\(\partial \Omega\)</span>.</p>
+</section>
+<section id="operations-on-sets">
+<h3><span class="section-number">2.5.2.3. </span>Operations on sets<a class="headerlink" href="#operations-on-sets" title="Link to this heading">¶</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(\Omega\)</span>, <span class="math notranslate nohighlight">\(\Omega_1\)</span>, <span class="math notranslate nohighlight">\(\Omega_2\)</span> be bounded domains in <span class="math notranslate nohighlight">\(\R^d\)</span>, and let <span class="math notranslate nohighlight">\(\phi\)</span>, <span class="math notranslate nohighlight">\(\phi_1, \phi_2: \R^d \to \R\)</span> be associated Level Set functions. Then,</p>
+<blockquote>
+<div><ul>
+<li><p>One Level Set function <span class="math notranslate nohighlight">\(\phi_c\)</span> for the complement <span class="math notranslate nohighlight">\(^{c}\overline{\Omega}\)</span> of <span class="math notranslate nohighlight">\(\Omega\)</span> is:</p>
+<p><div class="math notranslate nohighlight">
+\[\phi_c =- \phi.\]</div>
+</p>
+</li>
+<li><p>One Level Set function <span class="math notranslate nohighlight">\(\phi_u\)</span> for the reunion <span class="math notranslate nohighlight">\(\Omega_1 \cup \Omega_2\)</span> is:</p>
+<p><div class="math notranslate nohighlight">
+\[\phi_u = \min(\phi_1,\phi_2).\]</div>
+</p>
+</li>
+<li><p>One Level Set function <span class="math notranslate nohighlight">\(\phi_i\)</span> for the intersection <span class="math notranslate nohighlight">\(\Omega_1 \cap \Omega_2\)</span> is:</p>
+<p><div class="math notranslate nohighlight">
+\[\phi_i = \max(\phi_1,\phi_2).\]</div>
+</p>
+</li>
+</ul>
+</div></blockquote>
+<p>An illustration of the second formula is given in <a class="reference internal" href="#fig-unionls"><span class="std std-numref">Fig. 2.10</span></a>.</p>
+<figure class="align-default" id="id6">
+<span id="fig-unionls"></span><a class="reference internal image-reference" href="../_images/reuint.png"><img alt="../_images/reuint.png" src="../_images/reuint.png" style="width: 269.0px; height: 359.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.10 </span><span class="caption-text">One Level Set function <span class="math notranslate nohighlight">\(\phi_u\)</span> for the reunion of <span class="math notranslate nohighlight">\(\Omega_1\)</span>, <span class="math notranslate nohighlight">\(\Omega_2\)</span> is the minimum of Level Set functions <span class="math notranslate nohighlight">\(\phi_1\)</span>, <span class="math notranslate nohighlight">\(\phi_2\)</span> for <span class="math notranslate nohighlight">\(\Omega_1\)</span>, <span class="math notranslate nohighlight">\(\Omega_2\)</span>.</span><a class="headerlink" href="#id6" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="calculation-of-normal-vectors-and-mean-curvatures-with-level-set-functions-in-texttt-freefem">
+<h3><span class="section-number">2.5.2.4. </span>Calculation of normal vectors and mean curvatures with Level Set functions in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span><a class="headerlink" href="#calculation-of-normal-vectors-and-mean-curvatures-with-level-set-functions-in-texttt-freefem" title="Link to this heading">¶</a></h3>
+<p>In this section, we discuss how the formulas introduced in <a class="reference internal" href="#sec-normalls"><span class="std std-numref">Section 2.5.2.1</span></a> and <a class="reference internal" href="#sec-curvaturels"><span class="std std-numref">Section 2.5.2.2</span></a> allow to calculate the normal vector and the mean curvature of the boundary of a domain <span class="math notranslate nohighlight">\(\Omega\)</span> when the latter is only supplied via a Level Set function.
+The code associated to this section is contained in <a class="reference download internal" download="" href="../_downloads/7b854e5f53792700cdb0b5d3b648fa45/LScurv.edp"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a></p>
+<p>Let <span class="math notranslate nohighlight">\(\Omega \subset \R^2\)</span> be a smooth bounded domain, contained in a larger computational domain <span class="math notranslate nohighlight">\(D\)</span>. Let <span class="math notranslate nohighlight">\(\calT\)</span> be a mesh of <span class="math notranslate nohighlight">\(D\)</span>, and let <span class="math notranslate nohighlight">\(\phi : \R^2 \to \R\)</span> be a Level Set function for <span class="math notranslate nohighlight">\(\Omega\)</span>, discretized as a <span class="math notranslate nohighlight">\(\P_1\)</span> Finite Element function on <span class="math notranslate nohighlight">\(\calT\)</span>.</p>
+<p>Let us first consider the practical calculation of the normal vector <span class="math notranslate nohighlight">\(\n: \partial \Omega \to \R^2\)</span>. The formula <a class="reference internal" href="#equation-eq-normalls">(2.8)</a> can be used readily to this end, as in the following listing.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Calculation of the components (nx,ny) of the normal vector field n = \frac{\nabla\phi}{\lvert\nabla\phi\lvert} as P0 functions */</span>
+<span class="n">norm0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">sqrt</span><span class="p">(</span><span class="w"> </span><span class="nf">dx</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nf">dy</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">EPS</span><span class="w"> </span><span class="p">);</span>
+<span class="n">nx0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">dx</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">norm0</span><span class="p">;</span>
+<span class="n">ny0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">dy</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">norm0</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Since <span class="math notranslate nohighlight">\(\phi\)</span> is a <span class="math notranslate nohighlight">\(\P_1\)</span> Finite Element function, the normal vector is naturally calculated as a (discontinuous) <span class="math notranslate nohighlight">\(\P_0\)</span> function, and it is often desirable to handle a <span class="math notranslate nohighlight">\(\P_1\)</span> vector field. To achieve this, we rely on a useful general trick to reconstruct a <span class="math notranslate nohighlight">\(\P_1\)</span> Finite Element function <span class="math notranslate nohighlight">\(u\)</span> from a <span class="math notranslate nohighlight">\(\P_0\)</span> function <span class="math notranslate nohighlight">\(u_0\)</span>. We solve the following variational problem:</p>
+<p><div class="math notranslate nohighlight">
+\[\text{Search for } u \in H^1(D) \text{ s.t. } \forall v \in H^1(D), \quad \alpha^2 \int_\Omega \nabla u \cdot \nabla v \:\d \x + \int_\Omega uv \:\d \x = \int_\Omega u_0 v \:\d \x,\]</div>
+</p>
+<p>by choosing the space of <span class="math notranslate nohighlight">\(\P_1\)</span> Finite Elements for the discretization of <span class="math notranslate nohighlight">\(H^1(D)\)</span>.
+Here, the first integral in the above left-hand side is the bilinear form associated to the Laplace operator, weighted by the &quot;small&quot; parameter <span class="math notranslate nohighlight">\(\alpha\)</span> (often chosen of the order of the mesh size). It allows to additionally smooth the input field <span class="math notranslate nohighlight">\(u_0\)</span> over a length-scale <span class="math notranslate nohighlight">\(\alpha\)</span> by virtue of the regularizing properties of this operator, as a means to eliminate undesirable numerical artifacts. This procedure is implemented in the following listing.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Reconstruction of a P1 vector field for the normal vector;</span>
+<span class="cm">   Add a small smoothing with the Laplacian term \alpha^2 \Delta u */</span>
+<span class="kt">problem</span><span class="w"> </span><span class="nf">normalx</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">int2d</span><span class="p">(</span><span class="n">Th</span><span class="p">)(</span><span class="w"> </span><span class="n">alpha</span><span class="o">^</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="nf">dx</span><span class="p">(</span><span class="n">nx</span><span class="p">)</span><span class="o">*</span><span class="nf">dx</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">+</span><span class="nf">dy</span><span class="p">(</span><span class="n">nx</span><span class="p">)</span><span class="o">*</span><span class="nf">dy</span><span class="p">(</span><span class="n">v</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nx</span><span class="o">*</span><span class="n">v</span><span class="w"> </span><span class="p">)</span>
+<span class="w">                        </span><span class="o">-</span><span class="w"> </span><span class="nf">int2d</span><span class="p">(</span><span class="n">Th</span><span class="p">)(</span><span class="w"> </span><span class="n">nx0</span><span class="o">*</span><span class="n">v</span><span class="p">);</span>
+
+<span class="kt">problem</span><span class="w"> </span><span class="nf">normaly</span><span class="p">(</span><span class="n">ny</span><span class="p">,</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">int2d</span><span class="p">(</span><span class="n">Th</span><span class="p">)(</span><span class="w"> </span><span class="n">alpha</span><span class="o">^</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="nf">dx</span><span class="p">(</span><span class="n">ny</span><span class="p">)</span><span class="o">*</span><span class="nf">dx</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">+</span><span class="nf">dy</span><span class="p">(</span><span class="n">ny</span><span class="p">)</span><span class="o">*</span><span class="nf">dy</span><span class="p">(</span><span class="n">v</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ny</span><span class="o">*</span><span class="n">v</span><span class="w"> </span><span class="p">)</span>
+<span class="w">                        </span><span class="o">-</span><span class="w"> </span><span class="nf">int2d</span><span class="p">(</span><span class="n">Th</span><span class="p">)(</span><span class="w"> </span><span class="n">ny0</span><span class="o">*</span><span class="n">v</span><span class="p">);</span>
+
+<span class="n">normalx</span><span class="p">;</span>
+<span class="n">normaly</span><span class="p">;</span>
+
+<span class="n">norm1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">sqrt</span><span class="p">(</span><span class="w"> </span><span class="n">nx</span><span class="o">^</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ny</span><span class="o">^</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">EPS</span><span class="w"> </span><span class="p">);</span>
+<span class="n">nx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nx</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">norm1</span><span class="p">;</span>
+<span class="n">ny</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ny</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">norm1</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Let us now turn to the mean curvature <span class="math notranslate nohighlight">\(\kappa\)</span>. Judging from <a class="reference internal" href="#equation-eq-curvls">(2.9)</a>, it is tempting to calculate the extended normal vector <span class="math notranslate nohighlight">\(\n = \frac{\nabla \phi}{\lvert \nabla \phi \lvert}\)</span> as a <span class="math notranslate nohighlight">\(\P_0\)</span> function on <span class="math notranslate nohighlight">\(\calT\)</span>, to reconstruct a <span class="math notranslate nohighlight">\(\P_1\)</span> function on <span class="math notranslate nohighlight">\(\calT\)</span> by a similar trick as in the previous listing, and then to take derivatives in the result.
+Unfortunately, the successive differentiation and <span class="math notranslate nohighlight">\(\P_1\)</span> reconstructions of this strategy are likely to cause numerical instabilities.</p>
+<p>In order to alleviate the need for reconstructing <span class="math notranslate nohighlight">\(\P_1\)</span> Finite Element functions, we rely on the following application of the <a class="reference internal" href="../Generalities/anafunc.html#th-green"><span class="std std-ref">Green’s formula</span></a>:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall v \in H^1(D), \quad \int_D \kappa v \:\d \x = \int_{\partial D} (\n\cdot \n_D) v \:\d s - \int_D \n \cdot \nabla v\:\d \x,\]</div>
+</p>
+<p>where <span class="math notranslate nohighlight">\(\n = \frac{\nabla \phi}{\lvert \nabla \phi\lvert}\)</span> is the (extended) normal vector to <span class="math notranslate nohighlight">\(\partial \Omega\)</span> and <span class="math notranslate nohighlight">\(\n_D\)</span> is the unit normal vector to <span class="math notranslate nohighlight">\(\partial D\)</span>.
+Now, in order to calculate <span class="math notranslate nohighlight">\(\kappa\)</span>, we directly solve the following variational problem:</p>
+<p><div class="math notranslate nohighlight">
+\[\text{Search for } u \in H^1(D) \text{ s.t. } \forall v \in H^1(D),\quad \int_D \alpha^2 \nabla u \cdot \nabla v \:\d\x + \int_D uv \:\d \x = -\int_D \n \cdot \nabla v\:\d \x + \int_{\partial D} (\n\cdot \n_D) v \:\d s.\]</div>
+</p>
+</section>
+</section>
+<section id="application-fictitious-domain-methods">
+<span id="sec-ficimpref"></span><h2><span class="section-number">2.5.3. </span>Application: fictitious domain methods<a class="headerlink" href="#application-fictitious-domain-methods" title="Link to this heading">¶</a></h2>
+<p>Sometimes in realistic applications, it may be very complicated to obtain a mesh of the considered domain <span class="math notranslate nohighlight">\(\Omega\)</span>. It is often easier to introduce a larger, &quot;simple&quot; computational domain <span class="math notranslate nohighlight">\(D\)</span> (e.g. a box), for which it is possible to construct a mesh <span class="math notranslate nohighlight">\({\mathcal T}\)</span>. The domain <span class="math notranslate nohighlight">\(\Omega\)</span> is not meshed, but efficient methods (such as those broached in the next <a class="reference internal" href="LSM2.html#sec-distls"><span class="std std-numref">Section 2.6.1</span></a>) allow to generate an associated level set function <span class="math notranslate nohighlight">\(\phi : D \to \R\)</span>. An illustration of this situation is provided in <a class="reference internal" href="#fig-ersatz"><span class="std std-numref">Fig. 2.11</span></a>.</p>
+<p>In such a setting where it is difficult to directly apply the methods of <a class="reference internal" href="../Generalities/laplace.html#sec-lap"><span class="std std-numref">Section 1.4</span></a> for the resolution of boundary value problems on <span class="math notranslate nohighlight">\(\Omega\)</span>, a fictitious domain method ca be used.
+Essentially, an approximate problem is introduced, parametrized by a &quot;small&quot; parameter <span class="math notranslate nohighlight">\(\varepsilon \ll 1\)</span>, which is posed on the larger domain <span class="math notranslate nohighlight">\(D\)</span>. It gives rise to a solution <span class="math notranslate nohighlight">\(u_\varepsilon : D \to \R\)</span> whose restriction to <span class="math notranslate nohighlight">\(\Omega\)</span> is expected to be close to that of the original model: <span class="math notranslate nohighlight">\(u_\varepsilon \lvert_\Omega \approx u\)</span>.</p>
+<p>Understandably enough, the definition of this approximate problem depends on the nature of the original one, and to illustrate this practice, we consider two model situations.</p>
+<p>Let <span class="math notranslate nohighlight">\(\Omega\)</span> be the domain depicted on <a class="reference internal" href="#fig-ersatz"><span class="std std-numref">Fig. 2.11</span></a>, (left), a mesh of which is supplied <a class="reference download internal" download="" href="../_downloads/21648ff6a73bf6eead901c1cba11d96a/ersatz.mesh"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.
+We consider the following boundary-value problems:</p>
+<div class="math notranslate nohighlight" id="equation-eq-2pbsers">
+<span class="eqno">(2.10)<a class="headerlink" href="#equation-eq-2pbsers" title="Link to this equation">¶</a></span>\[\begin{split}\left\{
+\begin{array}{cl}
+- \Delta u_1 = 0 &amp; \text{in } \Omega, \\
+u_1 = u_D &amp; \text{on } \Gamma_D, \\
+\frac{\partial u_1}{\partial n} = g &amp; \text{on } \Gamma_N, \\
+\frac{\partial u_1}{\partial n} = 0 &amp; \text{on } \Gamma,
+\end{array}
+\right.
+\:\:\text{ and }\:\: \left\{
+\begin{array}{cl}
+- \Delta u_2 = 0 &amp; \text{in } \Omega, \\
+u_2 = u_D &amp; \text{on } \Gamma_D, \\
+\frac{\partial u_2}{\partial n} = g &amp; \text{on } \Gamma_N, \\
+u_2= 0 &amp; \text{on } \Gamma.
+\end{array}
+\right.\end{split}\]</div>
+<p>Both problems differ only by the type of boundary conditions imposed on the region <span class="math notranslate nohighlight">\(\Gamma\)</span> of <span class="math notranslate nohighlight">\(\partial \Omega\)</span>.
+The code associated to their resolution is available <a class="reference download internal" download="" href="../_downloads/ba13e608eb3101d620c01b70554b4dc8/laplace_ersatz_tem.edp"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>, see <a class="reference internal" href="#fig-ersneu"><span class="std std-numref">Fig. 2.12</span></a> (left) and <a class="reference internal" href="#fig-ersdir"><span class="std std-numref">Fig. 2.13</span></a> (left) for the results.</p>
+<p>We now consider the situation where no mesh of <span class="math notranslate nohighlight">\(\Omega\)</span> is available. Instead, a mesh <span class="math notranslate nohighlight">\(\calT\)</span> of a larger computational box <span class="math notranslate nohighlight">\(D\)</span> is provided (which can be downloaded <a class="reference download internal" download="" href="../_downloads/4caf8facd56a8cfc63660e320b11f999/box_ers.mesh"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>), together with a Level Set function <span class="math notranslate nohighlight">\(\phi : D \to \R\)</span> for <span class="math notranslate nohighlight">\(\Omega\)</span> (click <a class="reference download internal" download="" href="../_downloads/2962c43b6ba83ec628158dc79f272a4f/box_ers.sol"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>), see <a class="reference internal" href="#fig-ersatz"><span class="std std-numref">Fig. 2.11</span></a> (middle,right).</p>
+<figure class="align-default" id="id7">
+<span id="fig-ersatz"></span><a class="reference internal image-reference" href="../_images/ersatzset2.png"><img alt="../_images/ersatzset2.png" src="../_images/ersatzset2.png" style="width: 1141.6999999999998px; height: 347.9px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.11 </span><span class="caption-text">(Left) The considered domain <span class="math notranslate nohighlight">\(\Omega\)</span>; (middle) Mesh of the large computational box <span class="math notranslate nohighlight">\(D\)</span>; (right) Graph of a Level Set function <span class="math notranslate nohighlight">\(\phi: D\to \R\)</span> for <span class="math notranslate nohighlight">\(\Omega\)</span>.</span><a class="headerlink" href="#id7" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The next two exercises analyze how to approximately solve both problems <a class="reference internal" href="#equation-eq-2pbsers">(2.10)</a> in this context.
+The code for both examples is contained in <a class="reference download internal" download="" href="../_downloads/2e40710623c8d5c9ce576e7c739d4416/laplace_ersatz.edp"><code class="xref download docutils literal notranslate"><span class="pre">this</span> <span class="pre">file</span></code></a>, and the numerical results are represented in <a class="reference internal" href="#fig-ersneu"><span class="std std-numref">Fig. 2.12</span></a> and <a class="reference internal" href="#fig-ersdir"><span class="std std-numref">Fig. 2.13</span></a>.</p>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise (Computation of <span class="math notranslate nohighlight">\(u_1\)</span> by the ersatz material method)</p>
+<p>Let <span class="math notranslate nohighlight">\(u_{1,\e}\)</span> be the unique solution in <span class="math notranslate nohighlight">\(H^1(D)\)</span> to the following boundary-value problem:</p>
+<div class="math notranslate nohighlight" id="equation-eq-neufic">
+<span class="eqno">(2.11)<a class="headerlink" href="#equation-eq-neufic" title="Link to this equation">¶</a></span>\[\begin{split}  \left\{\begin{array}{cl}
+    -\dv(\gamma_\varepsilon(\x) \nabla u _{1,\varepsilon} ) = 0 &amp;\text{in } D, \\
+    u _{1,\varepsilon} = u_D &amp; \text{on } \Gamma_D, \\
+    \frac{\partial u _{1,\varepsilon}}{\partial n} = g &amp; \text{on } \Gamma_N, \\
+    \frac{\partial u _{1,\varepsilon}}{\partial n} = 0 &amp; \text{on } \partial D \setminus (\overline{\Gamma_D} \cup \overline{\Gamma_N}).
+    \end{array}
+  \right.\end{split}\]</div>
+<p>Here, the conductivity <span class="math notranslate nohighlight">\(\gamma_\varepsilon(x)\)</span> equals <span class="math notranslate nohighlight">\(1\)</span> if the point <span class="math notranslate nohighlight">\(x\)</span> is &quot;well-inside&quot; <span class="math notranslate nohighlight">\(\Omega\)</span> and a very low value <span class="math notranslate nohighlight">\(\varepsilon\)</span> if it is &quot;well-outside&quot; <span class="math notranslate nohighlight">\(\Omega\)</span>. In a thin band around <span class="math notranslate nohighlight">\(\partial \Omega\)</span>, it interpolates between these two values. One possible definition of <span class="math notranslate nohighlight">\(\gamma_\e\)</span> exhibiting this behavior is:</p>
+<p><div class="math notranslate nohighlight">
+\[\gamma_\varepsilon(\x) = \max\left(\varepsilon, \frac{1}{2}\left(1+\tanh\left(-\frac{\phi(\x)}{\varepsilon} \right)\right) \right), \quad \x \in D.\]</div>
+</p>
+<p>Solve <a class="reference internal" href="#equation-eq-neufic">(2.11)</a> with <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> and compare its solution <span class="math notranslate nohighlight">\(u_{1,\e}\)</span> to that <span class="math notranslate nohighlight">\(u_1\)</span> of <a class="reference internal" href="#equation-eq-2pbsers">(2.10)</a> (left).</p>
+<p><em>(Remark: An argument similar to the proof of the exercise in</em> <a class="reference internal" href="../Generalities/dirpen.html#sec-dirtgv"><span class="std std-numref">Section 1.8</span></a> <em>allows to prove that <span class="math notranslate nohighlight">\(u_{1,\e} \to u_1\)</span> in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>.)</em></p>
+</div>
+<figure class="align-default" id="id8">
+<span id="fig-ersneu"></span><a class="reference internal image-reference" href="../_images/ersatzneu.png"><img alt="../_images/ersatzneu.png" src="../_images/ersatzneu.png" style="width: 954.0px; height: 414.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.12 </span><span class="caption-text">(Left) Solution <span class="math notranslate nohighlight">\(u_1\)</span> of the Laplace equation on <span class="math notranslate nohighlight">\(\Omega\)</span> with homogeneous Neumann boundary conditions on <span class="math notranslate nohighlight">\(\Gamma\)</span>; (right) Solution <span class="math notranslate nohighlight">\(u_{1,\e}\)</span> of the penalized version on the whole domain <span class="math notranslate nohighlight">\(D\)</span>.</span><a class="headerlink" href="#id8" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise (Computation of <span class="math notranslate nohighlight">\(u_2\)</span> via the porosity method)</p>
+<p>Let <span class="math notranslate nohighlight">\(u_{2,\e}\)</span> be the unique <span class="math notranslate nohighlight">\(H^1(D)\)</span> solution to the following boundary-value problem:</p>
+<div class="math notranslate nohighlight" id="equation-eq-dirfic">
+<span class="eqno">(2.12)<a class="headerlink" href="#equation-eq-dirfic" title="Link to this equation">¶</a></span>\[\begin{split}\left\{ \begin{array}{cl}
+-\dv((1+c_\varepsilon(\x)) \nabla u _{2,\varepsilon} ) + c_\varepsilon(\x) u _{2,\varepsilon} = 0 &amp;\text{in } D, \\
+u _{2,\varepsilon} = u_D &amp; \text{on } \Gamma_D, \\
+\frac{\partial u _{2,\varepsilon}}{\partial n} = g &amp; \text{on } \Gamma_N, \\
+u _{2,\varepsilon} = 0 &amp; \text{on } \partial D \setminus (\overline{\Gamma_D} \cup \overline{\Gamma_N}).
+\end{array}
+\right.\end{split}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(c_\varepsilon(\x)\)</span> equals <span class="math notranslate nohighlight">\(0\)</span> if the point <span class="math notranslate nohighlight">\(\x\)</span> is &quot;well-inside&quot; <span class="math notranslate nohighlight">\(\Omega\)</span> and takes a very large value <span class="math notranslate nohighlight">\(\frac{1}{\e}\)</span> if it is &quot;well-outside&quot; <span class="math notranslate nohighlight">\(\Omega\)</span>. In a thin band around <span class="math notranslate nohighlight">\(\partial \Omega\)</span>, it interpolates between these two values. An example of a function showing this behavior is:</p>
+<p><div class="math notranslate nohighlight">
+\[c_\varepsilon(\x) = \frac{1}{2\varepsilon}\left(1+\tanh\left(\frac{\phi(\x)}{\varepsilon}\right)\right), \quad \x \in D.\]</div>
+</p>
+<p>Solve <a class="reference internal" href="#equation-eq-dirfic">(2.12)</a> with <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> and compare its solution <span class="math notranslate nohighlight">\(u_{2,\e}\)</span> to that <span class="math notranslate nohighlight">\(u_2\)</span> of <a class="reference internal" href="#equation-eq-2pbsers">(2.10)</a> (right).</p>
+<p><em>(Remark: Again, it is possible to prove that <span class="math notranslate nohighlight">\(u_{2,\e} \to u_2\)</span> in <span class="math notranslate nohighlight">\(H^1(\Omega)\)</span>.)</em></p>
+</div>
+<figure class="align-default" id="id9">
+<span id="fig-ersdir"></span><a class="reference internal image-reference" href="../_images/ersatzdir.png"><img alt="../_images/ersatzdir.png" src="../_images/ersatzdir.png" style="width: 950.0px; height: 413.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.13 </span><span class="caption-text">(Left) Solution <span class="math notranslate nohighlight">\(u_2\)</span> of the Laplace equation on <span class="math notranslate nohighlight">\(\Omega\)</span> with Dirichlet boundary conditions on <span class="math notranslate nohighlight">\(\Gamma\)</span>; (right) Solution <span class="math notranslate nohighlight">\(u_{2,\e}\)</span> of its penalized version on the whole domain <span class="math notranslate nohighlight">\(D\)</span>.</span><a class="headerlink" href="#id9" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/index_gen.html">1. Generalities</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index_adv.html">2. Advanced features</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="imgmesh.html">2.1. Meshing images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="curvature.html">2.2. Curvature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nonlinear.html">2.3. Nonlinear problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variational_inequalities.html">2.4. Variational inequalities</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2.5. Level Set method I</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM2.html">2.6. Level Set method II</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3dext.html">2.7. Going 3d</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_adv.html"><span class="section-number">2. </span>More advanced issues in scientific computing</a><ul>
+      <li>Previous: <a href="variational_inequalities.html" title="previous chapter"><span class="section-number">2.4. </span>A glimpse of variational inequalities</a></li>
+      <li>Next: <a href="LSM2.html" title="next chapter"><span class="section-number">2.6. </span>The Level Set method: Part II</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Advanced/LSM.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

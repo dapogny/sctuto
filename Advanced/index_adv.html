@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2. More advanced issues in scientific computing &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2.1. Creating a mesh from an image" href="imgmesh.html" />
+    <link rel="prev" title="1.9. The Laplace equation with pure Neumann boundary conditions" href="../Generalities/laplace_pure_Neumann.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="more-advanced-issues-in-scientific-computing">
+<span id="chap-adv"></span><h1><span class="section-number">2. </span>More advanced issues in scientific computing<a class="headerlink" href="#more-advanced-issues-in-scientific-computing" title="Link to this heading">¶</a></h1>
+<p>This chapter is the natural continuation of <a class="reference internal" href="../Generalities/index_gen.html#chap-start"><span class="std std-numref">Section 1</span></a>, where we have introduced the basic mathematical ingredients needed in the treatment of variational problems, as well as the convenient <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> environment for their implementation.
+The present section builds on the contents of <a class="reference internal" href="../Generalities/index_gen.html#chap-start"><span class="std std-numref">Section 1</span></a> and jumps to slightly more specific tools, that are transverse to many application fields while being perhaps a little less widely discussed in the literature.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="imgmesh.html">2.1. Meshing images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="curvature.html">2.2. Curvature</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="curvature.html#definition-of-curvature">2.2.1. Definition of curvature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="curvature.html#calculation-of-the-mean-curvature-from-a-mesh">2.2.2. Calculation of the mean curvature from a mesh</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nonlinear.html">2.3. Nonlinear problems</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nonlinear.html#the-newton-raphson-method">2.3.1. The Newton-Raphson method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nonlinear.html#an-application-example-a-non-linear-laplace-equation">2.3.2. An application example: a non linear Laplace equation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="variational_inequalities.html">2.4. Variational inequalities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="variational_inequalities.html#a-word-about-the-modeling">2.4.1. A word about the modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variational_inequalities.html#a-glimpse-of-the-theory">2.4.2. A glimpse of the theory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variational_inequalities.html#a-simple-penalty-method">2.4.3. A simple penalty method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variational_inequalities.html#use-of-a-constrained-optimization-algorithm-texttt-ipopt">2.4.4. Use of a constrained optimization algorithm: <span class="math notranslate nohighlight">\(\texttt{ipopt}\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="variational_inequalities.html#an-active-set-algorithm">2.4.5. An active set algorithm</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="LSM.html">2.5. Level Set method I</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="LSM.html#implicit-representation">2.5.1. Implicit representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM.html#handling-geometry-with-level-set-functions">2.5.2. Handling geometry with Level Set functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM.html#application-fictitious-domain-methods">2.5.3. Application: fictitious domain methods</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="LSM2.html">2.6. Level Set method II</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="LSM2.html#initialization-of-a-level-set-representation-by-the-signed-distance-function">2.6.1. Initialization of a Level Set representation by the signed distance function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM2.html#evolution-of-a-domain-by-the-level-set-method">2.6.2. Evolution of a domain by the Level Set method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM2.html#miscellaneous-operations-on-implicit-domains">2.6.3. Miscellaneous operations on implicit domains</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM2.html#implementation-of-the-level-set-method">2.6.4. Implementation of the Level Set Method</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="3dext.html">2.7. Going 3d</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="3dext.html#construction-of-a-3d-mesh">2.7.1. Construction of a 3d mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3dext.html#d-visualization-with-texttt-medit">2.7.2. 3d visualization with <span class="math notranslate nohighlight">\(\texttt{medit}\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="3dext.html#solution-of-the-finite-element-problem">2.7.3. Solution of the Finite Element problem</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/index_gen.html">1. Generalities</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">2. Advanced features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="imgmesh.html">2.1. Meshing images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="curvature.html">2.2. Curvature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nonlinear.html">2.3. Nonlinear problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variational_inequalities.html">2.4. Variational inequalities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM.html">2.5. Level Set method I</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM2.html">2.6. Level Set method II</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3dext.html">2.7. Going 3d</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../Generalities/laplace_pure_Neumann.html" title="previous chapter"><span class="section-number">1.9. </span>The Laplace equation with pure Neumann boundary conditions</a></li>
+      <li>Next: <a href="imgmesh.html" title="next chapter"><span class="section-number">2.1. </span>Creating a mesh from an image</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Advanced/index_adv.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>1.5. Visualization of meshes and solutions &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="1.6. A second encounter with meshes" href="mesh.html" />
+    <link rel="prev" title="1.4. The Laplace equation in all its forms" href="laplace.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="visualization-of-meshes-and-solutions">
+<span id="sec-visu"></span><h1><span class="section-number">1.5. </span>Visualization of meshes and solutions<a class="headerlink" href="#visualization-of-meshes-and-solutions" title="Link to this heading">¶</a></h1>
+<p>The typical outcome of a numerical calculation consists in a mesh of the computational domain and a solution defined on the latter; such is the case of the solution of a boundary value problem by the Finite Element Method, as we have seen in <a class="reference internal" href="laplace.html#sec-lap"><span class="std std-numref">Section 1.4</span></a>. This raises the question of how to visualize these objects. In this section, we present two ways of achieving this goal; the first one, described in <a class="reference internal" href="#sec-plotff"><span class="std std-numref">Section 1.5.1</span></a>, hinges on the simple built-in command <span class="math notranslate nohighlight">\(\texttt{plot}\)</span> of the <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> language; the second and more efficient one, presented in <a class="reference internal" href="#sec-plotmedit"><span class="std std-numref">Section 1.5.2</span></a>, leverages the simple and efficient tool <span class="math notranslate nohighlight">\(\texttt{medit}\)</span>.</p>
+<section id="the-texttt-plot-command-in-texttt-freefem">
+<span id="sec-plotff"></span><h2><span class="section-number">1.5.1. </span>The <span class="math notranslate nohighlight">\(\texttt{plot}\)</span> command in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span><a class="headerlink" href="#the-texttt-plot-command-in-texttt-freefem" title="Link to this heading">¶</a></h2>
+<p>To set ideas, let us come back to the situation considered in <a class="reference internal" href="laplace.html#sec-laplacestart"><span class="std std-numref">Section 1.4.2</span></a>, where we have calculated the solution <span class="math notranslate nohighlight">\(u\)</span> to the Laplace equation <a class="reference internal" href="laplace.html#equation-eq-laplace">(1.22)</a> on a mesh <span class="math notranslate nohighlight">\(\calT_h\)</span> of an L-shaped domain <span class="math notranslate nohighlight">\(\Omega\)</span>. The associated source code can be downloaded <a class="reference download internal" download="" href="../_downloads/b551ba6e26ac96aa201bc8e32f88acbd/laplace_start.edp"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.
+The visualization of <span class="math notranslate nohighlight">\(\calT_h\)</span> and <span class="math notranslate nohighlight">\(u\)</span> can be realized according to the following <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> function:</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Display and save the result */</span>
+<span class="nf">plot</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="n">u</span><span class="p">,</span><span class="kp">wait</span><span class="o">=</span><span class="mi">1</span><span class="p">,[</span><span class="kp">options</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p>Here, <span class="math notranslate nohighlight">\(\texttt{[options]}\)</span> stands for one or several optional arguments. The complete features of the <span class="math notranslate nohighlight">\(\texttt{plot}\)</span> function are described in the <a class="reference external" href="https://doc.freefem.org/documentation/visualization.html#visualization"><span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> documentation</a>, and we solely highlight a few useful ones:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\texttt{fill=1}\)</span> fills the elements of the mesh with a color related to the values of the solution.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\texttt{value=1}\)</span> displays the color scale.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\texttt{bb=[[0.0, 0.1],[0.9, 1.0]]}\)</span> makes a zoom on the subset <span class="math notranslate nohighlight">\((0.0,0.1) \times (0.9,1.0) \subset \Omega\)</span>.</p></li>
+</ul>
+</div></blockquote>
+<p>This instruction opens a new window with the desired features, as illustrated on <a class="reference internal" href="#fig-illusplot"><span class="std std-numref">Fig. 1.11</span></a>.</p>
+<figure class="align-default" id="id1">
+<span id="fig-illusplot"></span><a class="reference internal image-reference" href="../_images/illusplot.png"><img alt="../_images/illusplot.png" src="../_images/illusplot.png" style="width: 557.0px; height: 362.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.11 </span><span class="caption-text">Outcome of the <span class="math notranslate nohighlight">\(\texttt{plot}\)</span> command in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span>.</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="a-simple-and-efficient-visualization-tool-texttt-medit">
+<span id="sec-plotmedit"></span><h2><span class="section-number">1.5.2. </span>A simple and efficient visualization tool: <span class="math notranslate nohighlight">\(\texttt{medit}\)</span><a class="headerlink" href="#a-simple-and-efficient-visualization-tool-texttt-medit" title="Link to this heading">¶</a></h2>
+<p>The open-source software <a class="reference external" href="https://github.com/ISCDtoolbox/Medit"><span class="math notranslate nohighlight">\(\texttt{medit}\)</span></a> is a simple and efficient tool for displaying a mesh <span class="math notranslate nohighlight">\(\calT_h\)</span> and a <span class="math notranslate nohighlight">\(\mathbb{P}_1\)</span> function <span class="math notranslate nohighlight">\(u\)</span>, supplied by its values at the vertices of <span class="math notranslate nohighlight">\(\calT_h\)</span>. It can be used either directly within the <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> environment, or as a stand-alone program. We describe in this section a few important features of <span class="math notranslate nohighlight">\(\texttt{medit}\)</span>, referring to the <a class="reference external" href="https://www.ljll.fr/frey/logiciels/Docmedit.dir/">online documentation</a> for a more advanced use.</p>
+<p>Still in the context of the calculation of the solution <span class="math notranslate nohighlight">\(u\)</span> to the Laplace equation <a class="reference internal" href="laplace.html#equation-eq-laplace">(1.22)</a> on a mesh <span class="math notranslate nohighlight">\(\calT_h\)</span> considered in <a class="reference internal" href="laplace.html#sec-laplacestart"><span class="std std-numref">Section 1.4.2</span></a>, <span class="math notranslate nohighlight">\(\texttt{medit}\)</span> can be used to visualize <span class="math notranslate nohighlight">\(\calT_h\)</span> and <span class="math notranslate nohighlight">\(u\)</span> through the following <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> syntax:</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Load medit library */</span>
+<span class="cp">load</span><span class="w"> </span><span class="s">&quot;</span><span class="nf">medit</span><span class="s">&quot;</span>
+
+<span class="p">[...]</span>
+
+<span class="cm">/* Display mesh T_h and solution u */</span>
+<span class="nf">medit</span><span class="p">(</span><span class="s">&quot;u&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Th</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>An alternative, more flexible means to use <span class="math notranslate nohighlight">\(\texttt{medit}\)</span> is to call it outside of <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span>, via command lines;
+most installations of <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> indeed come along with a fully-fledged installation of <span class="math notranslate nohighlight">\(\texttt{medit}\)</span>. The latter can be called by using the following command line in the console:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ffmedit domain.mesh</span>
+</pre></div>
+</div>
+<p>Here, it is understood the the current directory contains a mesh file <span class="math notranslate nohighlight">\(\texttt{domain.mesh}\)</span> for the domain; if one additionally wishes to displaya solution attached to its vertices, the values of the latter must be contained in another file <span class="math notranslate nohighlight">\(\texttt{domain.sol}\)</span>, i.e. sharing the same name as the mesh, with the different extension <span class="math notranslate nohighlight">\(\texttt{.sol}\)</span>. In most situations, it is not necessary to understand the structures of <span class="math notranslate nohighlight">\(\texttt{.mesh}\)</span> and <span class="math notranslate nohighlight">\(\texttt{.sol}\)</span> files, since they can be read and saved by <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> functions; the curious or expert reader can find more information related to this structure in <a class="reference internal" href="mesh.html#sec-meshsolfiles"><span class="std std-numref">Section 1.6.3</span></a>.</p>
+<p>Let us illustrate visualization with <span class="math notranslate nohighlight">\(\texttt{medit}\)</span> with the mesh <span class="math notranslate nohighlight">\(\calT_h\)</span> and the solution <span class="math notranslate nohighlight">\(u\)</span> to the Laplace equation, tackled in <a class="reference internal" href="laplace.html#sec-laplacestart"><span class="std std-numref">Section 1.4.2</span></a>. At first, in the <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> script, the mesh <span class="math notranslate nohighlight">\(\calT_h\)</span> and the <span class="math notranslate nohighlight">\(\P_1\)</span> finite element function <span class="math notranslate nohighlight">\(u\)</span> are saved as <span class="math notranslate nohighlight">\(\texttt{.mesh}\)</span> and <span class="math notranslate nohighlight">\(\texttt{.sol}\)</span> files, thanks to the following lines:</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* medit must be loaded to use savesol */</span>
+<span class="cp">load</span><span class="w"> </span><span class="s">&quot;</span><span class="nf">medit</span><span class="s">&quot;</span>
+
+<span class="p">[...]</span>
+
+<span class="cm">/* Display and save the result */</span>
+<span class="nf">savemesh</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="s">&quot;Lshape.mesh&quot;</span><span class="p">);</span>
+<span class="nf">savesol</span><span class="p">(</span><span class="s">&quot;Lshape.sol&quot;</span><span class="p">,</span><span class="n">Th</span><span class="p">,</span><span class="n">u</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>We then call <span class="math notranslate nohighlight">\(\texttt{medit}\)</span> via the following console command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ffmedit Lshape.mesh</span>
+</pre></div>
+</div>
+<p>A window opens, as depicted in <a class="reference internal" href="#fig-medit1"><span class="std std-numref">Fig. 1.12</span></a>.</p>
+<figure class="align-default" id="id2">
+<span id="fig-medit1"></span><a class="reference internal image-reference" href="../_images/medit1.png"><img alt="../_images/medit1.png" src="../_images/medit1.png" style="width: 354.0px; height: 365.4px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.12 </span><span class="caption-text">Calling <span class="math notranslate nohighlight">\(\texttt{medit}\)</span> with the console.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Several keyboard shorthands then allow to act on the graphical rendering:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\texttt{b}\)</span> switches the background color from black to white, and conversely;</p></li>
+<li><p><span class="math notranslate nohighlight">\(\texttt{o}\)</span> displays the isolines of the solution file;</p></li>
+<li><p><span class="math notranslate nohighlight">\(\texttt{p}\)</span> displays the color scale, see <a class="reference internal" href="#fig-medit2"><span class="std std-numref">Fig. 1.13</span></a> (a);</p></li>
+<li><p><span class="math notranslate nohighlight">\(\texttt{m}\)</span> displays the values of the solution with a color filling rendering, as in <a class="reference internal" href="#fig-medit2"><span class="std std-numref">Fig. 1.13</span></a> (b);</p></li>
+<li><p><span class="math notranslate nohighlight">\(\texttt{k}\)</span> reveals the 3d graph of the solution; using the left click allows to change the view, see <a class="reference internal" href="#fig-medit2"><span class="std std-numref">Fig. 1.13</span></a> (c).</p></li>
+</ul>
+</div></blockquote>
+<figure class="align-default" id="id3">
+<span id="fig-medit2"></span><a class="reference internal image-reference" href="../_images/medit2.png"><img alt="../_images/medit2.png" src="../_images/medit2.png" style="width: 975.5999999999999px; height: 345.59999999999997px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.13 </span><span class="caption-text">A few basic commands in <span class="math notranslate nohighlight">\(\texttt{medit}\)</span>: (a) Displaying the isolines of the solution and the color palette; (b) Using a color fill rendering; (c) Visualizing the graph of the solution.</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><span class="math notranslate nohighlight">\(\texttt{Medit}\)</span> also enjoys convenient functionalities to access the values of the solution <span class="math notranslate nohighlight">\(u\)</span> at specific entities in the mesh:</p>
+<ul class="simple">
+<li><p>Clicking on a triangle with <span class="math notranslate nohighlight">\(\texttt{shift}\)</span> reveals the number of the triangle, of its three vertices, and the values of the solution at those, see <a class="reference internal" href="#fig-medit3"><span class="std std-numref">Fig. 1.14</span></a> (top).</p></li>
+<li><p>Clicking on a vertex with <span class="math notranslate nohighlight">\(\texttt{command} + \texttt{shift}\)</span> shows the value of the solution at this vertex, see <a class="reference internal" href="#fig-medit3"><span class="std std-numref">Fig. 1.14</span></a> (bottom).</p></li>
+</ul>
+<figure class="align-default" id="id4">
+<span id="fig-medit3"></span><a class="reference internal image-reference" href="../_images/medit3.png"><img alt="../_images/medit3.png" src="../_images/medit3.png" style="width: 758.4px; height: 879.6px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.14 </span><span class="caption-text">(Top) Clicking on a triangle to display the numbers of its vertices and the values of the attached solutions; (bottom) Clicking on a vertex to display its number and the value of the attached solution.</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>A few additional features of <span class="math notranslate nohighlight">\(\texttt{medit}\)</span> rely on the use of a parameter file. The latter must be called <span class="math notranslate nohighlight">\(\texttt{DEFAULT.medit}\)</span>; it is written by using any text editor, and it should be placed in the repository where <span class="math notranslate nohighlight">\(\texttt{medit}\)</span> is called – which may differ from the repository where the visualized files are located. Its syntax is very simple, and an example of such file can be downloaded <a class="reference download internal" download="" href="../_downloads/f03d8e1c056d75f323e6e73a1a4c5d90/DEFAULT.medit"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>. This file is primarily used to customize the color scale for the displayed values of the solution: to achieve this, the keyword <span class="math notranslate nohighlight">\(\texttt{palette}\)</span> is used, and 5 reference values are supplied for the interpolation of the color scale, see <a class="reference internal" href="#fig-palettemedit"><span class="std std-numref">Fig. 1.15</span></a>.</p>
+<figure class="align-default" id="id5">
+<span id="fig-palettemedit"></span><a class="reference internal image-reference" href="../_images/palettemedit.png"><img alt="../_images/palettemedit.png" src="../_images/palettemedit.png" style="width: 970.1999999999999px; height: 432.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.15 </span><span class="caption-text">The 5 supplied values under the keyword <span class="math notranslate nohighlight">\(\texttt{palette}\)</span> in the <span class="math notranslate nohighlight">\(\texttt{DEFAULT.medit}\)</span> file are those between which the color scale in the solution plot is interpolated.</span><a class="headerlink" href="#id5" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="proof remark admonition" id="remark-0">
+<p class="admonition-title"><span class="caption-number">Remark 1.9 </span></p>
+<section class="remark-content" id="proof-content">
+<p>Additional features of <span class="math notranslate nohighlight">\(\texttt{medit}\)</span> will be described in subsequent parts of this book:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../Advanced/3dext.html#sec-visu3d"><span class="std std-numref">Section 2.7.2</span></a> deals with the vizualization of meshes and solutions in 3d;</p></li>
+<li><p><a class="reference internal" href="../Structure_Mechanics/elasFE.html#sec-visuelas"><span class="std std-numref">Section 3.2.2.2</span></a> is devoted to the vizualization of vector fields.</p></li>
+</ul>
+</div></blockquote>
+</section>
+</div></section>
+<section id="creating-animated-texttt-gif-files-using-texttt-medit">
+<span id="sec-animmedit"></span><h2><span class="section-number">1.5.3. </span>Creating animated <span class="math notranslate nohighlight">\(\texttt{.gif}\)</span> files using <span class="math notranslate nohighlight">\(\texttt{medit}\)</span><a class="headerlink" href="#creating-animated-texttt-gif-files-using-texttt-medit" title="Link to this heading">¶</a></h2>
+<p>The software <span class="math notranslate nohighlight">\(\texttt{medit}\)</span> makes it possible to create beautiful animated gifs with the outputs of numerical simulations. We illustrate this feature with the example of <a class="reference internal" href="laplace.html#sec-laplaceunsteady"><span class="std std-numref">Section 1.4.4</span></a>, dealing with the solution of the unsteady Laplace equation <a class="reference internal" href="laplace.html#equation-eq-laplaceunsteady">(1.25)</a>.</p>
+<p>Let us recall that the solution of <a class="reference internal" href="laplace.html#equation-eq-laplaceunsteady">(1.25)</a> was addressed by decomposing the total time interval <span class="math notranslate nohighlight">\((0,T)\)</span> into several subintervals <span class="math notranslate nohighlight">\((t^n,t^{n+1})\)</span>, <span class="math notranslate nohighlight">\(n=0,\ldots,N_1\)</span>; the values <span class="math notranslate nohighlight">\(u^n(\x)=u(t^n,\x)\)</span> of the solution <span class="math notranslate nohighlight">\(u(t,\x)\)</span> at the intermediate times <span class="math notranslate nohighlight">\(t^n\)</span> are computed and stored, via a sequence of <span class="math notranslate nohighlight">\(\texttt{COMMON_NAME}.i.mesh\)</span> files for the mesh of the computational domain <span class="math notranslate nohighlight">\(\Omega\)</span> and <span class="math notranslate nohighlight">\(\texttt{COMMON_NAME}.i.sol\)</span> files for the values of <span class="math notranslate nohighlight">\(u^i\)</span>, <span class="math notranslate nohighlight">\(i=1,\ldots,N\)</span>:</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Load medit library */</span>
+<span class="cp">load</span><span class="w"> </span><span class="s">&quot;</span><span class="nf">medit</span><span class="s">&quot;</span>
+
+<span class="p">[...]</span>
+
+<span class="cm">/* Main loop */</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">it</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">it</span><span class="o">&lt;</span><span class="mi">99</span><span class="p">;</span><span class="w"> </span><span class="n">it</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">  </span><span class="p">[...]</span>
+
+<span class="w">  </span><span class="cm">/* Save solution */</span>
+<span class="w">  </span><span class="nf">savemesh</span><span class="p">(</span><span class="s">&quot;heat.&quot;</span><span class="o">+</span><span class="p">(</span><span class="n">it</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;.mesh&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="nf">savesol</span><span class="p">(</span><span class="s">&quot;heat.&quot;</span><span class="o">+</span><span class="p">(</span><span class="n">it</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;.sol&quot;</span><span class="p">,</span><span class="n">Th</span><span class="p">,</span><span class="n">u</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The execution of this code produces a sequence of <span class="math notranslate nohighlight">\(100\)</span> mesh files <span class="math notranslate nohighlight">\(\texttt{heat.1.mesh}\)</span>, …, <span class="math notranslate nohighlight">\(\texttt{heat.100.mesh}\)</span> (which are, in the present case all identical) and <span class="math notranslate nohighlight">\(100\)</span> associated solutions <span class="math notranslate nohighlight">\(\texttt{heat.1.sol}\)</span>, …, <span class="math notranslate nohighlight">\(\texttt{heat.100.sol}\)</span>. These can be all read all visualized with <span class="math notranslate nohighlight">\(\texttt{medit}\)</span> as a sequence, via the following console command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">medit heat -a 1 100</span>
+</pre></div>
+</div>
+<p>After setting the rendering preferences (such as the background color, etc.), one may select the option <span class="math notranslate nohighlight">\(\texttt{Toggle ImgSave}\)</span> from the right-click menu, followed by <span class="math notranslate nohighlight">\(\texttt{Play sequence}\)</span>; the sequence of meshes and solutions is played and each instance is saved as an image.</p>
+<figure class="align-default" id="id6">
+<span id="fig-meditanim"></span><a class="reference internal image-reference" href="../_images/meditanim.png"><img alt="../_images/meditanim.png" src="../_images/meditanim.png" style="width: 522.0px; height: 384.5px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.16 </span><span class="caption-text">Creating an animation with <span class="math notranslate nohighlight">\(\texttt{medit}\)</span> from a series of meshes and solutions.</span><a class="headerlink" href="#id6" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The process output a series of <span class="math notranslate nohighlight">\(\texttt{.ppm}\)</span> image files: <span class="math notranslate nohighlight">\(\texttt{heat.1.ppm}\)</span>, …, <span class="math notranslate nohighlight">\(\texttt{heat.100.ppm}\)</span>. The latter can now be converted into a single <span class="math notranslate nohighlight">\(\texttt{.gif}\)</span> file. To this end, one may use, for instance the open-source software suite <a class="reference external" href="https://imagemagick.org/index.php"><span class="math notranslate nohighlight">\(\texttt{ImageMagick}\)</span></a>; once the latter is installed, the following command achieves the desired purpose:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">convert -loop 1 -delay 20 heat.?.ppm heat.??.ppm heat.???.ppm output.gif</span>
+</pre></div>
+</div>
+<p>Here, the option <span class="math notranslate nohighlight">\(\texttt{-loop}\: 1\)</span> indicates that the animation stops at the last image; if one wishes instead to repeat the animation indefinitely, this must be replaced with the option <span class="math notranslate nohighlight">\(\texttt{-loop} \: 0\)</span>). The option <span class="math notranslate nohighlight">\(\texttt{delay}\)</span> sets the delay between frames.
+The final result is depicted on <a class="reference internal" href="#fig-meditheat"><span class="std std-numref">Fig. 1.17</span></a>.</p>
+<figure class="align-default" id="id7">
+<span id="fig-meditheat"></span><a class="reference internal image-reference" href="../_images/meditheat.gif"><img alt="../_images/meditheat.gif" src="../_images/meditheat.gif" style="width: 460.0px; height: 240.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.17 </span><span class="caption-text">Animation of the solution to the unsteady Laplace example in <a class="reference internal" href="laplace.html#sec-laplaceunsteady"><span class="std std-numref">Section 1.4.4</span></a>.</span><a class="headerlink" href="#id7" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index_gen.html">1. Generalities</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="anafunc.html">1.1. Functional analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varpbs.html">1.2. Lax-Milgram framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEtheory.html">1.3. The Finite Element method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="laplace.html">1.4. Laplace equation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1.5. Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">1.6. Meshes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen.html">1.7. Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dirpen.html">1.8. Penalization for Dirichlet conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="laplace_pure_Neumann.html">1.9. Pure Neumann</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Advanced/index_adv.html">2. Advanced features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_gen.html"><span class="section-number">1. </span>Getting started</a><ul>
+      <li>Previous: <a href="laplace.html" title="previous chapter"><span class="section-number">1.4. </span>The Laplace equation in all its forms</a></li>
+      <li>Next: <a href="mesh.html" title="next chapter"><span class="section-number">1.6. </span>A second encounter with meshes</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Generalities/visualization.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

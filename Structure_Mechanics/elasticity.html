@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3.1. An introduction to linear elasticity &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3.2. Resolution of the linear elasticity system with the Finite Element Method" href="elasFE.html" />
+    <link rel="prev" title="3. Structure mechanics" href="index_structmech.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="an-introduction-to-linear-elasticity">
+<h1><span class="section-number">3.1. </span>An introduction to linear elasticity<a class="headerlink" href="#an-introduction-to-linear-elasticity" title="Link to this heading">¶</a></h1>
+<p>This section deals with the physical model of linear elasticity describing the displacement of mechanical structures.
+Elasticity generally refers to the ability of an object to deform under the effect of loads, and to return to its exact initial configuration when they cease to be applied.</p>
+<p>We consider particular instances of such situations, that hinge on two simplifying assumptions:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>When the applied load is sufficiently small, so is the deformation, and the regime is linear.</p></li>
+<li><p>We restrict ourselves to considering time-independent situations. After a transient regime, the situations is assumed to have reached a state of equilibrim.</p></li>
+</ul>
+</div></blockquote>
+<p>The classical model of linear elasticity builds on three ingredients:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The first ingredient is kinematics, i.e. a description of the elastic body and its deformation, without making any reference to the efforts that have caused the latter. This is studied in <a class="reference internal" href="#sec-kinematics"><span class="std std-numref">Section 3.1.2</span></a>.</p></li>
+<li><p>The second ingredient is a model for efforts. They key concept in this respect is that of Cauchy’s stress tensor, which is discussed in <a class="reference internal" href="#sec-stresses"><span class="std std-numref">Section 3.1.3</span></a>.</p></li>
+<li><p>The last ingredient is a connection between efforts and deformations: a constitutive law, depending on the mechanical characteristics of the elastic material, relates the applied stresses on a structure with the induced deformation. This is discussed in <a class="reference internal" href="#sec-constitutivelaws"><span class="std std-numref">Section 3.1.4</span></a>.</p></li>
+</ul>
+</div></blockquote>
+<p>The reader primarily interested in the mathematical formulation of linear elasticity can directly jump to <a class="reference internal" href="#sec-elasbvp"><span class="std std-numref">Section 3.1.6</span></a>.
+Eventually, much intuition about mechanical structures can be gleaned by adopting an energy viewpoint. This is dicussed in <a class="reference internal" href="#sec-elasenergy"><span class="std std-numref">Section 3.1.7</span></a>.</p>
+<p>When it comes to the description of a medium <span class="math notranslate nohighlight">\(\Omega\)</span>, two paradigms are available:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The <a class="reference internal" href="../Generalities/glossary.html#glos-lagrangian"><span class="std std-ref">Lagrangian</span></a> point of view assumes a reference configuration <span class="math notranslate nohighlight">\(\widehat{\Omega}\)</span> (for instance, the state of <span class="math notranslate nohighlight">\(\Omega\)</span> at rest, or at the initial time of study).</p></li>
+<li><p>The <a class="reference internal" href="../Generalities/glossary.html#glos-eulerian"><span class="std std-ref">Eulerian</span></a> point of view considers all quantities of interest at the time <span class="math notranslate nohighlight">\(t\)</span> and point <span class="math notranslate nohighlight">\(\x \in \Omega\)</span> of interest.</p></li>
+</ul>
+</div></blockquote>
+<p>While the former point of view is generally adopted in the field of structural mechanics, it is customary to rely on the latter in fluid mechanics.</p>
+<section id="notations-regarding-vectors-and-tensors">
+<span id="sec-notelas"></span><h2><span class="section-number">3.1.1. </span>Notations regarding vectors and tensors<a class="headerlink" href="#notations-regarding-vectors-and-tensors" title="Link to this heading">¶</a></h2>
+<p>Before getting into the core of the matter, let us set some notations.
+Let <span class="math notranslate nohighlight">\(\sigma, \tau\)</span> be two second-order tensors, i.e. mappings on <span class="math notranslate nohighlight">\(\Omega\)</span> whose values <span class="math notranslate nohighlight">\(\sigma(\x)\)</span>, <span class="math notranslate nohighlight">\(\tau(\x)\)</span> are square <span class="math notranslate nohighlight">\(d \times d\)</span> matrices, <span class="math notranslate nohighlight">\(\x \in \Omega\)</span>. Their entries are denoted by <span class="math notranslate nohighlight">\(\sigma_{ij}\)</span> and <span class="math notranslate nohighlight">\(\tau_{ij}\)</span>, <span class="math notranslate nohighlight">\(i,j=1,...,d\)</span>, respectively.</p>
+<blockquote>
+<div><ul>
+<li><p>The <a class="reference internal" href="../Generalities/glossary.html#glos-frobenius"><span class="std std-ref">Frobenius inner product</span></a> <span class="math notranslate nohighlight">\(\sigma : \tau\)</span> between <span class="math notranslate nohighlight">\(\sigma\)</span> and <span class="math notranslate nohighlight">\(\tau\)</span> is the real-valued quantity defined by:</p>
+<p><div class="math notranslate nohighlight">
+\[\sigma : \tau = \sum\limits_{i,j=1}^d {\sigma_{ij} \tau_{ij}} = \text{tr}(\sigma^T \tau).\]</div>
+</p>
+</li>
+<li><p>The <a class="reference internal" href="../Generalities/glossary.html#glos-divtensor"><span class="std std-ref">divergence of a tensor</span></a> of <span class="math notranslate nohighlight">\(\sigma\)</span> is the vector <span class="math notranslate nohighlight">\(\text{div} \sigma\)</span> with size <span class="math notranslate nohighlight">\(d\)</span> whose coordinates are the divergence of the rows of <span class="math notranslate nohighlight">\(\sigma\)</span>, that is:</p>
+<div class="math notranslate nohighlight">
+\[(\text{div} \sigma)_i = \sum\limits_{j=1}^d{\frac{\partial \sigma_{ij}}{\partial x_j}}, \:\: i=1,...,d.\]</div>
+</li>
+</ul>
+</div></blockquote>
+<div class="proof proposition admonition" id="proposition-0">
+<p class="admonition-title"><span class="caption-number">Proposition 3.1 </span></p>
+<section class="proposition-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(\sigma: \Omega \to {\mathcal S}(\mathbb{R}^d)\)</span> be a smooth symmetric tensor field, and let <span class="math notranslate nohighlight">\(\u : \Omega \to \mathbb{R}^d\)</span> be a smooth function. Then:</p>
+<div class="math notranslate nohighlight">
+\[\int_{\Omega}{\text{div} \sigma \cdot \u \:\d\x } = \int_{\partial \Omega}{( \sigma \n )\cdot \u \:\d s} - \int_\Omega{\sigma : e(\u) \:\d \x}.\]</div>
+</section>
+</div><div class="dropdown admonition">
+<p class="admonition-title">Proof</p>
+<p>This is a simple adaptation of the basic Green’s theorem.</p>
+</div>
+</section>
+<section id="kinematics">
+<span id="sec-kinematics"></span><h2><span class="section-number">3.1.2. </span>Kinematics<a class="headerlink" href="#kinematics" title="Link to this heading">¶</a></h2>
+<p>As we have mentioned, elastic structures are usually described in a Lagrangian manner. Let us represent the configuration at rest of the structure by a domain <span class="math notranslate nohighlight">\(\Omega \subset \R^d\)</span>, and the displacement of the structure by a vector field <span class="math notranslate nohighlight">\(\u : \Omega \to \R^d\)</span>, which encodes the location <span class="math notranslate nohighlight">\(\x + \u(\x)\)</span> of any point <span class="math notranslate nohighlight">\(\x \in \Omega\)</span> after deformation: the deformed configuration of the structure is <span class="math notranslate nohighlight">\((\text{Id} + \u)(\Omega)\)</span>, as depicted on <a class="reference internal" href="#fig-sketchelas"><span class="std std-numref">Fig. 3.1</span></a>.</p>
+<figure class="align-default" id="id2">
+<span id="fig-sketchelas"></span><a class="reference internal image-reference" href="../_images/sketchelas.png"><img alt="../_images/sketchelas.png" src="../_images/sketchelas.png" style="width: 428.8px; height: 327.20000000000005px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 3.1 </span><span class="caption-text">The elastic structure <span class="math notranslate nohighlight">\(\Omega\)</span> realizes the displacement <span class="math notranslate nohighlight">\(\u\)</span> under the effect of body forces <span class="math notranslate nohighlight">\(\textbf{f} : \Omega \to \mathbb{R}^d\)</span> and surface loads <span class="math notranslate nohighlight">\(\textbf{g} : \Gamma_N \to \mathbb{R}^d\)</span>.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>In this section, we are interested with linear elasticity, where the displacement <span class="math notranslate nohighlight">\(u\)</span> and all its derivatives are assumed to be small, which allows for major simplifications in the mathematical equations.</p>
+<p>The relative motion of the points of a structure <span class="math notranslate nohighlight">\(\Omega\)</span> undergoing a displacement <span class="math notranslate nohighlight">\(\u\)</span> is measured in terms of the linearized strain tensor <span class="math notranslate nohighlight">\(e(\u) : \Omega \to \mathbb{R}^{d \times d}_{\text{\rm sym}}\)</span>, defined by:</p>
+<div class="math notranslate nohighlight">
+\[e(\u) = \frac12 (\nabla \u + \nabla \u ^T).\]</div>
+<p>For a point <span class="math notranslate nohighlight">\(\x \in \Omega\)</span>, the physical interpretation of the matrix <span class="math notranslate nohighlight">\(e(\u)(\x)\)</span> is as follows, see <a class="reference internal" href="#fig-strain"><span class="std std-numref">Fig. 3.2</span></a> for an illustration:</p>
+<blockquote>
+<div><ul>
+<li><p>For <span class="math notranslate nohighlight">\(i=1,\ldots,d\)</span>, the diagonal entry <span class="math notranslate nohighlight">\(e(u)(x)_{ii}\)</span> encodes the stretching or the compression effect induced by <span class="math notranslate nohighlight">\(u\)</span> in the direction <span class="math notranslate nohighlight">\(e_i\)</span>; the length <span class="math notranslate nohighlight">\(h \ll 1\)</span> of the small line segment with endpoints <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(x + he_i\)</span> becomes, after deformation:</p>
+<div class="math notranslate nohighlight">
+\[\lvert x + he_i + u(x+he_i) - (x+u(x)) \lvert \approx h + h e(u)(x)_{ii} .\]</div>
+</li>
+<li><p>For <span class="math notranslate nohighlight">\(i,j=1,\ldots,d\)</span>, <span class="math notranslate nohighlight">\(i\neq j\)</span>, <span class="math notranslate nohighlight">\(e(u)(x)_{ij}\)</span> measures the distortion of angles between the directions <span class="math notranslate nohighlight">\(e_i\)</span> and <span class="math notranslate nohighlight">\(e_j\)</span>; more precisely,</p>
+<div class="math notranslate nohighlight">
+\[e(u)(x)_{ij} = \frac{1}{2}(\kappa_1+ \kappa_2), \text{ where }  \kappa_1 \approx \tan \kappa_1 \approx \frac{\partial u_2}{\partial x_1}, \text{ and } \kappa_2 \approx \tan \kappa_2 \approx \frac{\partial u_1}{\partial x_2}.\]</div>
+</li>
+</ul>
+</div></blockquote>
+<figure class="align-default" id="id3">
+<span id="fig-strain"></span><a class="reference internal image-reference" href="../_images/diagoffdiagstrain.png"><img alt="../_images/diagoffdiagstrain.png" src="../_images/diagoffdiagstrain.png" style="width: 900.8000000000001px; height: 372.8px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 3.2 </span><span class="caption-text">Physical interpretation of the entries of the strain tensor <span class="math notranslate nohighlight">\(e(u)(x)\)</span>; (a) The diagonal entry <span class="math notranslate nohighlight">\(e(u)(x)_{ii}\)</span> appraises the variation of the segment <span class="math notranslate nohighlight">\([x,x+he_i]\)</span> after deformation; (b) The off-diagonal entry <span class="math notranslate nohighlight">\(e(u)(x)_{12}\)</span> measures the variation of the angle between <span class="math notranslate nohighlight">\([x,x+he_1]\)</span> and <span class="math notranslate nohighlight">\([x,x+he_2]\)</span> after deformation.</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Another means to appraise how <span class="math notranslate nohighlight">\(e(u)\)</span> accounts for the deformation of lengths and angles induced by <span class="math notranslate nohighlight">\(u\)</span> is the following. Let <span class="math notranslate nohighlight">\([0,1] \ni t \mapsto \gamma(t)\)</span> be a curve drawn within <span class="math notranslate nohighlight">\(\Omega\)</span>, with length:</p>
+<div class="math notranslate nohighlight">
+\[\ell(\gamma) = \int_0^1 \lvert \gamma^\prime(t) \lvert \:\text{d} t.\]</div>
+<p>The deformed version of <span class="math notranslate nohighlight">\(\gamma\)</span> is the curve <span class="math notranslate nohighlight">\([0,1] \ni t \mapsto (\text{Id} + u)( \gamma(t))\)</span>, whose length equals:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{&gt;{\text{d}isplaystyle}cc&gt;{\text{d}isplaystyle}l}
+\ell((\text{Id} + u)\circ \gamma) &amp;=&amp; \displaystyle\int_0^1 \sqrt{C(u)(\gamma(t)) \gamma^\prime(t) \cdot \gamma^\prime(t)} \:\text{d} t, \\
+&amp;\approx&amp; \ell(\gamma) + \displaystyle\int_0^1 e(u)(\gamma(t)) \frac{\gamma^\prime(t)}{|\gamma^\prime(t)|} \cdot \frac{\gamma^\prime(t)}{|\gamma^\prime(t)|}  |\gamma^\prime(t)| \:\text{d} t,
+\end{array}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(C(u)\)</span> is the right Cauchy-Green strain tensor defined by</p>
+<div class="math notranslate nohighlight">
+\[C(u) = (\text{I} + \nabla u)^T (\text{I} + \nabla u).\]</div>
+<p>The latter depends in a nonlinear way on <span class="math notranslate nohighlight">\(u\)</span>, and it measures exactly the deformation of lengths incurred by the displacement <span class="math notranslate nohighlight">\(u\)</span>. The linearized strain tensor <span class="math notranslate nohighlight">\(e(u)\)</span> is the linear part of the tensor <span class="math notranslate nohighlight">\(\frac12(C(u)-\text{I})\)</span>. Considering <span class="math notranslate nohighlight">\(e(u)\)</span> in place of <span class="math notranslate nohighlight">\(C(u)\)</span> is the first source of linearity in the classical linear elasticity model; this simplification is called the geometric linearity assumption.</p>
+</section>
+<section id="stresses">
+<span id="sec-stresses"></span><h2><span class="section-number">3.1.3. </span>Stresses<a class="headerlink" href="#stresses" title="Link to this heading">¶</a></h2>
+<p>The second ingredient in the description of an elastic structure <span class="math notranslate nohighlight">\(\Omega\)</span> is the representation of internal and external efforts, also called stresses.</p>
+<section id="cauchy-s-stress-tensor">
+<h3><span class="section-number">3.1.3.1. </span>Cauchy’s stress tensor<a class="headerlink" href="#cauchy-s-stress-tensor" title="Link to this heading">¶</a></h3>
+<p>This task involves Cauchy’s stress tensor <span class="math notranslate nohighlight">\(\sigma : \Omega \to \mathbb{R}^{d \times d}\)</span>: for any point <span class="math notranslate nohighlight">\(x \in \Omega\)</span> and any unit vector <span class="math notranslate nohighlight">\(n \in \mathbb{S}^{d-1}\)</span>, <span class="math notranslate nohighlight">\(\sigma(x) n\)</span> is the force applied by the outer medium on the face of an infinitesimally small cube of material around <span class="math notranslate nohighlight">\(x\)</span>, see <a class="reference internal" href="#fig-3stress"><span class="std std-numref">Fig. 3.3</span></a>.
+The entries of the tensor <span class="math notranslate nohighlight">\(\sigma(x)\)</span> can be separated between traction-compression entries and shear components, as depicted on <a class="reference internal" href="#fig-3stress"><span class="std std-numref">Fig. 3.3</span></a> (b), (c):</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>For <span class="math notranslate nohighlight">\(i=1,\ldots,d\)</span>, <span class="math notranslate nohighlight">\(\sigma(x)_{ii}\)</span> represents the <span class="math notranslate nohighlight">\(i^{\text{th}}\)</span> component of the force applied on the face oriented by <span class="math notranslate nohighlight">\(e_i\)</span>; it thus accounts for a compression effect when <span class="math notranslate nohighlight">\(\sigma(x)_{ii} &lt; 0\)</span>, and a stretching (or dilation) effect if <span class="math notranslate nohighlight">\(\sigma(x)_{ii} &gt;0\)</span>.</p></li>
+<li><p>For <span class="math notranslate nohighlight">\(i,j=1,\ldots,d\)</span>, <span class="math notranslate nohighlight">\(i\neq j\)</span>, the off-diagonal entry <span class="math notranslate nohighlight">\(\sigma(x)_{ij}\)</span> is the <span class="math notranslate nohighlight">\(i^{\text{th}}\)</span> component of the force applied on the face oriented by <span class="math notranslate nohighlight">\(e_j\)</span>; it accounts for a shearing effect, whereby this face undergoes a tangential deformation.</p></li>
+</ul>
+</div></blockquote>
+<figure class="align-default" id="id4">
+<span id="fig-3stress"></span><a class="reference internal image-reference" href="../_images/stress3.png"><img alt="../_images/stress3.png" src="../_images/stress3.png" style="width: 827.2px; height: 509.6px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 3.3 </span><span class="caption-text">The stress tensor: (a) For <span class="math notranslate nohighlight">\(x\in \Omega\)</span> and <span class="math notranslate nohighlight">\(n \in \mathbb{S}^{d-1}\)</span>, the vector <span class="math notranslate nohighlight">\(\sigma(x) n\)</span> is the force imposed by the outer medium onto the face oriented by <span class="math notranslate nohighlight">\(n\)</span> of a small cube around <span class="math notranslate nohighlight">\(x\)</span>; (b) The diagonal entries of <span class="math notranslate nohighlight">\(\sigma(x)\)</span> account for the compression efforts felt by this cube; (c) The off-diagonal entries encode the shear effects imposed on this cube.</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="proof theorem admonition" id="theorem-1">
+<p class="admonition-title"><span class="caption-number">Theorem 3.1 </span></p>
+<section class="theorem-content" id="proof-content">
+<p>The stress is linear.</p>
+</section>
+</div><div class="dropdown admonition">
+<p class="admonition-title">Proof</p>
+<p>Cauchy’s tetrahedron</p>
+</div>
+</section>
+<section id="the-laws-of-equilibrium">
+<h3><span class="section-number">3.1.3.2. </span>The laws of equilibrium<a class="headerlink" href="#the-laws-of-equilibrium" title="Link to this heading">¶</a></h3>
+<p>The stress tensor allows to express the conditions of equilibrium of a structure <span class="math notranslate nohighlight">\(\Omega\)</span>.
+Let <span class="math notranslate nohighlight">\(f: \Omega \to \R^d\)</span> be the density of body forces (e.g. gravity) at play in <span class="math notranslate nohighlight">\(\Omega\)</span>,
+and let <span class="math notranslate nohighlight">\(g: \Gamma_N \to \R^d\)</span> be the density of surface loads, applied on a fixed subset <span class="math notranslate nohighlight">\(\Gamma_N\)</span> of <span class="math notranslate nohighlight">\(\partial \Omega\)</span>. Then:</p>
+<blockquote>
+<div><ul>
+<li><p>The law of balance of linear momentum states that, for each subdomain <span class="math notranslate nohighlight">\(\omega \Subset \Omega\)</span>, the sum of the body forces inside <span class="math notranslate nohighlight">\(\omega\)</span> and the forces applied by the rest of the structure on <span class="math notranslate nohighlight">\(\partial \omega\)</span> must vanish, i.e.</p>
+<div class="math notranslate nohighlight">
+\[\int_\omega f \:\text{d} x + \int_{\partial \omega} \sigma n \:\text{d} s = 0.\]</div>
+<p>After application of the Green’s formula of cref{prop.Green}, this rewrites:</p>
+<div class="math notranslate nohighlight">
+\[\int_\omega (\text{div}(\sigma) + f ) \:\text{d} x= 0,\]</div>
+<p>and since this relation should hold for any subdomain <span class="math notranslate nohighlight">\(\omega \Subset \Omega\)</span>, it follows:</p>
+<div class="math notranslate nohighlight">
+\[-\text{div}(\sigma) = f \text{ in } \Omega.\]</div>
+</li>
+<li><p>Applying the same principle inside a small enough subdomain <span class="math notranslate nohighlight">\(\omega \subset \Omega\)</span> whose boundary contains a portion of <span class="math notranslate nohighlight">\(\Gamma_N\)</span>, we obtain:</p>
+<div class="math notranslate nohighlight">
+\[\int_\omega f \:\text{d} x + \int_{\partial \omega \cap \Gamma_N} g \:\text{d} s + \int_{\partial \omega \setminus \overline{\Gamma_N}} \sigma n \:\text{d} s = 0,\]</div>
+<p>that is:</p>
+<div class="math notranslate nohighlight">
+\[\int_\omega f \:\text{d} x +  \int_{\partial \omega} \sigma \cdot n \:\text{d} s +  \int_{\partial \omega \cap \Gamma_N} g \:\text{d} s -\int_{\partial \omega \cap \Gamma_N} \sigma n \:\text{d} s = 0.\]</div>
+<p>Using Green’s formula on the second term in the above left-hand side together with the fact that <span class="math notranslate nohighlight">\(-\text{div}(\sigma) = f\)</span> inside <span class="math notranslate nohighlight">\(\omega\)</span>, we obtain that the first two terms of the above equation vanish; since <span class="math notranslate nohighlight">\(\omega\)</span> is arbitrary, this entails:</p>
+<div class="math notranslate nohighlight">
+\[\sigma n = g \text{ on } \Gamma_N.\]</div>
+<p>Note that this fact can also be understood as an application of the law of reciprocal actions.</p>
+</li>
+</ul>
+</div></blockquote>
+<p>One last consequence of equilibrium is that <span class="math notranslate nohighlight">\(\Omega\)</span> should be in rotational equilibrium. This implies the symmetry of the stress tensor, as expressed by the next result.</p>
+<div class="proof theorem admonition" id="theorem-2">
+<p class="admonition-title"><span class="caption-number">Theorem 3.2 </span> (Cauchy’s theorem)</p>
+<section class="theorem-content" id="proof-content">
+<p>For any point <span class="math notranslate nohighlight">\(x \in \Omega\)</span>, the tensor <span class="math notranslate nohighlight">\(\sigma(x)\)</span> is symmetric:</p>
+<div class="math notranslate nohighlight">
+\[\forall x \in \Omega, \quad \sigma(x) = \sigma(x)^T.\]</div>
+</section>
+</div><div class="dropdown admonition">
+<p class="admonition-title">Proof</p>
+<p>This is a non trivial consequence of the law of balance of momentum: no subdomain <span class="math notranslate nohighlight">\(\omega \Subset \Omega\)</span> should undergo rotational efforts induced by the outer medium.</p>
+</div>
+</section>
+</section>
+<section id="constitutive-laws">
+<span id="sec-constitutivelaws"></span><h2><span class="section-number">3.1.4. </span>Constitutive laws<a class="headerlink" href="#constitutive-laws" title="Link to this heading">¶</a></h2>
+<p>The above description of an elastic structure is completed by a constitutive
+relation between the stress <span class="math notranslate nohighlight">\(\sigma\)</span> inside <span class="math notranslate nohighlight">\(\Omega\)</span> and the induced strain <span class="math notranslate nohighlight">\(e(\u)\)</span>.
+In multiple applications, it is supposed to be linear, of the form:</p>
+<div class="math notranslate nohighlight">
+\[\sigma = A e(\u) , \text{ or equivalently } e(\u) = S \sigma.\]</div>
+<p>Here, the a priori inhomogeneous (i.e. space dependent) tensor <span class="math notranslate nohighlight">\(A\)</span> and its inverse <span class="math notranslate nohighlight">\(S\)</span> are the Hooke’s tensor and the compliance tensor of the material, respectively.
+For <span class="math notranslate nohighlight">\(\x \in \Omega\)</span>, <span class="math notranslate nohighlight">\(A(\x)\)</span> and <span class="math notranslate nohighlight">\(S(\x)\)</span> are linear mappings from <span class="math notranslate nohighlight">\(\Rsym\)</span> into itself, encoding the local properties of the constituent material of <span class="math notranslate nohighlight">\(\Omega\)</span> around <span class="math notranslate nohighlight">\(x\)</span>, in a way which we now discuss more precisely. To this end, we focus on the three-dimensional context;
+the 2d case is evoked in <a class="reference internal" href="#rem-elas2d"><span class="std std-numref">remark 3.1</span></a>. Also, to simplify the discussion, we assume the considered material to be homogeneous.</p>
+<p>In general, <span class="math notranslate nohighlight">\(A\)</span> is a fourth-order tensor <span class="math notranslate nohighlight">\(A = \left\{A_{ijkl} \right\}_{i,j,k,l=1,\ldots,3}\)</span> with the following symmetries:</p>
+<div class="math notranslate nohighlight">
+\[\forall i,j,k,l=1,\ldots,3, \quad A_{ijkl} = A_{klij}, \text{ and } A_{ijkl} = A_{jikl} = A_{ijlk}.\]</div>
+<p>Hence, <span class="math notranslate nohighlight">\(A\)</span> has <span class="math notranslate nohighlight">\(21\)</span> independent entries.
+Fortunately, most materials present symmetries, which allows to reduce the number of these independent entries:</p>
+<ul>
+<li><p>Isotropic materials exhibit the same behavior in all directions of space; their Hooke’s tensor <span class="math notranslate nohighlight">\(A\)</span> is completely characterized by two scalar parameters <span class="math notranslate nohighlight">\(\lambda\)</span> and <span class="math notranslate nohighlight">\(\mu\)</span>, called the Lamé parameters of the material:</p>
+<div class="math notranslate nohighlight" id="equation-eq-isoa">
+<span class="eqno">(3.1)<a class="headerlink" href="#equation-eq-isoa" title="Link to this equation">¶</a></span>\[\forall \xi \in \mathbb{R}_{\text{sym}}^{3\times 3} , \quad A\xi = 2\mu \xi + \lambda \tr(\xi) \I.\]</div>
+<p>The parameter <span class="math notranslate nohighlight">\(\mu\)</span> is called the shear modulus; it corresponds to the angular deviation caused by a unit shear stress, see <a class="reference internal" href="#fig-muenu"><span class="std std-numref">Fig. 3.4</span></a> (a); the physical interpretation of <span class="math notranslate nohighlight">\(\lambda\)</span> is unfortunately not as clear. Usually, two more physical quantities <span class="math notranslate nohighlight">\(E\)</span> and <span class="math notranslate nohighlight">\(\nu\)</span> are used, from which <span class="math notranslate nohighlight">\(\lambda\)</span> and <span class="math notranslate nohighlight">\(\mu\)</span> can be retrieved as:</p>
+<div class="math notranslate nohighlight">
+\[\mu = \frac{E}{2(1+\nu)}, \text{ and } \lambda = \frac{E\nu}{(1+\nu)(1-2\nu)}.\]</div>
+<p>The Young’s modulus <span class="math notranslate nohighlight">\(E\)</span> measures the resistance of the material to traction and compression, and the Poisson’s ratio <span class="math notranslate nohighlight">\(\nu\)</span> measures its resistance to transverse deformations, see <a class="reference internal" href="#fig-muenu"><span class="std std-numref">Fig. 3.4</span></a> (b).</p>
+</li>
+<li><p>A more general class of materials is that of orthotropic materials. These possess three orthogonal planes of symmetry, and as a result, they enjoy different properties along the corresponding axes. They are characterized by one Young’s modulus <span class="math notranslate nohighlight">\(E_i\)</span> in each direction <span class="math notranslate nohighlight">\(i=1,2,3\)</span>, one Poisson’s ratio <span class="math notranslate nohighlight">\(\nu_{ij}\)</span> and one shear modulus <span class="math notranslate nohighlight">\(G_{ij}\)</span> for each pair <span class="math notranslate nohighlight">\(i\neq j\)</span>. One example of an orthotropic material is depicted on <a class="reference internal" href="#fig-woodconcrete"><span class="std std-numref">Fig. 3.5</span></a> (a).</p></li>
+<li><p>Transversely isotropic materials have a particular form of orthotropy. They have one plane of symmetry, and show an isotropic behavior within any plane parallel to the latter. The physical properties of a material with transverse isotropy, say in direction <span class="math notranslate nohighlight">\(e_3\)</span>, are characterized by five independent parameters: two Young’s moduli <span class="math notranslate nohighlight">\(E_3\)</span> and <span class="math notranslate nohighlight">\(E_1 = E_2\)</span> encoding the resistance to stretching in the transverse and longitudinal directions, respectively, two Poisson’s ratios <span class="math notranslate nohighlight">\(\nu_{13} = \nu_{23}\)</span> and <span class="math notranslate nohighlight">\(\nu_{12}\)</span> and the shear modulus <span class="math notranslate nohighlight">\(G_{13} = G_{23}\)</span> between the transverse and longitudinal directions. One example of a transversely isotropic material is depicted on <a class="reference internal" href="#fig-woodconcrete"><span class="std std-numref">Fig. 3.5</span></a> (b).</p></li>
+</ul>
+<figure class="align-default" id="id5">
+<span id="fig-muenu"></span><a class="reference internal image-reference" href="../_images/muEnu.png"><img alt="../_images/muEnu.png" src="../_images/muEnu.png" style="width: 873.6px; height: 343.2px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 3.4 </span><span class="caption-text">Elastic parameters: (a) The shear modulus <span class="math notranslate nohighlight">\(\mu\)</span> accounts for the force <span class="math notranslate nohighlight">\(\sigma_{23} = \mu \alpha\)</span> that should be applied on the face oriented by <span class="math notranslate nohighlight">\(e_3\)</span> of a piece of material in the transverse direction <span class="math notranslate nohighlight">\(e_2\)</span> to create an angle <span class="math notranslate nohighlight">\(\alpha\)</span> with the <span class="math notranslate nohighlight">\(e_3\)</span> direction; (b) The Young’s modulus <span class="math notranslate nohighlight">\(E = \sigma/L\)</span> accounts for the amplitude of the force <span class="math notranslate nohighlight">\(\sigma\)</span> needed to stretch a piece of material by a length <span class="math notranslate nohighlight">\(L\)</span>; the Poisson’s ratio <span class="math notranslate nohighlight">\(\nu = -\ell / L\)</span> measures the relative transverse displacement in this process.</span><a class="headerlink" href="#id5" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="id6">
+<span id="fig-woodconcrete"></span><a class="reference internal image-reference" href="../_images/woodConcrete.png"><img alt="../_images/woodConcrete.png" src="../_images/woodConcrete.png" style="width: 798.0px; height: 252.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 3.5 </span><span class="caption-text">Two different elastic materials: (a) Wood is an orthotropic material with large stiffness in the direction of the grain, low stiffness in the radial direction, and intermediate stiffness in the azimuthal direction; (b) Fiber-reinforced concrete is a transversely isotropic material: it is much stiffer in the direction of the metallic fibers than in the orthogonal directions.</span><a class="headerlink" href="#id6" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="proof remark admonition" id="remark-3">
+<span id="rem-elas2d"></span><p class="admonition-title"><span class="caption-number">Remark 3.1 </span></p>
+<section class="remark-content" id="proof-content">
+<p>The above considerations related to the elastic properties of structures take place in the physically prevalent setting of three space dimensions. The definition of the Hooke’s tensor <span class="math notranslate nohighlight">\(A\)</span> of a 2d structure depends on how the latter accounts for a 3d one which is invariant in the <span class="math notranslate nohighlight">\(e_3\)</span> direction. In plane stress, where the components <span class="math notranslate nohighlight">\(\sigma_{i3} = \sigma_{3i}\)</span> of the stress tensor vanish (<span class="math notranslate nohighlight">\(i=1,2,3\)</span>), the Lamé parameters <span class="math notranslate nohighlight">\(\lambda\)</span> and <span class="math notranslate nohighlight">\(\mu\)</span> characterizing the 2d tensor <span class="math notranslate nohighlight">\(A\)</span> in <a class="reference internal" href="#equation-eq-isoa">(3.1)</a> are obtained from the Young’s modulus <span class="math notranslate nohighlight">\(E\)</span> and the Poisson’s ratio <span class="math notranslate nohighlight">\(\nu\)</span> of the 3d material via the relations:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\mu = \frac{E}{2(1+\nu)}, \text{ and } \lambda = \frac{E\nu}{1-\nu^2}.\]</div>
+</div></blockquote>
+<p>In plane strain, where the components <span class="math notranslate nohighlight">\(e(u)_{i3} = e(u)_{3i}\)</span> of the strain tensor vanish, one has instead:</p>
+<div class="math notranslate nohighlight">
+\[\mu = \frac{E}{2(1+\nu)}, \text{ and } \lambda = \frac{E\nu}{(1+\nu)(1-2\nu)}.\]</div>
+</section>
+</div><div class="proof remark admonition" id="remark-4">
+<p class="admonition-title"><span class="caption-number">Remark 3.2 </span></p>
+<section class="remark-content" id="proof-content">
+<p>The strain tensor <span class="math notranslate nohighlight">\(e(u)\)</span> is by essence a Lagrangian quantity, as it is defined on the reference configuration <span class="math notranslate nohighlight">\(\Omega\)</span> of the structure. On the contrary, stresses are naturally expressed in the Eulerian variable, i.e. on the deformed configuration <span class="math notranslate nohighlight">\((\text{Id} + u)(\Omega)\)</span>. Hence, the constitutive law should relate <span class="math notranslate nohighlight">\(e(u)\)</span> with a transported version of the stress tensor <span class="math notranslate nohighlight">\(\sigma\)</span> onto the reference configuration, called the Piola-Kirchoff stress tensor. In the present setting, this difficulty is ignored since both notions of stress tensors coincide at leading order, as the displacement of the structure is small, see the discussion in Chap. 13 of <span id="id1">[<a class="reference internal" href="../Generalities/bibliography.html#id17" title="Roger Temam and Alain Miranville. Mathematical modeling in continuum mechanics. Cambridge University Press, 2005.">TM05</a>]</span> about this point.</p>
+</section>
+</div></section>
+<section id="boundary-conditions">
+<span id="sec-elasbc"></span><h2><span class="section-number">3.1.5. </span>Boundary conditions<a class="headerlink" href="#boundary-conditions" title="Link to this heading">¶</a></h2>
+<p>Clamping, traction, two-phase</p>
+</section>
+<section id="towards-mathematical-modeling-a-typical-boundary-value-problem">
+<span id="sec-elasbvp"></span><h2><span class="section-number">3.1.6. </span>Towards mathematical modeling: a typical boundary value problem<a class="headerlink" href="#towards-mathematical-modeling-a-typical-boundary-value-problem" title="Link to this heading">¶</a></h2>
+<p>Gathering the concepts of the previous sections, we are in position to write down a prototype for boundary-value problems in the physical context of linearly elastic structures.</p>
+<p>Let <span class="math notranslate nohighlight">\(\Omega \subset \R^d\)</span> be a structure which is attached on a region <span class="math notranslate nohighlight">\(\Gamma_D\)</span> of its boundary;
+it is submitted to body forces <span class="math notranslate nohighlight">\(\textbf{f} : \Omega \to \R^d\)</span> and surface loads <span class="math notranslate nohighlight">\(\textbf{g} : \Gamma_N \to \R^d,\)</span> applied on a region <span class="math notranslate nohighlight">\(\Gamma_N\)</span> of <span class="math notranslate nohighlight">\(\partial \Omega\)</span> disjoint from <span class="math notranslate nohighlight">\(\Gamma_D\)</span>. The displacement <span class="math notranslate nohighlight">\(\u\)</span> of <span class="math notranslate nohighlight">\(\Omega\)</span> is the solution to the following system:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left\{
+\begin{array}{cl}
+-\text{div}(Ae(\u)) = \textbf{f} &amp; \text{in } \Omega, \\
+\u = 0 &amp; \text{on } \Gamma_D, \\
+Ae(\u) \n= \textbf{g} &amp;\text{on } \Gamma_N, \\
+Ae(\u)\n = 0 &amp; \text{on } \Gamma.
+\end{array}
+\right.\end{split}\]</div>
+<p>The mathematical framework associated to this system is similar to that presented in \cref{sec.1phaseconduc}.
+The Hooke’s tensor <span class="math notranslate nohighlight">\(A : \Omega \to \calL(\Rsym,\Rsym)\)</span> is a smooth enough mapping satisfying the following ellipticity property:</p>
+<div class="math notranslate nohighlight">
+\[\text{There exist constants } 0 &lt; \alpha \leq \beta  &lt; \infty \text{ s.t. } \forall x \in \Omega, \: \: \forall \xi \in \Rsym, \quad \alpha || \xi ||^2 \leq A(x) \xi : \xi \leq \beta ||\xi ||^2.\]</div>
+<p>The body forces and surface loads <span class="math notranslate nohighlight">\(f\)</span> and <span class="math notranslate nohighlight">\(g\)</span> belong to the respective spaces <span class="math notranslate nohighlight">\(L^2(\Omega)^d\)</span> and <span class="math notranslate nohighlight">\(L^2(\Gamma_N)^d\)</span> and
+the displacement <span class="math notranslate nohighlight">\(u\)</span> is sought as the solution to the variational problem:</p>
+<div class="math notranslate nohighlight">
+\[\text{Search for } u \in H^1_{\Gamma_D}(\Omega)^d \text{ s.t. } \forall v \in  H^1_{\Gamma_D}(\Omega)^d , \quad \int_\Omega Ae(u) : e(v) \:\text{d} x = \int_\Omega f \cdot v \:\text{d} x + \int_{\Gamma_N} g \cdot v \:\text{d} s,\]</div>
+<p>whose well-posedness follows from the <a class="reference internal" href="../Generalities/varpbs.html#sec-laxmilgram"><span class="std std-ref">Lax-Milgram theory</span></a> – the coercivity of the involved bilinear form being a consequence of cref{eq.ellelas} and the Korn’s inequality, see for instance cite{ciarlet2021mathematical}.</p>
+<div class="proof remark admonition" id="remark-5">
+<p class="admonition-title"><span class="caption-number">Remark 3.3 </span></p>
+<section class="remark-content" id="proof-content">
+<p>The elliptic regularity theory, which loosely speaking ensures that, under suitable assumptions on <span class="math notranslate nohighlight">\(\Omega\)</span>, <span class="math notranslate nohighlight">\(f\)</span> and <span class="math notranslate nohighlight">\(g\)</span>, the solution <span class="math notranslate nohighlight">\(u\)</span> to \cref{eq.elas} is smooth, can be deployed pretty much as in the scalar case of the conductivity equation evoked in \cref{rem.ellregconduc}. As is exemplified in the sketch provided in \cref{sec.appellreg}, the pivotal ingredient of this theory is the ellipticity assumption \cref{eq.ellelas}, ensuring a control of the norm of <span class="math notranslate nohighlight">\(u\)</span> in terms of the operator <span class="math notranslate nohighlight">\(\u \mapsto -\text{div}(Ae(\u))\)</span>.</p>
+</section>
+</div></section>
+<section id="energy">
+<span id="sec-elasenergy"></span><h2><span class="section-number">3.1.7. </span>Energy<a class="headerlink" href="#energy" title="Link to this heading">¶</a></h2>
+<p>Much intuition about the behavior of an elastic structure can be gleaned from energetic considerations. The fundamental result in this study is the following.</p>
+<div class="proof theorem admonition" id="theorem-6">
+<p class="admonition-title"><span class="caption-number">Theorem 3.3 </span></p>
+<section class="theorem-content" id="proof-content">
+<p>Let the structure <span class="math notranslate nohighlight">\(\Omega\)</span> under scrutiny be in a deformed state characterized by the displacement <span class="math notranslate nohighlight">\(u\)</span>. The work done by internal forces when this structure is further displaced  by a small increment <span class="math notranslate nohighlight">\(v\)</span> equals:</p>
+<div class="math notranslate nohighlight" id="equation-eq-workinternalelas">
+<span class="eqno">(3.2)<a class="headerlink" href="#equation-eq-workinternalelas" title="Link to this equation">¶</a></span>\[-\int_{\Omega} \sigma(u) : e(v) \:\text{d} x.\]</div>
+<p>Equivalently, in order to bring the structure from the configuration defined by <span class="math notranslate nohighlight">\(u\)</span> to that defined by <span class="math notranslate nohighlight">\(u+v\)</span>, one has to supply an amount of energy equal to <span class="math notranslate nohighlight">\(\int_\Omega \sigma(u) : e(v) \:\text{d} x\)</span>.</p>
+</section>
+</div><div class="dropdown admonition">
+<p class="admonition-title">Proof</p>
+<p>Bla bla</p>
+</div>
+<p>Note that, when <span class="math notranslate nohighlight">\(v\)</span> is of the form <span class="math notranslate nohighlight">\(v = \text{d} h u\)</span> with <span class="math notranslate nohighlight">\(\text{d} h \ll 1\)</span>, the work <a class="reference internal" href="#equation-eq-workinternalelas">(3.2)</a> is negative,
+indicating that internal forces always work against the actual motion.</p>
+<p>The total strain energy needed to bring <span class="math notranslate nohighlight">\(\Omega\)</span> from rest to <span class="math notranslate nohighlight">\((\text{Id} + u)(\Omega)\)</span> is
+obtained by integrating the above increment between both configurations, which reads:</p>
+<div class="math notranslate nohighlight">
+\[\int_0^1  \int_\Omega \sigma(hu) : e(u) \:\text{d} x\:\text{d} h = \frac{1}{2} \int_\Omega \sigma(u): e(u) \:\text{d} x.\]</div>
+<p>Physically, the elastic energy of a system is the potential energy stored in the latter as the deformation occurs under the effect of work performed on it.
+This energy can then be converted and released under various forms, such as kinetic or thermal energy.</p>
+<p>Likewise, when the structure is further deformed according to a small increment <span class="math notranslate nohighlight">\(v\)</span> from the deformed configuration characterized by <span class="math notranslate nohighlight">\(u\)</span>, the work of external loads is</p>
+<div class="math notranslate nohighlight">
+\[\int_\Omega f \cdot v \:\text{d} x + \int_{\Gamma_N} g \cdot v \:\text{d} s.\]</div>
+<p>This quantity is positive when <span class="math notranslate nohighlight">\(v\)</span> is oriented in the direction of the forces <span class="math notranslate nohighlight">\(f\)</span> and <span class="math notranslate nohighlight">\(g\)</span>: intuitively, these then work in favor of the motion by handing energy to the system. The total work of <span class="math notranslate nohighlight">\(f\)</span> and <span class="math notranslate nohighlight">\(g\)</span> when <span class="math notranslate nohighlight">\(\Omega\)</span> passes from rest to the deformed configuration <span class="math notranslate nohighlight">\((\text{Id} + u)(\Omega)\)</span> is obtained by a similar integration as above:</p>
+<div class="math notranslate nohighlight">
+\[\int_\Omega f \cdot u \:\text{d} x + \int_{\Gamma_N} g \cdot u \:\text{d} s.\]</div>
+<p>Finally, the total energy <span class="math notranslate nohighlight">\(E(u)\)</span> stored by <span class="math notranslate nohighlight">\(\Omega\)</span> in the displacement from rest to <span class="math notranslate nohighlight">\((\text{Id} + u)(\Omega)\)</span> equals:</p>
+<div class="math notranslate nohighlight">
+\[E(u) :=  \frac{1}{2} \int_\Omega \sigma(u) : e(u) \:\text{d} x - \int_\Omega f \cdot u \:\text{d} x - \int_{\Gamma_N} g \cdot u \:\text{d} s.\]</div>
+<p>The actual displacement <span class="math notranslate nohighlight">\(u_\Omega\)</span> of <span class="math notranslate nohighlight">\(\Omega\)</span>, which we have characterized as the solution to \cref{eq.elas} in the previous section, is obtained by minimizing <span class="math notranslate nohighlight">\(E(u)\)</span> among all the possible displacements of the structure, that is:</p>
+<div class="math notranslate nohighlight">
+\[u_\Omega = \underset{u \in H^1_{\Gamma_D}(\Omega)^d}{\text{arg min}} \:E(u).\]</div>
+<p>The mathematical equivalence between \cref{eq.elas} and \cref{eq.minpot} follows from a classical application of the Lax-Milgram theory.
+Note that, using the variational problem \cref{eq.varfelas} satisfied by <span class="math notranslate nohighlight">\(u_\Omega\)</span>, the minimum value of the energy <span class="math notranslate nohighlight">\(E(u)\)</span> reads:</p>
+<div class="math notranslate nohighlight">
+\[E(u_\Omega) = \min\limits_{u \in H^1_{\Gamma_D}(\Omega)^d } E(u) = -\frac{1}{2} \int_\Omega Ae(u_\Omega) : e(u_\Omega) \:\text{d} x.\]</div>
+<p>This quantity is always nonpositive, reflecting that the application of external forces <span class="math notranslate nohighlight">\(f\)</span> and <span class="math notranslate nohighlight">\(g\)</span> to the structure <span class="math notranslate nohighlight">\(\Omega\)</span> always triggers a motion of the latter by conveying energy (which is thus subtracted from its potential energy).</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/index_gen.html">1. Generalities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Advanced/index_adv.html">2. Advanced features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index_structmech.html">3. Structure mechanics</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">3.1. Linear elasticity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elasFE.html">3.2. Finite Elements for linear elasticity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hyperelasticity.html">3.3. Hyperelasticity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contact.html">3.4. Contact</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_structmech.html"><span class="section-number">3. </span>Structure mechanics</a><ul>
+      <li>Previous: <a href="index_structmech.html" title="previous chapter"><span class="section-number">3. </span>Structure mechanics</a></li>
+      <li>Next: <a href="elasFE.html" title="next chapter"><span class="section-number">3.2. </span>Resolution of the linear elasticity system with the Finite Element Method</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Structure_Mechanics/elasticity.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

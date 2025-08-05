@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>1.7. Eigenvalue problems &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="1.8. Imposing Dirichlet boundary conditions by exact penalization" href="dirpen.html" />
+    <link rel="prev" title="1.6. A second encounter with meshes" href="mesh.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="eigenvalue-problems">
+<span id="sec-eigen"></span><h1><span class="section-number">1.7. </span>Eigenvalue problems<a class="headerlink" href="#eigenvalue-problems" title="Link to this heading">¶</a></h1>
+<p>In this section, we consider the treatment of eigenvalue problems with <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span>.
+Beyond its physical relevance and ubiquity in applications, this task is a good opportunity to learn how to handle the Finite Element matrices involved in variational formulations.</p>
+<section id="handling-finite-element-matrices">
+<span id="sec-femats"></span><h2><span class="section-number">1.7.1. </span>Handling Finite Element matrices<a class="headerlink" href="#handling-finite-element-matrices" title="Link to this heading">¶</a></h2>
+<p>Since <a class="reference internal" href="laplace.html#sec-lap"><span class="std std-numref">Section 1.4</span></a>, we have been solving variational problems with <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> via the keyword <code class="code docutils literal notranslate"><span class="pre">problem</span></code>. This practice conveniently conceals the operations involved in the numerical resolution, notably the assembly and inversion of the stiffness matrix.
+This section describes an alternative way to solve a variational problem with <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> which is more intrusive, but also more flexible; the source code corresponding to this presentation can be downloaded <a class="reference download internal" download="" href="../_downloads/ef6008bc01fc4af7db3dd219e3110398/laplace_with_matrix.edp"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
+<p>To set ideas, let us consider again the Laplace equation in an L-shaped domain <span class="math notranslate nohighlight">\(\Omega\)</span>, introduced in <a class="reference internal" href="laplace.html#sec-lap"><span class="std std-numref">Section 1.4</span></a>: we look for the solution <span class="math notranslate nohighlight">\(u \in H^1_0(\Omega)\)</span> to the following boundary-value problem:</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\left\{
+\begin{array}{cl}
+-\Delta u = f &amp; \text{in } \Omega, \\
+u = 0 &amp; \text{on } \partial \Omega,
+\end{array}
+\right.
+\quad \text{ where } f = 1.\end{split}\]</div>
+</p>
+<p>As we have seen, the variational formulation for this problem reads:</p>
+<div class="math notranslate nohighlight" id="equation-eq-varfmathandle">
+<span class="eqno">(1.27)<a class="headerlink" href="#equation-eq-varfmathandle" title="Link to this equation">¶</a></span>\[\text{Search for } u \in H^1_0(\Omega) \text{ s.t. } \forall v \in H^1_0(\Omega), \quad \int_\Omega \nabla u\cdot \nabla v \:\d \x = \int_\Omega fv\:\d \x,\]</div>
+<p>which becomes, after Finite Element discretization:</p>
+<div class="math notranslate nohighlight" id="equation-eq-varfmathandlemat">
+<span class="eqno">(1.28)<a class="headerlink" href="#equation-eq-varfmathandlemat" title="Link to this equation">¶</a></span>\[\text{Search for the coefficient vector } \bU_h \in \mathbb{R}^{N_{V_h}} \:\: \text{ s.t. } \:\: K_h \bU_h = \bF_h,\]</div>
+<p>where <span class="math notranslate nohighlight">\(K_h\)</span> is the <span class="math notranslate nohighlight">\(N_{V_h} \times N_{V_h}\)</span> stiffness matrix, and <span class="math notranslate nohighlight">\(\bF_h \in\mathbb{R}^{N_{V_h}}\)</span> is the force vector.</p>
+<p>The main components of such a variational problem – i.e. its bilinear form and its right-hand side – may be entered in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> thanks to the keyword <code class="code docutils literal notranslate"><span class="pre">varf</span></code>, as in the following listing.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Finite Element spaces and functions */</span>
+<span class="kt">fespace</span><span class="w"> </span><span class="nf">Vh</span><span class="p">(</span><span class="n">Th</span><span class="p">,</span><span class="nc">P1</span><span class="p">);</span>
+<span class="n">Vh</span><span class="w"> </span><span class="n">uh</span><span class="p">;</span>
+
+<span class="cm">/* Variational formulation of the Laplace equation */</span>
+<span class="kt">varf</span><span class="w"> </span><span class="n">varlap</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">int2d</span><span class="p">(</span><span class="n">Th</span><span class="p">)(</span><span class="nf">dx</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="nf">dx</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">+</span><span class="nf">dy</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="nf">dy</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+<span class="w">                 </span><span class="o">+</span><span class="w"> </span><span class="nf">int2d</span><span class="p">(</span><span class="n">Th</span><span class="p">)(</span><span class="n">f</span><span class="p">()</span><span class="o">*</span><span class="n">v</span><span class="p">)</span><span class="w">   </span><span class="c1">// Watch out for the sign!</span>
+<span class="w">                 </span><span class="o">+</span><span class="w"> </span><span class="nf">on</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">u</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Note that the sign between the bilinear and linear parts differs between this syntax and that attached to the keyword <code class="code docutils literal notranslate"><span class="pre">problem</span></code>;
+this is because the present encoding does not allow to solve directly the variational problem. The stiffness matrix <span class="math notranslate nohighlight">\(K_h\)</span> and the force vector <span class="math notranslate nohighlight">\(\bF_h\)</span> of the Finite Element discretization <a class="reference internal" href="#equation-eq-varfmathandlemat">(1.28)</a> are constructed as follows.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Assembly of the stiffness matrix */</span>
+<span class="kt">matrix</span><span class="w"> </span><span class="kp">A</span><span class="p">;</span>
+<span class="kp">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">varlap</span><span class="p">(</span><span class="n">Vh</span><span class="p">,</span><span class="n">Vh</span><span class="p">,</span><span class="kp">solver</span><span class="o">=</span><span class="kr">UMFPACK</span><span class="p">);</span>
+
+<span class="cm">/* Assembly of the right-hand side */</span>
+<span class="n">Vh</span><span class="w"> </span><span class="n">rhs</span><span class="p">;</span>
+<span class="n">rhs</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">varlap</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">Vh</span><span class="p">);</span><span class="w"> </span><span class="c1">// rhs[] is the array with size</span>
+<span class="w">                    </span><span class="c1">//the number of dofs of the Finite Element</span>
+<span class="w">                   </span><span class="c1">// space, whose entries are the coefficients of rhs.</span>
+</pre></div>
+</div>
+<p>Here, we recall from <a class="reference internal" href="mesh.html#rm-ucoef"><span class="std std-numref">remark 1.11</span></a> that the array containing the coefficients of a Finite Element function <span class="math notranslate nohighlight">\(u\)</span> is obtained by the command <span class="math notranslate nohighlight">\(\texttt{u[]}\)</span>.</p>
+<p>Finally, the Finite Element system <a class="reference internal" href="#equation-eq-varfmathandlemat">(1.28)</a> is inverted by the following natural command:</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Resolution of the Finite Element system */</span>
+<span class="n">uh</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kp">A</span><span class="o">^</span><span class="mi">-1</span><span class="w"> </span><span class="o">*</span><span class="n">rhs</span><span class="p">[];</span>
+</pre></div>
+</div>
+</section>
+<section id="an-eigenvalue-problem">
+<h2><span class="section-number">1.7.2. </span>An eigenvalue problem<a class="headerlink" href="#an-eigenvalue-problem" title="Link to this heading">¶</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(\Omega\)</span> be a bounded domain in <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span>; we consider the following eigenvalue problem:</p>
+<div class="math notranslate nohighlight" id="equation-eq-evlap">
+<span class="eqno">(1.29)<a class="headerlink" href="#equation-eq-evlap" title="Link to this equation">¶</a></span>\[\begin{split} \text{Search for } \lambda \in \mathbb{R} \text{ and } u \in H^1_0(\Omega), \: u\neq 0,\:\: \text{ s.t. } \left\{
+\begin{array}{cl}
+-\Delta u = \lambda u &amp; \text{in } \Omega, \\
+u=0 &amp; \text{on } \partial\Omega.
+\end{array}
+\right.\end{split}\]</div>
+<p>Obviously, for any real value <span class="math notranslate nohighlight">\(\lambda\)</span>, <span class="math notranslate nohighlight">\(u = 0\)</span> is solution to this problem. The sought eigenvalues are precisely those values <span class="math notranslate nohighlight">\(\lambda\)</span> for which a non trivial eigenfunction exists. It can actually be proved that these eigenvalues form a sequence of positive real numbers going to infinity:</p>
+<div class="math notranslate nohighlight">
+\[0\leq \lambda_1 \leq \lambda_2 \leq ... \: \to \: \infty;\]</div>
+<p>The peculiar property of eigenvalues is at the core of the modeling of multiple physical phenomena. For instance,</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>When <span class="math notranslate nohighlight">\(\Omega\)</span> represents an elastic membrane, the values <span class="math notranslate nohighlight">\(\lambda_n\)</span> are its self-vibration frequencies;</p></li>
+<li><p>When <span class="math notranslate nohighlight">\(\Omega\)</span> is a thermal cavity, one may prove that the solution to the unsteady heat equation <a class="reference internal" href="laplace.html#equation-eq-laplaceunsteady">(1.25)</a> decays exponentially fast in time, at the rate <span class="math notranslate nohighlight">\(e^{-\lambda_1 t}\)</span>; the asymptotic profile of the temperature is then given by the first eigenvector <span class="math notranslate nohighlight">\(u_1\)</span>.</p></li>
+</ul>
+</div></blockquote>
+<p>In this tutorial, we shall not say much about the difficult, but fascinating spectral theory, dealing with the eigenelements of boundary-value problems, and we shall only formally describe their numerical calculation. We refer for instance to <span id="id1">[<a class="reference internal" href="bibliography.html#id2" title="Grégoire Allaire. Numerical analysis and optimization: an introduction to mathematical modelling and numerical simulation. OUP Oxford, 2007.">All07</a>]</span> for a glimpse of the rigorous framework.</p>
+<p>The resolution of <a class="reference internal" href="#equation-eq-evlap">(1.29)</a> relies on a variational formulation, similar to that of a classical boundary-value problem, and we briefly rephrase the argument. Since the sought function <span class="math notranslate nohighlight">\(u\)</span> satisfies homogeneous Dirichlet boundary conditions, it is natural to work with the functional space <span class="math notranslate nohighlight">\(V = H^1_0(\Omega)\)</span>, defined in <a class="reference internal" href="anafunc.html#sec-h10"><span class="std std-numref">Section 1.1.3.4.1</span></a>. Multiplying the main equation of <a class="reference internal" href="#equation-eq-evlap">(1.29)</a> by an arbitrary test function <span class="math notranslate nohighlight">\(v \in H^1_0(\Omega)\)</span> and using <a class="reference internal" href="anafunc.html#th-green"><span class="std std-ref">Green’s formula</span></a>, we are led to the following problem:</p>
+<div class="math notranslate nohighlight">
+\[\text{Search for } \lambda \in \R \text{ and } u \in V \text{ with } u \neq 0 \:\: \text{ s.t. } \:\: \forall v \in H^1_0(\Omega), \:\: a(u,v) = \lambda m(u,v).\]</div>
+<p>This formulation brings into play the same continuous and coercive bilinear form <span class="math notranslate nohighlight">\(a : V \times V \to \R\)</span> as that involved in the variational problem for the Laplace equation, see <a class="reference internal" href="varpbs.html#sec-lm"><span class="std std-numref">Section 1.2</span></a>, and an additional continuous, bilinear form <span class="math notranslate nohighlight">\(m: V \times V \to \R\)</span>:
+<div class="math notranslate nohighlight">
+\[a(u,v) = \int_\Omega \nabla u \cdot \nabla v \:\d \x , \:\: \text{ and } \:\: m(u,v) = \int_\Omega uv \:\d \x.\]</div>
+</p>
+<p>Proceeding along the lines of <a class="reference internal" href="FEtheory.html#sec-fe"><span class="std std-numref">Section 1.3</span></a>, we now introduce a finite-dimensional subspace <span class="math notranslate nohighlight">\(V_h\)</span> of <span class="math notranslate nohighlight">\(H^1_0(\Omega)\)</span>, we are led to the following Finite Element problem:</p>
+<div class="math notranslate nohighlight" id="equation-eq-disceigenvf">
+<span class="eqno">(1.30)<a class="headerlink" href="#equation-eq-disceigenvf" title="Link to this equation">¶</a></span>\[\text{Search for } \lambda_h \in \R \text{ and } u_h \in V_h \text{ with } u_h \neq 0 \:\: \text{ s.t. } \:\: \forall v_h \in V_h, \:\: a(u_h,v_h)= \lambda_h m(u_h,v_h).\]</div>
+<p>Let us now select a basis <span class="math notranslate nohighlight">\(\left\{ \varphi_j\right\}_{j=1,...,N_h}\)</span> of functions for <span class="math notranslate nohighlight">\(V_h\)</span>; we denote by <span class="math notranslate nohighlight">\(\bU_h = \left( u_j \right)_{j=1,...,N_h} \in \R^{N_h}\)</span> the vector of the components of the sought eigenfunction <span class="math notranslate nohighlight">\(u_h\)</span> in this basis:</p>
+<p><div class="math notranslate nohighlight">
+\[u_h = \sum\limits_{j=1}^{N_h}{u_j\varphi_j}.\]</div>
+</p>
+<p>Injecting this expression into the Finite Element problem <a class="reference internal" href="#equation-eq-disceigenvf">(1.30)</a> and taking test functions <span class="math notranslate nohighlight">\(v_h = \varphi _i\)</span>, <span class="math notranslate nohighlight">\(i=1,...,N_h\)</span>, we arrive at the following <span class="math notranslate nohighlight">\(N_h \times N_h\)</span> linear system:</p>
+<p><div class="math notranslate nohighlight">
+\[K_h \bU_h = \lambda_h B_h \bU_h,\]</div>
+</p>
+<p>where the matrix <span class="math notranslate nohighlight">\(K_h\)</span> is the usual stiffness matrix for the Laplace equation, and <span class="math notranslate nohighlight">\(B_h\)</span> is the so-called mass matrix:</p>
+<div class="math notranslate nohighlight">
+\[(K_h)_{ij} = \int_\Omega{\nabla \varphi_j \cdot \nabla \varphi_i \:\d\x}, \text{ and } (B_h){ij} = \int_\Omega{\varphi_j \varphi_i \:\d\x}.\]</div>
+<p>We therefore end up with a generalized matrix eigenvalue problem, which can be conveniently solved thanks to the <code class="code docutils literal notranslate"><span class="pre">EigenValue</span></code> command in  <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span>.</p>
+<p>The archetypal resolution of such an eigenvalue problem with <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> is exemplified in the following listing, where we use the syntax elements introduced in <a class="reference internal" href="#sec-femats"><span class="std std-numref">Section 1.7.1</span></a> to define the stiffness and mass matrices of the problem. The complete code can be downloaded <a class="reference download internal" download="" href="../_downloads/92b6e8dc69ee65cc1d8393f717908ed1/laplace_ev.edp"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
+<div class="highlight-freefem notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Variational formulations for the stiffness and mass matrices;</span>
+<span class="cm">   the homogeneous Dirichlet b.c. has to be put only on the stiffness matrix */</span>
+<span class="kt">varf</span><span class="w"> </span><span class="nf">stiffness</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">int2d</span><span class="p">(</span><span class="n">Th</span><span class="p">)(</span><span class="nf">dx</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="nf">dx</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">+</span><span class="nf">dy</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="nf">dy</span><span class="p">(</span><span class="n">v</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nf">on</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">u</span><span class="o">=</span><span class="mf">0.0</span><span class="p">);</span>
+
+<span class="kt">varf</span><span class="w"> </span><span class="nf">mass</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">int2d</span><span class="p">(</span><span class="n">Th</span><span class="p">)(</span><span class="n">u</span><span class="o">*</span><span class="n">v</span><span class="p">);</span>
+
+<span class="cm">/* Getting matrices */</span>
+<span class="kt">matrix</span><span class="w"> </span><span class="kp">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stiffness</span><span class="p">(</span><span class="n">Vh</span><span class="p">,</span><span class="n">Vh</span><span class="p">,</span><span class="kp">solver</span><span class="o">=</span><span class="kr">CG</span><span class="p">);</span>
+<span class="kt">matrix</span><span class="w"> </span><span class="kp">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mass</span><span class="p">(</span><span class="n">Vh</span><span class="p">,</span><span class="n">Vh</span><span class="p">,</span><span class="kp">solver</span><span class="o">=</span><span class="kr">CG</span><span class="p">);</span>
+
+<span class="cm">/* Setting parameters */</span>
+<span class="kt">int</span><span class="w"> </span><span class="kp">nev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span><span class="w"> </span><span class="c1">// Number of computed eigenvalues</span>
+<span class="kt">real</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="w"> </span><span class="n">ev</span><span class="p">(</span><span class="kp">nev</span><span class="p">);</span><span class="w"> </span><span class="c1">// Table of the computed eigenvalues</span>
+<span class="n">Vh</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="w"> </span><span class="n">eV</span><span class="p">(</span><span class="kp">nev</span><span class="p">);</span><span class="w"> </span><span class="c1">// Table for the eigenvectors</span>
+<span class="kt">real</span><span class="w"> </span><span class="kp">sigma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="c1">// Value around which the eigenvalues are computed.</span>
+
+<span class="cm">/* Solving matrix eigenvalue problem */</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">EigenValue</span><span class="p">(</span><span class="kp">A</span><span class="p">,</span><span class="kp">B</span><span class="p">,</span><span class="kp">sym</span><span class="o">=</span><span class="kr">true</span><span class="p">,</span><span class="kp">sigma</span><span class="o">=</span><span class="kp">sigma</span><span class="p">,</span><span class="kp">value</span><span class="o">=</span><span class="n">ev</span><span class="p">,</span><span class="kp">vector</span><span class="o">=</span><span class="n">eV</span><span class="p">,</span><span class="kp">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span><span class="kp">maxit</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="kp">ncv</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The result of this procedure is depicted on <a class="reference internal" href="#fig-exev"><span class="std std-numref">Fig. 1.23</span></a>.</p>
+<figure class="align-default" id="id2">
+<span id="fig-exev"></span><a class="reference internal image-reference" href="../_images/exev.png"><img alt="../_images/exev.png" src="../_images/exev.png" style="width: 887.0px; height: 333.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1.23 </span><span class="caption-text">(Left) Physical domain <span class="math notranslate nohighlight">\(\Omega\)</span> of the eigenvalue problem; (middle) Eigenfunction <span class="math notranslate nohighlight">\(u_1\)</span> associated to the first eigenvalue <span class="math notranslate nohighlight">\(\lambda_1 \approx 7.61\)</span>; (right) Eigenfunction <span class="math notranslate nohighlight">\(u_{20}\)</span> associated to the <span class="math notranslate nohighlight">\(20^{\text{th}}\)</span> eigenvalue <span class="math notranslate nohighlight">\(\lambda_{20} \approx 39.05\)</span>.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index_gen.html">1. Generalities</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="anafunc.html">1.1. Functional analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varpbs.html">1.2. Lax-Milgram framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEtheory.html">1.3. The Finite Element method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="laplace.html">1.4. Laplace equation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization.html">1.5. Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">1.6. Meshes</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1.7. Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dirpen.html">1.8. Penalization for Dirichlet conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="laplace_pure_Neumann.html">1.9. Pure Neumann</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Advanced/index_adv.html">2. Advanced features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_gen.html"><span class="section-number">1. </span>Getting started</a><ul>
+      <li>Previous: <a href="mesh.html" title="previous chapter"><span class="section-number">1.6. </span>A second encounter with meshes</a></li>
+      <li>Next: <a href="dirpen.html" title="next chapter"><span class="section-number">1.8. </span>Imposing Dirichlet boundary conditions by exact penalization</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Generalities/eigen.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2.4. A glimpse of variational inequalities &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2.5. The Level Set method: Part I" href="LSM.html" />
+    <link rel="prev" title="2.3. A first encounter with nonlinear problems" href="nonlinear.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="a-glimpse-of-variational-inequalities">
+<span id="sec-varineq"></span><h1><span class="section-number">2.4. </span>A glimpse of variational inequalities<a class="headerlink" href="#a-glimpse-of-variational-inequalities" title="Link to this heading">¶</a></h1>
+<p>This section deals with variational inequalities. We consider a simple instance, featuring the following obstacle problem:</p>
+<div class="math notranslate nohighlight" id="equation-eq-obstacle">
+<span class="eqno">(2.3)<a class="headerlink" href="#equation-eq-obstacle" title="Link to this equation">¶</a></span>\[\begin{split}\left\{
+\begin{array}{cl}
+-\Delta u \geq f &amp; \text{in } \Omega, \\
+u \geq m &amp; \text{in } \Omega, \\
+-\Delta u = f &amp; \text{on } \left\{ u &gt; m\right\}, \\
+u = 0 &amp; \text{on } \partial \Omega.
+\end{array}
+\right.\end{split}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(f: \Omega \to \R\)</span> is a suitable source term, and we have chosen homogeneous Dirichlet boundary conditions on <span class="math notranslate nohighlight">\(\partial\Omega\)</span> for the sake of simplicity – although we shall use different boundary data in our examples.</p>
+<p>As we shall see, this problem is often better understood from a variational viewpoint, i.e. it is seen as the minimization problem:</p>
+<div class="math notranslate nohighlight" id="equation-eq-obstaclevar">
+<span class="eqno">(2.4)<a class="headerlink" href="#equation-eq-obstaclevar" title="Link to this equation">¶</a></span>\[\begin{split}\min\limits_{u = \varphi \text{ on } \partial \Omega, \atop u \in K} J(u), \:\: \text{ where }\:\: \left\{\begin{array}{l}
+ J(u) := \frac12 \displaystyle\int_\Omega \lvert\nabla u\lvert^2 \:\d\x - \displaystyle\int_\Omega fu \:\d\x, \\
+ K = \Big\{u \in H^1(\Omega) \text{ s.t. } u \geq m \Big\}.
+ \end{array}
+ \right.\end{split}\]</div>
+<p>This problem serves as a prototype for more complex contact problems, in the setting of mechanical structures, as we shall see in the later <a class="reference internal" href="../Structure_Mechanics/contact.html#sec-contact"><span class="std std-numref">Section 3.4</span></a>. We refer to the article <span id="id1">[<a class="reference internal" href="../Generalities/bibliography.html#id11" title="Tom Gustafsson, Rolf Stenberg, and Juha Videman. On finite element formulations for the obstacle problem–mixed and stabilised methods. Computational Methods in Applied Mathematics, 17(3):413–429, 2017.">GSV17</a>]</span> for an account of some of the existing numerical methods.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="../_images/under_work.png"><img alt="../_images/under_work.png" src="../_images/under_work.png" style="width: 269.2px; height: 320.0px;" />
+</a>
+</figure>
+<section id="a-word-about-the-modeling">
+<h2><span class="section-number">2.4.1. </span>A word about the modeling<a class="headerlink" href="#a-word-about-the-modeling" title="Link to this heading">¶</a></h2>
+<p>The considered obstacle problem arises in multiple physical contexts, but its perhaps most intuitive interpretation arises in the context of membrane theory.</p>
+<p>Let us consider an elastic membrane, whose base is a two-dimensional domain <span class="math notranslate nohighlight">\(\Omega \subset \R^2\)</span>. We denote by <span class="math notranslate nohighlight">\(u:\Omega \to \R\)</span> the vertical displacement of the membrane. The latter is supposed to be attached on <span class="math notranslate nohighlight">\(\partial \Omega\)</span>, i.e. <span class="math notranslate nohighlight">\(u(\x) = 0\)</span> for <span class="math notranslate nohighlight">\(\x \in \partial \Omega\)</span>.
+The membrane is loaded by a normal force with amplitude <span class="math notranslate nohighlight">\(f : \Omega \to \R\)</span>.</p>
+<p>We thus arrive at the following problem:</p>
+<p><div class="math notranslate nohighlight">
+\[\min\limits_{u \in H^1_0(\Omega)} \int_\Omega \lvert \nabla u \lvert^2 \:\d \x - \int_\Omega q u \:\d \x. \]</div>
+</p>
+<p>Now assuming that an obstacle <span class="math notranslate nohighlight">\(m : \Omega \to \R\)</span> is present, the following constraint is added:</p>
+<p><div class="math notranslate nohighlight">
+\[u(\x) \geq m(\x) \text{ for a.e. } \x \in \Omega.\]</div>
+</p>
+</section>
+<section id="a-glimpse-of-the-theory">
+<h2><span class="section-number">2.4.2. </span>A glimpse of the theory<a class="headerlink" href="#a-glimpse-of-the-theory" title="Link to this heading">¶</a></h2>
+<p>Convex minimization problem.</p>
+<blockquote>
+<div><div class="math notranslate nohighlight" id="equation-eq-varineqgen">
+<span class="eqno">(2.5)<a class="headerlink" href="#equation-eq-varineqgen" title="Link to this equation">¶</a></span>\[   \text{Search for } u \in K \text{ s.t. for all } v\in K, \quad \langle Au, v-u \rangle \geq \ell(v-u).\]</div>
+</div></blockquote>
+<p>The mathematical analysis of such variational inequalities often relies on the Lions-Stampacchia theorem, which is a generalization of the Lax-Milgram <a class="reference internal" href="../Generalities/varpbs.html#th-laxmilgram"><span class="std std-numref">theorem 1.3</span></a> encountered in the treatment of variational equalities.</p>
+<div class="proof theorem admonition" id="theorem-0">
+<span id="th-lionsstampacchia"></span><p class="admonition-title"><span class="caption-number">Theorem 2.1 </span> (Lions-Stampacchia)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(V\)</span> be a real Hilbert space, and let <span class="math notranslate nohighlight">\(K \subset V\)</span> be a closed, convex and non empty subset of <span class="math notranslate nohighlight">\(V\)</span>. Let <span class="math notranslate nohighlight">\(A: K \to V^*\)</span> be a (possibly non linear) mapping such that</p>
+<blockquote>
+<div><ul>
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is Lipschitz continuous: there exists <span class="math notranslate nohighlight">\(M \geq 0\)</span> such that</p>
+<p><div class="math notranslate nohighlight">
+\[\forall u,v \in K, \quad \lvert\lvert A u - A v \lvert\lvert_{V^*}  \leq M \lvert\lvert u - v \lvert\lvert.\]</div>
+</p>
+</li>
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is coercive: there exists <span class="math notranslate nohighlight">\(\alpha &gt;0\)</span> such that:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall u,v \in K, \quad \alpha \lvert\lvert u\lvert\lvert^2 \leq \langle A u - Av, u-v \rangle.\]</div>
+</p>
+</li>
+</ul>
+</div></blockquote>
+<p>Then, for every linear form <span class="math notranslate nohighlight">\(\ell \in V^*\)</span>, there exists a unique function <span class="math notranslate nohighlight">\(u\)</span> satisfying <a class="reference internal" href="#equation-eq-varineqgen">(2.5)</a>. Moreover, the dependence of <span class="math notranslate nohighlight">\(u\)</span> on <span class="math notranslate nohighlight">\(\ell\)</span> is Lipschitz continuous, i.e. if <span class="math notranslate nohighlight">\(u_1\)</span>, <span class="math notranslate nohighlight">\(u_2\)</span> are the unique solutions to <a class="reference internal" href="#equation-eq-varineqgen">(2.5)</a> associated to the forms <span class="math notranslate nohighlight">\(\ell_1\)</span>, <span class="math notranslate nohighlight">\(\ell_2 \in V^*\)</span>, it holds:</p>
+<p><div class="math notranslate nohighlight">
+\[\lvert\lvert u_1- u_2 \lvert\lvert \leq \left(1 -\frac{\alpha^2}{M^2}\right)^{1/2} \lvert \lvert \ell_1 - \ell_2 \lvert\lvert_{V^*} .\]</div>
+</p>
+</section>
+</div><div class="dropdown admonition">
+<p class="admonition-title">Proof</p>
+<p>The proof consists in rewriting the search for <span class="math notranslate nohighlight">\(u\)</span> as that of a fixed point of a suitable mapping, by using the variational characterization of the projection onto the closed convex set <span class="math notranslate nohighlight">\(K\)</span> offered by <a class="reference internal" href="../Appendix/convexity.html#th-projconv"><span class="std std-numref">theorem 6.7</span></a>.</p>
+<p>To achieve this, let us first remark that an element <span class="math notranslate nohighlight">\(u \in K\)</span> satisfies <a class="reference internal" href="#equation-eq-varineqgen">(2.5)</a> if and only <span class="math notranslate nohighlight">\(u\)</span> is an element in <span class="math notranslate nohighlight">\(V\)</span> satisfying:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall v \in K, \quad \langle u - (u - \rho A u), v - u \rangle  \geq \ell(v-u),\]</div>
+</p>
+<p>where <span class="math notranslate nohighlight">\(\rho &gt; 0\)</span> is for the moment arbitrary. Denoting by <span class="math notranslate nohighlight">\(I: V^* \to V\)</span> the Riesz representation mapping, this is in turn equivalent to:</p>
+<p><div class="math notranslate nohighlight">
+\[u\in K \text{ is s.t. } \forall v \in K, \quad \langle u - T _\rho u ,v - u \rangle \geq 0, \text{ where } T _\rho : V \to V \text{ is defined by } T _\rho v= v - \rho I A v + I\ell . \]</div>
+</p>
+<p>Now invoking the projection operator <span class="math notranslate nohighlight">\(p_K\)</span> over the closed convex set <span class="math notranslate nohighlight">\(K \subset V\)</span>, this is equivalent to the fact that <span class="math notranslate nohighlight">\(u = p_K T _\rho u\)</span>. Hence, since the projection mapping <span class="math notranslate nohighlight">\(p_K\)</span> is <span class="math notranslate nohighlight">\(1\)</span> Lipschitz, the result will follow provided we can prove that the mapping <span class="math notranslate nohighlight">\(p_K T _\rho : V \to V\)</span> is a contraction, for a suitable value of <span class="math notranslate nohighlight">\(\rho\)</span>. To see this, let us calculate:</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\begin{array}{ccl}
+\lvert\lvert T _\rho u - T _\rho v \lvert\lvert^2 &amp;=&amp; \lvert\lvert u - v - \rho (IA u - IA v) \lvert\lvert^2 \\
+&amp;=&amp; \lvert\lvert u - v \lvert\lvert^2 - 2\rho \langle A u - Av, u-v \rangle + \rho^2 \lvert\lvert Au- A v \lvert\lvert^2 \\
+&amp;\leq &amp; (1-2\rho \alpha + M^2) \lvert\lvert u - v \lvert\lvert^2,
+\end{array}\end{split}\]</div>
+</p>
+<p>where we have used the coerciveness assumption to estimate the second term in the right-hand side of the second line, and the Lipschitz assumption to deal with its third term.</p>
+<p>Now choosing <span class="math notranslate nohighlight">\(\rho\)</span> such that <span class="math notranslate nohighlight">\(0 &lt; \rho &lt; \frac{2M^2}{\alpha}\)</span> (for instance <span class="math notranslate nohighlight">\(\rho = \frac{\alpha}{M^2}\)</span> works), the desired result follows.</p>
+</div>
+<p>The following result is an immediate consequence of the Lions-Stampacchia theorem, but it is useful in a wide variety of situations.</p>
+<div class="proof corollary admonition" id="corollary-1">
+<p class="admonition-title"><span class="caption-number">Corollary 2.1 </span></p>
+<section class="corollary-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(V\)</span> be a real Hilbert space, and let <span class="math notranslate nohighlight">\(K \subset V\)</span> be a closed, convex and non empty subset of <span class="math notranslate nohighlight">\(V\)</span>. Let <span class="math notranslate nohighlight">\(a: V \times V \to \R\)</span> be a continuous and coercive bilinear form, and let <span class="math notranslate nohighlight">\(\ell : V \to \R\)</span> be a continuous linear form. Then the variational inequality:</p>
+<p><div class="math notranslate nohighlight">
+\[\text{Search for } u \in K \text{ s.t. } \forall v \in K, \quad a(u,v-u) \geq \ell(v-u) \]</div>
+</p>
+<p>has a unique solution that depends continuously on <span class="math notranslate nohighlight">\(\ell\)</span>.</p>
+</section>
+</div></section>
+<section id="a-simple-penalty-method">
+<h2><span class="section-number">2.4.3. </span>A simple penalty method<a class="headerlink" href="#a-simple-penalty-method" title="Link to this heading">¶</a></h2>
+<p>This section deals with a penalization method for the obstacle problem <a class="reference internal" href="#equation-eq-obstacle">(2.3)</a>; in other terms, the inequality constraint <span class="math notranslate nohighlight">\(u \geq m\)</span> is imposed in a &quot;soft&quot;, approximate way, via a suitable penalization of the energy functional.
+More precisely, we consider the following minimization problem:</p>
+<p><div class="math notranslate nohighlight">
+\[\min\limits_{u \in H^1_0(\Omega)} J _\e(u), \text{ where } J _\e(u) = \frac{1}{2}\int_\Omega \lvert \nabla u \lvert^2 \:\d \x - \int_\Omega fu \:\d\x + \frac{1}{2\e}\int_\Omega [ u-m ]_-^2 \:\d\x.\]</div>
+</p>
+<p>Here, we have denoted by <span class="math notranslate nohighlight">\([t]_- := \min(0,t)\)</span> the negative part of a real number <span class="math notranslate nohighlight">\(t\in\R\)</span>.
+Intuitively, as <span class="math notranslate nohighlight">\(\e\)</span> tends to <span class="math notranslate nohighlight">\(\infty\)</span>, the minimization of this energy gives priority to the final term: <span class="math notranslate nohighlight">\([u-m]_-\)</span> is driven to <span class="math notranslate nohighlight">\(0\)</span>, so that the constraint is satisfied in this limit.</p>
+<p>The variational formulation for this problem reads:</p>
+<p><div class="math notranslate nohighlight">
+\[\text{Search for }  u \in H^1_0(\Omega) \text{ s.t. } \forall v \in H^1_0(\Omega), \quad \int_\Omega \nabla u \cdot \nabla v \:\d\x + \frac{1}{\e} \int_\Omega [ u-m ]_- v \:\d \x = \int_\Omega fv \:\d\x,\]</div>
+</p>
+<p>see notably the exercise in <a class="reference internal" href="../Appendix/appadvanafunc.html#app-nemitski"><span class="std std-numref">Section 6.3.1</span></a> for the treatment of the last integral in the left-hand side.
+This is a non linear variational problem, to which we apply Newton’s method.</p>
+<p>This yields the following scheme:</p>
+<blockquote>
+<div><ul>
+<li><p><span class="math notranslate nohighlight">\(u^0\)</span> is the initial datum.</p></li>
+<li><p>For <span class="math notranslate nohighlight">\(n=0, \ldots\)</span> until convergence, do:</p>
+<ul>
+<li><p>Define the set <span class="math notranslate nohighlight">\(A^n = \left\{ \x \in \Omega, \:\: u(\x) \leq m(\x) \right\}\)</span>;</p></li>
+<li><p>Solve the variational problem:</p>
+<div class="math notranslate nohighlight" id="equation-eq-newtonvarineq">
+<span class="eqno">(2.6)<a class="headerlink" href="#equation-eq-newtonvarineq" title="Link to this equation">¶</a></span>\[\text{Search for } u^{n+1} \in H^1_0(\Omega) \text{ s.t. } \forall v \in H^1_0(\Omega), \quad \int_\Omega \nabla u^{n+1} \cdot \nabla v \:\d \x + \frac{1}{\e} \int_{A^n} u^{n+1} v \:\d \x = \int_\Omega fv \:\d \x + \frac{1}{\e}\int_{A^n} m v \:\d \x.\]</div>
+</li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+<p>That this scheme is exactly that provided by Newton’s method is the purpose of the next exercise.</p>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<p>Prove that the above algorithm exactly corresponds to the application of Newton’s method to the non linear mapping:</p>
+<p><div class="math notranslate nohighlight">
+\[H^1_0(\Omega) \to H^{-1}(\Omega), \quad F(u) : v \mapsto \int_\Omega \nabla u \cdot \nabla v \:\d\x + \frac{1}{\e} \int_\Omega [ u-m ]_- v \:\d \x - \int_\Omega fv \:\d\x.\]</div>
+</p>
+</div>
+<div class="dropdown admonition">
+<p class="admonition-title">Correction</p>
+<p>Let us calculate the derivative of the function <span class="math notranslate nohighlight">\(F\)</span> at some iterate <span class="math notranslate nohighlight">\(u^n\)</span>:</p>
+<p><div class="math notranslate nohighlight">
+\[F^\prime(u^n)(h) = \int_\Omega \nabla h \cdot \nabla v \:\d x + \frac{1}{\e} \int_\Omega \chi_{A^n} h v \:\d \x,  \]</div>
+</p>
+<p>where <span class="math notranslate nohighlight">\(\chi_{A^n}\)</span> is the characteristic function of <span class="math notranslate nohighlight">\(A^n\)</span>. Now, the <span class="math notranslate nohighlight">\(n^{\text{th}}\)</span> iteration of Newton’s method reads:</p>
+<p><div class="math notranslate nohighlight">
+\[u^{n+1} = u^n + h^n, \text{ where } h^n \text{ is the solution to } F^\prime(u^n)(h^n) = -F(u^n).\]</div>
+</p>
+</div>
+<p>The implementation of this strategy can be downloaded <a class="reference download internal" download="" href="../_downloads/27cef1ee06a873b9b476f152a6447ea2/varineq_penalty.edp"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.
+Let us consider its application to a suitably tailored situation where the analytical situation is known. <span class="math notranslate nohighlight">\(\Omega\)</span> is the 2d square <span class="math notranslate nohighlight">\(\Omega = (-2,2) \times (-2,2)\)</span>, and the obstacle <span class="math notranslate nohighlight">\(m\)</span> is defined by:</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}m(\x) = \left\{
+\begin{array}{cl}
+\sqrt{1-x_1^2 - x_2^2} &amp; \text{if } \lvert \x \lvert \leq 1, \\
+-1 &amp; \text{otherwise}.
+\end{array}
+\right.\end{split}\]</div>
+</p>
+<p>We also set the boundary condition <span class="math notranslate nohighlight">\(u_d\)</span> so that the analytical solution to this problem is given by:
+<div class="math notranslate nohighlight">
+\[\begin{split}u_{\text{ex}}(\x) = \left\{
+\begin{array}{cl}
+\sqrt{1-\lvert \x \lvert^2} &amp; \text{if } \lvert \x \lvert &lt; r^*, \\
+- \frac{{r^*}^2}{(1-{r^*}^2)^{1/2}} \log\left(\frac12\lvert\x\lvert\right) &amp; \text{otherwise},
+\end{array}
+\right.\end{split}\]</div>
+
+where <span class="math notranslate nohighlight">\(r^*\)</span> is defined so that <span class="math notranslate nohighlight">\((r^*)^2\left(1-\log\left(\frac{r^*}{2}\right)\right)=1\)</span>, that is: <span class="math notranslate nohighlight">\(r^* \approx 0.697965\)</span>.</p>
+<p>The result is depicted on <a class="reference internal" href="#fig-obstacle"><span class="std std-numref">Fig. 2.7</span></a>, as well as the solution to a similar instance, associated to another situation.</p>
+<figure class="align-default" id="id3">
+<span id="fig-obstacle"></span><a class="reference internal image-reference" href="../_images/solobstacle.png"><img alt="../_images/solobstacle.png" src="../_images/solobstacle.png" style="width: 636.0px; height: 619.2px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.7 </span><span class="caption-text">(Upper row) Obstacle and solution of the obstacle problem <a class="reference internal" href="#equation-eq-obstacle">(2.3)</a> for the analytical example; (Lower row) Obstacle and solution in another particular instance.</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="use-of-a-constrained-optimization-algorithm-texttt-ipopt">
+<h2><span class="section-number">2.4.4. </span>Use of a constrained optimization algorithm: <span class="math notranslate nohighlight">\(\texttt{ipopt}\)</span><a class="headerlink" href="#use-of-a-constrained-optimization-algorithm-texttt-ipopt" title="Link to this heading">¶</a></h2>
+<p>An alternative idea is to use a constrained optimization algorithm.
+Let us consider the following discretization of the obstacle problem.</p>
+<p>Then, it is natural to try and use an on-the-shelf constrained optimization algorithm, such as <span class="math notranslate nohighlight">\(\texttt{ipopt}\)</span>, which is interfaced in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span>. The syntax for calling <span class="math notranslate nohighlight">\(\texttt{ipopt}\)</span> in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> is the following.</p>
+<p>Note that <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> also interfaces <span class="math notranslate nohighlight">\(\texttt{nlopt}\)</span>.</p>
+<p>Note that this method is likely to be very costly, since the number of constraints is huge – being equal to the number of vertices in the mesh.</p>
+</section>
+<section id="an-active-set-algorithm">
+<h2><span class="section-number">2.4.5. </span>An active set algorithm<a class="headerlink" href="#an-active-set-algorithm" title="Link to this heading">¶</a></h2>
+<p>This section deals with an alternative solution technique of the obstacle problem <a class="reference internal" href="#equation-eq-obstacle">(2.3)</a>, proposed in the article <span id="id2">[<a class="reference internal" href="../Generalities/bibliography.html#id13" title="Michael Hintermuller, Kazufumi Ito, and Karl Kunisch. The primal-dual active set strategy as a semismooth newton method. SIAM Journal on Optimization, 13(3):865–888, 2002.">HIK02</a>]</span>. In a nutshell, this method amount to solving the first-order necessary conditions for optimality of the constrained optimization problem <a class="reference internal" href="#equation-eq-obstaclevar">(2.4)</a>.
+Since constrained optimization theory is significantly more technical in infinite-dimensional spaces, we describe the method in the finite-dimensional setting.</p>
+<p>Let us then consider the following discretization of <a class="reference internal" href="#equation-eq-obstaclevar">(2.4)</a>, with a Finite Element method counting <span class="math notranslate nohighlight">\(N\)</span> degrees of freedom, see <a class="reference internal" href="../Generalities/FEtheory.html#sec-discvarpb"><span class="std std-numref">Section 1.3.3</span></a>.</p>
+<p><div class="math notranslate nohighlight">
+\[\min\limits_{\u \in \R^N} \:\left(\frac{1}{2} A\u \cdot \u - \f \cdot \u \right) \:\: \text{ s.t. } \:\: m_i - u_i \leq 0 \text{ for } i =1,\ldots,N. \]</div>
+</p>
+<p>Here,</p>
+<blockquote>
+<div><ul>
+<li><p><span class="math notranslate nohighlight">\(A \in \R^{N\times N}\)</span> is the stiffness matrix of the problem:</p>
+<p><div class="math notranslate nohighlight">
+\[A_{ij} = \int_\Omega \nabla \phi_j\cdot\nabla\phi_i \:\d\x, \quad i,j=1,\ldots,N.\]</div>
+</p>
+</li>
+<li><p><span class="math notranslate nohighlight">\(\f \in \R^N\)</span> is the force vector:</p>
+<p><div class="math notranslate nohighlight">
+\[f_i = \int_\Omega f(\x) \phi_i(\x) \:\d \x, \quad i=1,\ldots,N.\]</div>
+</p>
+</li>
+<li><p>The unknown <span class="math notranslate nohighlight">\(\u = \left\{u_i\right\}_{i=1,\ldots,N} \in \R^N\)</span> is the collection of degrees of freedom of the sought function <span class="math notranslate nohighlight">\(u\)</span> in the chosen basis:</p>
+<p><div class="math notranslate nohighlight">
+\[u(\x) = \sum\limits_{i=1}^N u_i \phi_i(\x), \quad \x \in \Omega.\]</div>
+</p>
+</li>
+</ul>
+</div></blockquote>
+<p>Let us now write down the first-order conditions characterizing the optimality of a vector <span class="math notranslate nohighlight">\(\u \in \R^N\)</span>, see <a class="reference internal" href="../Appendix/compoptim.html#app-recalloptim"><span class="std std-numref">Section 6.5</span></a>;
+note that their fulfillment is equivalent to that of the problem <a class="reference internal" href="#equation-eq-obstaclevar">(2.4)</a> itself, since the latter is a convex optimization program. A vector <span class="math notranslate nohighlight">\(\u \in \R^N\)</span> is solution to <a class="reference internal" href="#equation-eq-obstaclevar">(2.4)</a> if and only if there exists a Lagrange multiplier <span class="math notranslate nohighlight">\(\lambda \in \R^N\)</span> such that:</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\left\{
+\begin{array}{l}
+A \u + \lambda = \f \\
+u_i \geq m_i, \: \lambda_i \geq 0, \text{ and } \lambda_i (u_i-m_i)=0 \text{ for all } i=1,\ldots,N.
+\end{array}
+\right.\end{split}\]</div>
+</p>
+<p>In order to endow this problem with an equivalent expression which is amenable to computations, we rely on the following elementary reformulation of the complementarity constraints, featured on the second line.</p>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<p>Let <span class="math notranslate nohighlight">\(\u\)</span>, <span class="math notranslate nohighlight">\(\m\)</span>  and  <span class="math notranslate nohighlight">\(\lambda\)</span> be three vectors in <span class="math notranslate nohighlight">\(\R^N\)</span>, and let <span class="math notranslate nohighlight">\(c &gt;0\)</span> be a fixed, arbitrary real number. Prove that the following two assertions are equivalent:</p>
+<ol class="lowerroman simple">
+<li><p>For all <span class="math notranslate nohighlight">\(i=1,\ldots,N\)</span>, <span class="math notranslate nohighlight">\(\:\)</span> <span class="math notranslate nohighlight">\(u_i \geq m_i\)</span>, <span class="math notranslate nohighlight">\(\:\)</span> <span class="math notranslate nohighlight">\(\lambda_i \geq 0\)</span> <span class="math notranslate nohighlight">\(\:\)</span> and <span class="math notranslate nohighlight">\(\lambda_i(u_i-m_i) = 0\)</span>.</p></li>
+<li><p>For all <span class="math notranslate nohighlight">\(i=1,\ldots,N\)</span>, <span class="math notranslate nohighlight">\(\:\)</span> <span class="math notranslate nohighlight">\(\lambda_i = \max(0,\lambda_i - c(u_i-m_i))\)</span>.</p></li>
+</ol>
+</div>
+<div class="dropdown admonition">
+<p class="admonition-title">Correction</p>
+<p>Let us first assume that <span class="math notranslate nohighlight">\((i)\)</span> holds true. Then, on the one hand, <span class="math notranslate nohighlight">\(\lambda_i \geq 0\)</span>, and since <span class="math notranslate nohighlight">\(u_i - m_i \geq 0\)</span>, we also have <span class="math notranslate nohighlight">\(\lambda_i \geq \lambda_i - c(u_i-m_i)\)</span>. Thus, <span class="math notranslate nohighlight">\(\lambda_i \geq \max(0,\lambda_i - c(u_i-m_i))\)</span>. In order to prove the converse inequality, let us distinguish two cases:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(\lambda_i = 0\)</span>, then obviously, <span class="math notranslate nohighlight">\(\lambda_i \leq \max(0,\lambda_i - c(u_i-m_i))\)</span>;</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(\lambda_i &gt; 0\)</span>, then by the last relation, <span class="math notranslate nohighlight">\(u_i - m_i =0\)</span>, and so <span class="math notranslate nohighlight">\(\lambda_i =\lambda_i - c(u_i-m_i)\)</span>. In particular, <span class="math notranslate nohighlight">\(\lambda_i \leq \max(0,\lambda_i - c(u_i-m_i))\)</span>.</p></li>
+</ul>
+</div></blockquote>
+<p>Hence, in both cases, we have that <span class="math notranslate nohighlight">\(\lambda_i \leq \max(0,\lambda_i - c(u_i-m_i))\)</span>, and we have thus proved that <span class="math notranslate nohighlight">\((i)\)</span> implies <span class="math notranslate nohighlight">\((ii)\)</span>.</p>
+<p>Let us now assume that <span class="math notranslate nohighlight">\((ii)\)</span> holds true. Then, obviously, we have that <span class="math notranslate nohighlight">\(\lambda_i \geq 0\)</span>. Let us now distinguish two cases:</p>
+<ul class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(\lambda_i = 0\)</span>, then necessarily, <span class="math notranslate nohighlight">\(\lambda_i - c(u_i-m_i) \leq 0\)</span>, which proves that <span class="math notranslate nohighlight">\(u_i-m_i \geq 0\)</span>. We also obviously have that <span class="math notranslate nohighlight">\(\lambda_i(u_i-m_i) = 0\)</span> in this case.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(\lambda_i &gt; 0\)</span> then <span class="math notranslate nohighlight">\(\lambda_i = \lambda_i - c(u_i-m_i)\)</span>, and thus <span class="math notranslate nohighlight">\(u_i-m_i=0\)</span>. Also in this case, we have that <span class="math notranslate nohighlight">\(\lambda_i(u_i-m_i)=0\)</span>.</p></li>
+</ul>
+<p>This proves that <span class="math notranslate nohighlight">\((ii)\)</span> implies <span class="math notranslate nohighlight">\((i)\)</span>.</p>
+</div>
+<p>Let us now introduce the function <span class="math notranslate nohighlight">\(\bC: \R^N \times \R^N \to \R^N\)</span> defined by:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall (\u,\lambda) \in \R^N \times \R^N, \quad C(\u,\lambda)_i = \max(0,\lambda_i - c(u_i-m_i)).\]</div>
+</p>
+<p>It follows that our problem is now equivalent to:</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\text{Search for } (\u,\lambda) \in \R^N \times \R^N \:\: \text{ s.t. } \bF(\u,\lambda) = \bz, \text{ where } \bF(\u,\lambda) = \left(
+\begin{array}{c}
+A \u + \lambda - \f \\
+\lambda - \bC(\u,\lambda)
+\end{array}
+\right).\end{split}\]</div>
+</p>
+<p>We now treat this problem with a so-called semi-smooth Newton’s method. Loosely speaking, we use Newton’s method to search for a zero of <span class="math notranslate nohighlight">\(\bF : \R^N \times \R^N \to \R^N \times \R^N\)</span> by proceeding as if <span class="math notranslate nohighlight">\(\bC\)</span> were differentiable everywhere, relying on the following formulas:</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\frac{\partial C_i}{\partial u_i} (\u,\lambda) = \left\{
+\begin{array}{cl}
+-c &amp; \text{if } \lambda_i - c(u_i-m_i) &gt; 0, \\
+0 &amp; \text{if } \lambda_i - c(u_i-m_i) &lt; 0, \\
+\end{array}
+\right. \:\: \text{ and } \:\: \frac{\partial C_i}{\partial \lambda_i} (\u,\lambda) = \left\{
+\begin{array}{cl}
+1 &amp; \text{if } \lambda_i - c(u_i-m_i) &gt; 0, \\
+0 &amp; \text{if } \lambda_i - c(u_i-m_i) &lt; 0. \\
+\end{array}
+\right. \end{split}\]</div>
+</p>
+<p>The following exercise provides the iteration formulas associated to this strategy.</p>
+<div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<p>Show that the Newton iteration formula</p>
+<p><div class="math notranslate nohighlight">
+\[(\u^{n+1},\lambda^{n+1}) = (\u^{n},\lambda^{n})  +(\delta \u^{n},\delta\lambda^{n}), \:\: \text{ where } \:\:(\delta \u^{n},\delta\lambda^{n}) \text{ solves } \bF^\prime(\u^n,\lambda^n)(\delta \u^n, \delta\lambda^n) = -\bF(\u^n,\lambda^n),\]</div>
+</p>
+<p>is equivalent to</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\left\{
+\begin{array}{cl}
+A\u^{n+1} + \lambda^{n+1} = \f &amp; \\
+\lambda_i^{n+1}  = 0 &amp; \text{if } \lambda_i^n - c(u_i^n-m_i) &lt; 0, \\
+u_i^{n+1}  = m_i&amp; \text{if } \lambda_i^n - c(u_i^n-m_i) &gt; 0, \\
+\end{array}
+\right.\end{split}\]</div>
+</p>
+</div>
+<div class="dropdown admonition">
+<p class="admonition-title">Correction</p>
+<p>The Newton iteration formula reads:</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\left\{
+\begin{array}{cl}
+A\delta \u^n + \delta \lambda^n = \f - A \u^n - \lambda^n &amp;  \\
+\delta\lambda_i^{n}  = - \lambda_i^n + C_i(\u^n,\lambda^n) &amp; \text{if } \lambda_i - c(u_i-m_i) &lt; 0, \\
+-c \delta u_i^{n}  = -\lambda_i^n + C_i(\u^n,\lambda^n)&amp; \text{if } \lambda_i - c(u_i-m_i) &gt; 0.
+\end{array}
+\right.\end{split}\]</div>
+</p>
+<p>Using now the very definition of <span class="math notranslate nohighlight">\(C(\u^n,\lambda^n)\)</span>, this rewrites:</p>
+<p><div class="math notranslate nohighlight">
+\[\begin{split}\left\{
+\begin{array}{cl}
+A\delta \u^n + \delta \lambda^n = \f - A \u^n - \lambda^n &amp;  \\
+\delta\lambda_i^{n}  = - \lambda_i^n &amp; \text{if } \lambda_i^n - c(u_i^n-m_i) &lt; 0, \\
+-c \delta u_i^{n}  = - c(u_i^n-m_i)&amp; \text{if } \lambda_i^n - c(u_i^n-m_i) &gt; 0.
+\end{array}
+\right.\end{split}\]</div>
+</p>
+<p>A simple rearrangement of this system yields the desired expression.</p>
+</div>
+<p>According to this result, let us introduce the sets <span class="math notranslate nohighlight">\(\calA^n\)</span> and <span class="math notranslate nohighlight">\(\calI^n\)</span> of indices of the active and inactive degrees of freedom as:</p>
+<p><div class="math notranslate nohighlight">
+\[\calA^n := \Big\{ i=1,\ldots,N \: \text{ s.t. }\: \lambda_i^n - c (u_i^n - m_i)  &gt; 0 \Big\}, \text{ and } \calI^n := \Big\{1,\ldots,n \Big\} \setminus \calA^n.\]</div>
+</p>
+<p>For simplicity of the presentation, and without loss of generality, we assume that <span class="math notranslate nohighlight">\(\calA^n = \left\{1,\ldots,K\right\}\)</span> and <span class="math notranslate nohighlight">\(\calI^n = \left\{K+1,\ldots,N\right\}\)</span>. Accordingly, we write the matrix <span class="math notranslate nohighlight">\(A\)</span> block-wise:</p>
+<p>These features can be conveniently imposed in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span> via a similar penalization trick as for Dirichlet conditions, see <a class="reference internal" href="../Generalities/dirpen.html#sec-dirtgv"><span class="std std-numref">Section 1.8</span></a>.</p>
+<p>This yields the following numerical procedure:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Initialization: Take <span class="math notranslate nohighlight">\(\u^0 \in \R^N\)</span> and <span class="math notranslate nohighlight">\(\lambda^0 \in \R^N\)</span>.</p></li>
+<li><p>For <span class="math notranslate nohighlight">\(n=0,\ldots,\)</span> until convergence:</p>
+<ul>
+<li><p>Identify the sets <span class="math notranslate nohighlight">\(\calA^n\)</span> and <span class="math notranslate nohighlight">\(\calI^n\)</span>.</p></li>
+<li><p>Solve the system:</p></li>
+<li><p>Update the Lagrange multiplier.</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+<p>As we have seen, <span class="math notranslate nohighlight">\(\calA^k\)</span> coincides with the indices <span class="math notranslate nohighlight">\(i\)</span> where <span class="math notranslate nohighlight">\(u_i^k = m_i\)</span> – i.e. the obstacle constraint is active.</p>
+<p>The implementation of this procedure can be downloaded <a class="reference download internal" download="" href="../_downloads/8a4f530433d28675f2848310121b4c3f/varineq_primaldual.edp"><code class="xref download docutils literal notranslate"><span class="pre">here</span></code></a>.</p>
+<div class="proof remark admonition" id="remark-2">
+<p class="admonition-title"><span class="caption-number">Remark 2.2 </span></p>
+<section class="remark-content" id="proof-content">
+<ul class="simple">
+<li><p>From the theoretical viewpoint, <span class="math notranslate nohighlight">\(c &gt;0\)</span> could be chosen arbitrarily. However, in numerical practice, choosing a large value of <span class="math notranslate nohighlight">\(c\)</span> will tend to yield a &quot;small&quot; number of active nodes (especially at the first iterations), i.e. of those nodes where <span class="math notranslate nohighlight">\(u_i\)</span> should be constrained to equal <span class="math notranslate nohighlight">\(m_i\)</span>, while a small value of <span class="math notranslate nohighlight">\(c\)</span> will yield a large number of active nodes.</p></li>
+<li><p>From the practical side, be very careful with the manipulation of both finite element functions and arrays of real numbers in <span class="math notranslate nohighlight">\(\texttt{FreeFem}\)</span>.</p></li>
+</ul>
+</section>
+</div></section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/index_gen.html">1. Generalities</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index_adv.html">2. Advanced features</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="imgmesh.html">2.1. Meshing images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="curvature.html">2.2. Curvature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nonlinear.html">2.3. Nonlinear problems</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2.4. Variational inequalities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM.html">2.5. Level Set method I</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LSM2.html">2.6. Level Set method II</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3dext.html">2.7. Going 3d</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_adv.html"><span class="section-number">2. </span>More advanced issues in scientific computing</a><ul>
+      <li>Previous: <a href="nonlinear.html" title="previous chapter"><span class="section-number">2.3. </span>A first encounter with nonlinear problems</a></li>
+      <li>Next: <a href="LSM.html" title="next chapter"><span class="section-number">2.5. </span>The Level Set method: Part I</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Advanced/variational_inequalities.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>8. Glossary &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="7. Bibliography" href="bibliography.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="glossary">
+<h1><span class="section-number">8. </span>Glossary<a class="headerlink" href="#glossary" title="Link to this heading">¶</a></h1>
+<table class="hlist"><tr><td><ul>
+<li><div class="dropdown admonition" id="glos-banach">
+<p class="admonition-title">Banach space</p>
+<p>This is a complete space equipped with a norm.</p>
+</div>
+</li>
+<li><div class="dropdown admonition" id="glos-divtensor">
+<p class="admonition-title">Divergence (of a tensor)</p>
+<p>Let <span class="math notranslate nohighlight">\(\sigma: \Omega \to \R^{d\times d}\)</span> be a second-order tensor, i.e. a matrix-valued mapping on <span class="math notranslate nohighlight">\(\Omega\)</span>.
+The divergence of <span class="math notranslate nohighlight">\(\sigma\)</span> is the vector field <span class="math notranslate nohighlight">\(\dv\sigma : \Omega \to \R^d\)</span> with entries:</p>
+<p><div class="math notranslate nohighlight">
+\[(\dv\sigma(\x))_i = \sum\limits_{j=1}^d \frac{\partial \sigma_{ij}}{\partial x_j}(\x), \quad i=1,\ldots,d.\]</div>
+</p>
+</div>
+</li>
+<li><div class="dropdown admonition" id="glos-eulerian">
+<p class="admonition-title">Eulerian (viewpoint)</p>
+<p>The Eulerian description of a medium…</p>
+</div>
+</li>
+<li><div class="dropdown admonition" id="glos-frobenius">
+<p class="admonition-title">Frobenius inner product</p>
+<p>The Frobenius inner product between two square matrices <span class="math notranslate nohighlight">\(M, N \in \mathbb{R}^{d\times d}\)</span> is the real value <span class="math notranslate nohighlight">\(M:N\)</span> defined by:
+<div class="math notranslate nohighlight">
+\[M:N = \text{tr}(M^TN) = \sum\limits_{i,j=1}^d m_{ij} n_{ij}.\]</div>
+</p>
+</div>
+</li>
+<li><div class="dropdown admonition" id="glos-hilbert">
+<p class="admonition-title">Hilbert space</p>
+<p>A Hilbert space is, in particular a Banach space.</p>
+</div>
+</li>
+<li><div class="dropdown admonition" id="glos-lagrangian">
+<p class="admonition-title">Lagrangian (viewpoint)</p>
+<p>The Lagrangian description of a medium…</p>
+</div>
+</li>
+</ul>
+</td><td><ul>
+<li><div class="dropdown admonition" id="glos-lsm">
+<p class="admonition-title">Level set method</p>
+<p>The level set method generally consists in representing a domain <span class="math notranslate nohighlight">\(\Omega \subset \R^d\)</span> in an implicit way when dealing with its evolution, i.e.</p>
+<p>This method is more extensively described in <a class="reference internal" href="../Advanced/LSM.html#sec-lsm"><span class="std std-numref">Section 2.5</span></a>.</p>
+</div>
+</li>
+<li><div class="dropdown admonition" id="glos-curvature">
+<p class="admonition-title">Mean curvature</p>
+<p>We refer to <a class="reference internal" href="../Advanced/curvature.html#sec-curvature"><span class="std std-numref">Section 2.2</span></a> for further details.</p>
+</div>
+</li>
+<li><div class="dropdown admonition" id="glos-strain">
+<p class="admonition-title">Strain</p>
+<p>Strain is synonymous to deformation.</p>
+</div>
+</li>
+<li><div class="dropdown admonition" id="glos-vi">
+<p class="admonition-title">Variational inequality</p>
+<p>A variational inequality is
+Prototypes are obstacle problems, or contact problems.</p>
+</div>
+</li>
+<li><div class="dropdown admonition" id="glos-vp">
+<p class="admonition-title">Variational problem</p>
+<p>A variational problem is defined by</p>
+</div>
+</li>
+<li><div class="dropdown admonition" id="glos-vorticity">
+<p class="admonition-title">Vorticity</p>
+<p>The vorticity of a fluid is the trend to create eddies.</p>
+</div>
+</li>
+</ul>
+</td></tr></table>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index_gen.html">1. Generalities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Advanced/index_adv.html">2. Advanced features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Appendix/index_app.html">6. Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="bibliography.html" title="previous chapter"><span class="section-number">7. </span>Bibliography</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Generalities/glossary.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

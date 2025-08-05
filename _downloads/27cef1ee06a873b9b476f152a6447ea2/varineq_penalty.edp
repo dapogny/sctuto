@@ -1,0 +1,102 @@
+/* Solution of an obstacle problem via the penalty method */
+load "medit"
+
+/* Names of meshes and Finite Element files */
+string MESH     = "obs.mesh";
+string SOL      = "obs.sol";
+string SOLOBS   = "obs_m.sol";
+string SOLEX    = "obs_ex.sol";
+
+/* Creation of a mesh of a ball with radius 2 */
+int N      = 200;
+int REFDIR = 1;
+int MAXIT  = 10;
+real err   = 1e10;
+real tol   = 1e-3;
+border left(t=0.0,1.0) {x=-2.0; y=2.0-4.0*t; label=REFDIR;};
+border bottom(t=0.0,1.0) {x=-2.0+4.0*t; y=-2.0; label=REFDIR;};
+border right(t=0.0,1.0) {x=2.0; y=-2.0+4.0*t; label=REFDIR;};
+border top(t=0.0,1.0) {x=2.0-4.0*t; y=2.0; label=REFDIR;};
+
+mesh Th = buildmesh(left(N)+bottom(N)+right(N)+top(N));
+
+// border circle(t=0.0,1.0) {x=2.0*cos(2.0*pi*t); y=2.0*sin(2.0*pi*t); label=REFDIR; };
+// mesh Th = buildmesh(circle(N));
+
+/* Finite Element spaces and functions */
+fespace Vh(Th,P1);
+Vh un,unp,u,v,m1,m2,chiA,uex1,udir;
+
+/* Definition of the obstacle(s) */
+func real obstacle1(real xx,real yy) {
+  real rr = xx^2 + yy^2;
+  if ( rr <= 1.0 ) {
+    return (sqrt(1.0-rr));
+  }
+  else return (-1.0);
+}
+
+m1 = obstacle1(x,y);
+
+func real obstacle2(real xx,real yy) {
+  real r = 0.25;
+  if ( (abs(xx) <= r && abs(yy-1.0) <= r) || (abs(xx+1.0) <= r && abs(yy+1.0) <= r) || (abs(xx-1.0) <= r && abs(yy+1.0) <= r) ) {
+    return (1.0);
+  }
+  else return (0.0);
+}
+
+m2 = obstacle2(x,y);
+
+/* Source term */
+func f = 0.0;
+
+/* Penalization parameter */
+real EPS = 1.e-4;
+
+/* Analytical solution for obstacle m1 */
+real rs = 0.697865;
+func real exactSol1(real xx,real yy) {
+  real rr = xx^2+yy^2;
+  real r = sqrt(rr);
+  
+  if ( r < rs ) return ( sqrt(1-rr) );
+  else {
+    return ( -rs^2/sqrt(1-rs^2)*log(0.5*r) );
+  }
+}
+
+uex1 = exactSol1(x,y);
+
+/* Dirichlet conditions */
+udir = 0.0; // uex1;
+
+/* Variational problem for the initial guess: unconstrained function */
+problem initialGuess(un,v) = int2d(Th)(dx(un)*dx(v)+dy(un)*dy(v))
+                             - int2d(Th)(f*v)
+                             + on(REFDIR,un=udir);
+
+/* Variational problem for the penalized obstacle problem */
+problem iterObs(unp,v) = int2d(Th)(dx(unp)*dx(v)+dy(unp)*dy(v))
+                         + int2d(Th)(1.0/EPS*chiA*unp*v)
+                         - int2d(Th)(f*v)
+                         - int2d(Th)(1.0/EPS*chiA*m2*v)
+                         + on(REFDIR,unp=udir);
+                             
+/* Main loop */
+initialGuess;
+
+for (int n=0; n<MAXIT; n++) {
+  chiA = (un < m2); // Function equals 1 at vertices where un <= m, 0 at others
+  iterObs;
+  err = int2d(Th)((unp-un)^2);
+  cout<<"Iteration "<<n+1<<" error "<<err<<endl;
+  un = unp;
+  if ( err < tol ) break;
+}
+
+/* Save mesh and solution */
+savemesh(Th,MESH);
+savesol(SOL,Th,un);
+savesol(SOLOBS,Th,m2);
+savesol(SOLEX,Th,uex1);

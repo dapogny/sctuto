@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>6.3. More advanced functional analysis &#8212; Numerical tours in scientific computing</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=8203d6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=25db1f2b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gen.css?v=1d84c916" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"calA": "{{\\mathcal A}}", "calC": "{{\\mathcal C}}", "calI": "{{\\mathcal I}}", "calF": "{{\\mathcal F}}", "calL": "{{\\mathcal L}}", "bz": "{\\mathbf{0}}", "d": "{\\text{d}}", "dv": "{\\text{div}}", "e": "{\\varepsilon}", "be": "{\\textbf{e}}", "n": "{\\textbf{n}}", "t": "{\\textbf{t}}", "f": "{\\textbf{f}}", "g": "{\\textbf{g}}", "u": "{\\textbf{u}}", "m": "{\\textbf{m}}", "v": "{\\textbf{v}}", "p": "{\\textbf{p}}", "bj": "{\\textbf{j}}", "bC": "{\\textbf{C}}", "bF": "{\\textbf{F}}", "bU": "{\\textbf{U}}", "bV": "{\\textbf{V}}", "x": "{\\textbf{x}}", "y": "{\\textbf{y}}", "bX": "{\\textbf{X}}", "P": "{\\mathbb{P}}", "R": "{\\mathbb{R}}", "N": "{\\mathbb{N}}", "I": "{\\text{I}}", "Id": "{\\text{Id}}", "o": "{\\text{o}}", "calT": "{{\\mathcal T}}", "Hdiv": "{H_{\\text{div}}}", "tr": "{\\text{tr}}", "bold": ["{\\bf #1}", 1]}, "loader": {"load": ["[tex]/boldsymbol"]}, "packages": {"[+]": ["boldsymbol"]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="6.4. A few words about convexity" href="convexity.html" />
+    <link rel="prev" title="6.2. Complements of functional analysis" href="companafunc.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="more-advanced-functional-analysis">
+<span id="sec-appadvanafunc"></span><h1><span class="section-number">6.3. </span>More advanced functional analysis<a class="headerlink" href="#more-advanced-functional-analysis" title="Link to this heading">¶</a></h1>
+<section id="nemitski-operators">
+<span id="app-nemitski"></span><h2><span class="section-number">6.3.1. </span>Nemitski operators<a class="headerlink" href="#nemitski-operators" title="Link to this heading">¶</a></h2>
+<p>This section deals with a class of operations that is frequently encountered in non linear problems.
+We refer to <span id="id1">[<a class="reference internal" href="../Generalities/bibliography.html#id3" title="Antonio Ambrosetti and Giovanni Prodi. A primer of nonlinear analysis. Number 34. Cambridge University Press, 1995.">AP95</a>]</span> for more details.</p>
+<p>Throughout this section, <span class="math notranslate nohighlight">\(\Omega\)</span> is a bounded set in <span class="math notranslate nohighlight">\(\R^d\)</span>.</p>
+<div class="proof definition admonition" id="definition-0">
+<p class="admonition-title"><span class="caption-number">Definition 6.7 </span></p>
+<section class="definition-content" id="proof-content">
+<p>A function <span class="math notranslate nohighlight">\(f : \Omega \times \R \to \R\)</span> is called a Caratheodory function if it satisfies the following two properties:</p>
+<ul class="simple">
+<li><p>For almost every <span class="math notranslate nohighlight">\(\x \in \Omega\)</span>, the mapping <span class="math notranslate nohighlight">\(s \mapsto f(\x,s)\)</span> is continuous.</p></li>
+<li><p>For all <span class="math notranslate nohighlight">\(s \in \R\)</span>, the mapping <span class="math notranslate nohighlight">\(\x \mapsto f(x,s)\)</span> is measurable.</p></li>
+</ul>
+</section>
+</div><p>Now, to each Caractheodory function, we associate formally a (non linear) operator <span class="math notranslate nohighlight">\(T_f\)</span> acting on functions <span class="math notranslate nohighlight">\(u : \Omega \to \R\)</span> via the following formula:</p>
+<p><div class="math notranslate nohighlight">
+\[T_f u (\x) = f(\x, u(\x)). \]</div>
+</p>
+<p>Under suitable conditions on the function <span class="math notranslate nohighlight">\(f\)</span>, this defines a mapping between certain Lebesgue spaces, as made more specific by the following statement.</p>
+<div class="proof theorem admonition" id="theorem-1">
+<p class="admonition-title"><span class="caption-number">Theorem 6.4 </span></p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(p,q \geq 1\)</span>, and let <span class="math notranslate nohighlight">\(f : \Omega \times \R \to \R\)</span> be a Caratheodory function, satisfying the following growth condition:</p>
+<p><div class="math notranslate nohighlight">
+\[\text{For a.e. } \x \in \Omega \text{ and all } s \in \R, \quad \lvert f(x,s) \lvert \leq a + b \lvert s \lvert^{\frac{p}{q}}.\]</div>
+</p>
+<p>Then the mapping <span class="math notranslate nohighlight">\(T_f\)</span> maps <span class="math notranslate nohighlight">\(L^p(\Omega)\)</span> into <span class="math notranslate nohighlight">\(L^q(\Omega)\)</span>, and it defines a continuous operator between these spaces.</p>
+</section>
+</div><p>The following statement now gives sufficient conditions for this mapping to be differentiable.</p>
+<div class="proof theorem admonition" id="theorem-2">
+<p class="admonition-title"><span class="caption-number">Theorem 6.5 </span> (Differentiability of Nemitski operators, case <span class="math notranslate nohighlight">\(p&gt;2\)</span>)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(p &gt; 2\)</span> be given, and let <span class="math notranslate nohighlight">\(f : \Omega \times \R \to \R\)</span> be a Caratheodory function such that:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The function <span class="math notranslate nohighlight">\(\Omega \ni \x \mapsto f(\x,0)\)</span> is bounded on <span class="math notranslate nohighlight">\(\Omega\)</span>;</p></li>
+<li><p>It holds, for a.e. <span class="math notranslate nohighlight">\(\x \in \Omega\)</span> and all <span class="math notranslate nohighlight">\(s \in \R\)</span>, <span class="math notranslate nohighlight">\(\left\lvert \frac{\partial f}{\partial s} (\x,s) \right\lvert \leq a + b \lvert s \lvert^{p-2}\)</span>.</p></li>
+</ul>
+</div></blockquote>
+<p>Then the mapping <span class="math notranslate nohighlight">\(T_f\)</span> defines a continuous operator from <span class="math notranslate nohighlight">\(L^p(\Omega)\)</span> into <span class="math notranslate nohighlight">\(L^{p^\prime}(\Omega)\)</span>, where <span class="math notranslate nohighlight">\(p^\prime\)</span> is the conjugate exponent of <span class="math notranslate nohighlight">\(p\)</span>. Moreover, this mapping is Fréchet differentiable, with derivative:</p>
+<p><div class="math notranslate nohighlight">
+\[f(\x,u(\x)+v(\x))  = f(\x,u(\x)) + \frac{\partial f}{\partial s} (\x,u(\x)) v(\x) + \o(\lvert\lvert v \lvert\lvert_{L^p(\Omega)}).  \]</div>
+</p>
+</section>
+</div><p>Note that the operator <span class="math notranslate nohighlight">\(T_f\)</span> is well defined as an operator from <span class="math notranslate nohighlight">\(L^p(\Omega)\)</span> into <span class="math notranslate nohighlight">\(L^{p^\prime}(\Omega)\)</span>, since the above condition in particular implies, upon integration, that:</p>
+<p><div class="math notranslate nohighlight">
+\[\lvert f(\x,s) \lvert \leq a + b \lvert s \lvert^{p-1}, \text{ for different constants } a,b &gt;0.\]</div>
+</p>
+<p>The above theorem does not cover the case where <span class="math notranslate nohighlight">\(p=2\)</span>. A similar – albeit a little weaker – statement holds in this case, under slightly stronger assumptions.</p>
+<div class="proof theorem admonition" id="theorem-3">
+<p class="admonition-title"><span class="caption-number">Theorem 6.6 </span> (Differentiability of Nemitski operators, case <span class="math notranslate nohighlight">\(p=2\)</span>)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(f : \Omega \times \R \to \R\)</span> be a Caratheodory function such that <span class="math notranslate nohighlight">\(\frac{\partial f}{\partial s}\)</span> is also a Caratheodory function. Assume in addition that:</p>
+<p><div class="math notranslate nohighlight">
+\[\text{There exists a constant } C &gt;0 \text{ s.t. } \lvert f(\x,s) \lvert \leq C \text{ for a.e. } \x \in \Omega \text{ and all } s \in \R. \]</div>
+</p>
+<p>Then <span class="math notranslate nohighlight">\(T_f\)</span> is a continuous operator from <span class="math notranslate nohighlight">\(L^2(\Omega)\)</span> into itself. Moreover, this mapping is Gâteaux differentiable at every <span class="math notranslate nohighlight">\(u \in L^2(\Omega)\)</span>, i.e.</p>
+<p><div class="math notranslate nohighlight">
+\[\forall v \in L^2(\Omega), \quad \left\lvert\left\lvert \frac{f(\x,u(\x)+t(v(\x))) - f(\x,u(\x))}{t}  - \frac{\partial f}{\partial s}(\x,u(\x)) v(\x)\right\lvert\right\lvert \xrightarrow{t\to 0} 0.\]</div>
+</p>
+</section>
+</div><div class="admonition-exo admonition">
+<p class="admonition-title">Exercise</p>
+<p>Show that the mapping <span class="math notranslate nohighlight">\(T:H^1(\Omega) \to L^2(\Omega)\)</span>, defined by:</p>
+<p><div class="math notranslate nohighlight">
+\[\forall u \in H^1(\Omega), \quad T(u) = \max(0,u)\]</div>
+</p>
+<p>is Fréchet differentiable at any <span class="math notranslate nohighlight">\(u \in H^1(\Omega)\)</span>, with derivative:</p>
+<p><div class="math notranslate nohighlight">
+\[T^\prime(u)(h) = \chi_{\left\{ u \geq 0\right\}} h.\]</div>
+</p>
+</div>
+<div class="dropdown admonition">
+<p class="admonition-title">Correction</p>
+<p>Bla bla bla</p>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/falcmill.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/index_gen.html">1. Generalities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Advanced/index_adv.html">2. Advanced features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Structure_Mechanics/index_structmech.html">3. Structure mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Fluid_Mechanics/index_fl.html">4. Fluid mechanics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Optimal_design/index_od.html">5. Optimal design</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index_app.html">6. Appendix</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="calculus.html">6.1. Differential calculus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="companafunc.html">6.2. Complements of functional analysis</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">6.3. More advanced functional analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convexity.html">6.4. Convexity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compoptim.html">6.5. Optimization theory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appPDE.html">6.6. PDE</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/bibliography.html">7. Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Generalities/glossary.html">8. Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index_app.html"><span class="section-number">6. </span>Appendix</a><ul>
+      <li>Previous: <a href="companafunc.html" title="previous chapter"><span class="section-number">6.2. </span>Complements of functional analysis</a></li>
+      <li>Next: <a href="convexity.html" title="next chapter"><span class="section-number">6.4. </span>A few words about convexity</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      <a href="../_sources/Appendix/appadvanafunc.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
