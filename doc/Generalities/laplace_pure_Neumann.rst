@@ -318,9 +318,12 @@ The complete numerical implementation of both approaches is proposed :download:`
 
 .. _fig.LapPureNeumann:
 
-.. figure:: ../figures/LapPureNeumann.png
-   :scale: 30 %
+.. figure:: ../figures/lapPureNeumann.png
+   :scale: 33 %
 
    Resolution of the pure Neumann problem :math:numref:`eq.pureNeumann`; (Left) Setting of the test-case: heat is entering $\Omega$ from the left boundary $\Gamma_{\text{in}}$ with a flux $g_{\text{in}}$ and is leaving $\Omega$ from the right boundary $\Gamma_{\text{out}}$ with a flux $g_{\text{out}}$; (right) Plot of the solution.
 
 .. #################@
+
+
+
